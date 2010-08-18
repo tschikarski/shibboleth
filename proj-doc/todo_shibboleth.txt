@@ -1,0 +1,22 @@
+Todos
+[x] SVN-Test
+[ ] Installation Apache-Modul auf meinem Testserver
+	[ ] https://spaces.internet2.edu/display/SHIB2/NativeSPWindowsApacheInstaller befolgen
+		[x] Installer-Download (.msi) ist http://shibboleth.internet2.edu/downloads/shibboleth/cppsp/latest/win32/ verlinkt, Downl. nach S:\shibboleth\multi_v2-3-1\original
+		[x] Computerneustart erwarten!
+		[x] MSI-File starten, bis zu "Destination Folder" durchklicken
+		[x] Zielpfad MUSS C:\opt\shibboleth-sp\ sein
+		[x] Port 1600 bestätigen
+		[x] Rest durchklickern, dann Restart
+		[ ] Weiter mit Apache-Konfiguration, dann PHP-Prototyp
+[ ] Einlesen in Shibboleth
+	[ ] Deployment Checklist
+	[ ] http://net.educause.edu/node/12960 (noch nicht in Bib.)
+[x] Festlegung Testserver: Windows/Apache
+[ ] (+ish) Konsequenzen aus Deployment Checklist besprechen
+[ ] (+ish) Extension anlegen und submitten
+[ ] (+ish) Diese Datei ins SVN packen
+
+Fragen an Kunden
+[ ] Welche Shibb-Ver? 2.x oder 1.x
+[ ] Test-Account, Testserver (Provider, WAYF)
