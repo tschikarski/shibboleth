@@ -10,8 +10,11 @@ Todos
 		[x] Rest durchklickern, dann Restart
 		[x] Weiter mit Apache-Konfiguration (Include)
 [ ] PHP-Prototyp
-	[ ] Virtual Host definieren (aus Include-Datei herausnehmen)
-	[ ] Verzeichnis-Konfiguration aus 
+	[x] Virtual Host definieren (aus Include-Datei herausnehmen)
+	[ ] shibboleth2.xml anpassen
+	[ ] Verzeichnis-Konfiguration aus (?)
+	[ ] UseCanonicalName = On !
+	[ ] Kein Zugriff darf haben Apache auf die private key files. Schreibzugr. nötig für Logdatei native.log
 	[ ] Einfachsten Prototypen bauen. (Mit phpinfo beginnen.)
 [ ] Einlesen in Shibboleth
 	[ ] Deployment Checklist
