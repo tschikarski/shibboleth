@@ -1,0 +1,4 @@
+  # cat=basic/enable; type=string; label=URL of Shibboleth handler: See your shibboleth xml config file (shibboleth2.xml): attribute "handlerURL" of tag "Sessions"
+sessions_handlerURL = /Shibboleth.sso
+  # cat=basic/enable; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"
+sessionInitiator_Location = /Login
