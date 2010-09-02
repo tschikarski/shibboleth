@@ -22,4 +22,7 @@ t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /
 			'className' => 'tx_shibboleth_sv1',
 		)
 	);
+
+
+t3lib_extMgm::addPItoST43($_EXTKEY, 'pi1/class.tx_shibboleth_pi1.php', '_pi1', 'list_type', 1);
 ?>
