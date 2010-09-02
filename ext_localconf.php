@@ -3,20 +3,26 @@ if (!defined ('TYPO3_MODE')) {
  	die ('Access denied.');
 }
 
+$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1'; // default ****
+//$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
+
+$subtypes = 'getUserFE,authUserFE,getUserBE,authUserBE';
+$subtypes = 'getUserFE'; // ****
+
 t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /* sv key */,
 		array(
 
 			'title' => 'Shibboleth Authentication',
 			'description' => '',
 
-			'subtype' => 'getUserFE,authUserFE,getUserBE,authUserBE',
+			'subtype' => $subtypes,
 
 			'available' => TRUE,
-			'priority' => 50,
-			'quality' => 50,
+			'priority' => 500,
+			'quality' => 500,
 
 			'os' => '',
-			'exec' => 'Shibboleth 2.2 Apache Module mod_shib_22',
+			'exec' => '',
 
 			'classFile' => t3lib_extMgm::extPath($_EXTKEY).'sv1/class.tx_shibboleth_sv1.php',
 			'className' => 'tx_shibboleth_sv1',

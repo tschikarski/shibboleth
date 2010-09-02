@@ -29,7 +29,6 @@
 
 require_once(PATH_t3lib.'class.t3lib_svbase.php');
 
-
 /**
  * Service "Shibboleth Authentication" for the "shibboleth" extension.
  *
@@ -37,7 +36,7 @@ require_once(PATH_t3lib.'class.t3lib_svbase.php');
  * @package	TYPO3
  * @subpackage	tx_shibboleth
  */
-class tx_shibboleth_sv1 extends t3lib_svbase {
+class tx_shibboleth_sv1 extends tx_sv_authbase {
 				var $prefixId = 'tx_shibboleth_sv1';		// Same as class name
 				var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
 				var $extKey = 'shibboleth';	// The extension key.
@@ -58,6 +57,15 @@ class tx_shibboleth_sv1 extends t3lib_svbase {
 					// If there's no reason for initialization you can remove this function.
 	
 					return $available;
+				}
+				
+				function getUser() {
+					//die('hier');
+					t3lib_div::devlog('msg','shibboleth',0,$_SERVER);
+				}
+				
+				function authUser() {
+					t3lib_div::devlog('msg','shibboleth',0,$_SERVER);
 				}
 	
 				/**

@@ -57,7 +57,7 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		
 	
 		$content='
-			<a href="http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local%2Fphpinfo.php">Shibboleth-Login</a>
+			<a href="http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local">Shibboleth-Login</a>
 		';
 	
 		return $this->pi_wrapInBaseClass($content);
