@@ -1,6 +1,6 @@
 	  AuthType shibboleth                                                                            
-		ShibRequireSession On                                                                          
+		#ShibRequireSession On                                                                          
 	#	Zugang für Shibboleth- Nutzer bei denen das Attribut "orgUnitNumber" den Wert 134200 hat       
 		 #require orgUnitNumber 134200                                                                 
 	  #Zugang für alle Shibboleth- Nutzer                                                            
-	  require valid-user                                                                             
+	  require shibboleth                                                                            
