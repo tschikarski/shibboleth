@@ -17,7 +17,7 @@ https://spaces.internet2.edu/display/SHIB2/NativeSPConfiguration
     <InProcess logger="native.logger">
         <ISAPI normalizeRequest="true">
             <!-- Maps IIS Instance ID values to the host name. -->
-            <Site id="1" name="testshibb.abezetdom.local"/>
+            <Site id="1" name="shibblocal.abezet.de"/>
         </ISAPI>
 
     </InProcess>
@@ -28,11 +28,11 @@ https://spaces.internet2.edu/display/SHIB2/NativeSPConfiguration
     <SessionCache type="StorageService" StorageService="mem" cacheTimeout="3600" inprocTimeout="900" cleanupInterval="900"/>
     <ReplayCache StorageService="mem"/>
 
-    <!-- The RequestMap defines portions of the webspace to protect; testshibb.abezetdom.local/secure here. -->
+    <!-- The RequestMap defines portions of the webspace to protect; shibblocal.abezet.de/secure here. -->
     <RequestMapper type="Native">
 
         <RequestMap applicationId="default">
-            <Host name="testshibb.abezetdom.local">
+            <Host name="shibblocal.abezet.de">
                 <Path name="secure" authType="shibboleth" requireSession="true"/>
             </Host>
         </RequestMap>
@@ -40,8 +40,8 @@ https://spaces.internet2.edu/display/SHIB2/NativeSPConfiguration
 
     <!-- The entityID is the name TestShib made for your SP. -->
     <ApplicationDefaults id="default" policyId="default" REMOTE_USER="eppn"
-        entityID="https://testshibb.abezetdom.local/shibboleth-sp"
-        homeURL="https://testshibb.abezetdom.local/">
+        entityID="https://shibblocal.abezet.de/shibboleth-sp"
+        homeURL="https://shibblocal.abezet.de/">
 
         <Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/Shibboleth.sso" handlerSSL="false">
 
@@ -50,7 +50,7 @@ https://spaces.internet2.edu/display/SHIB2/NativeSPConfiguration
             TestShib IdP.  If you want to use a different IdP that has joined TestShib, just change this entityID.
             -->
 
-            <SessionInitiator type="SAML2" Location="/TestShib" isDefault="true" defaultACSIndex="1" id="TestShib"
+            <SessionInitiator type="SAML2" Location="/Login" isDefault="true" defaultACSIndex="1" id="TestShib"
                 entityID="https://idp.testshib.org/idp/shibboleth" template="bindingTemplate.html" />
 
 <!--

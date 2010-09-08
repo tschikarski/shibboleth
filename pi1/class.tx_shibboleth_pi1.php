@@ -54,10 +54,15 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		$this->conf = $conf;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
+		global $TYPO3_CONF_VARS;
 		
-	
+		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
+		// TODO: check slashes of conf-urls
+		// TODO: https
+		// TODO: urlencode des target
+		
 		$content='
-			<a href="http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local">Shibboleth-Login</a>
+			<a href="http://' . t3lib_div::getIndpEnv('HTTP_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=http%3A%2F%2F' . t3lib_div::getIndpEnv('HTTP_HOST') . '">Shibboleth-Login</a>
 		';
 	
 		return $this->pi_wrapInBaseClass($content);
