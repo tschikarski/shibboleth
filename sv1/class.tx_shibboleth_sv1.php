@@ -27,7 +27,7 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-require_once(PATH_t3lib.'class.t3lib_svbase.php');
+//require_once(PATH_t3lib.'class.t3lib_svbase.php');
 
 /**
  * Service "Shibboleth Authentication" for the "shibboleth" extension.
@@ -37,53 +37,52 @@ require_once(PATH_t3lib.'class.t3lib_svbase.php');
  * @subpackage	tx_shibboleth
  */
 class tx_shibboleth_sv1 extends tx_sv_authbase {
-				var $prefixId = 'tx_shibboleth_sv1';		// Same as class name
-				var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
-				var $extKey = 'shibboleth';	// The extension key.
-	
-				/**
+	var $prefixId = 'tx_shibboleth_sv1';		// Same as class name
+	var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
+	var $extKey = 'shibboleth';	// The extension key.
+
+	/**
 	 * [Put your description here]
 	 *
 	 * @return	[type]		...
 	 */
-				function init()	{
-					$available = parent::init();
+	function init()	{
+		$available = parent::init();
+
+		// Here you can initialize your class.
+
+		// The class have to do a strict check if the service is available.
+		// The needed external programs are already checked in the parent class.
+
+		// If there's no reason for initialization you can remove this function.
+
+		return $available;
+	}
 	
-					// Here you can initialize your class.
+	function getUser() {
+
+		if($this->writeDevLog) t3lib_div::devlog('getUser','shibboleth',0,$_SERVER);
+		// check, if the user is Shibboleth authenticated
+		if($_SERVER['Shib-Session-ID']) {
+			// get some basic user data from shibboleth server-variables
+			$user = array(
+				'username' => $_SERVER['REMOTE_USER'],
+				'password' => 'alkfdsjl4$',
+				'authenticated' => false,
+			);
+			// TODO: check, if the user exists already! (Learn about "anonymous FE user" - see devLog entries)
+			// TODO: Shibboleth-username prefix/postfix
+			if($this->writeDevLog) t3lib_div::devlog('user','shibboleth',0,$user);
+			return $user;
+		}
+	}
 	
-					// The class have to do a strict check if the service is available.
-					// The needed external programs are already checked in the parent class.
-	
-					// If there's no reason for initialization you can remove this function.
-	
-					return $available;
-				}
-				
-				function getUser() {
-					//die('hier');
-					t3lib_div::devlog('msg','shibboleth',0,$_SERVER);
-				}
-				
-				function authUser() {
-					t3lib_div::devlog('msg','shibboleth',0,$_SERVER);
-				}
-	
-				/**
-	 * [Put your description here]
-	 * performs the service processing
-	 *
-	 * @param	string		Content which should be processed.
-	 * @param	string		Content type
-	 * @param	array		Configuration array
-	 * @return	boolean
-	 */
-				function process($content='', $type='', $conf=array())	{
-	
-					// Depending on the service type there's not a process() function.
-					// You have to implement the API of that service type.
-	
-					return FALSE;
-				}
+	function authUser($user) {
+		if($this->writeDevLog) t3lib_div::devlog('authUser','shibboleth',0,$_SERVER);
+		return 200; // TODO: Just a dummy test
+	}
+
+
 }
 
 

@@ -55,16 +55,22 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 		global $TYPO3_CONF_VARS;
+#debug($_SERVER);
+			// check, if the (apache) module is available.
+			// SCHEMAS is if the user is not authenticated, Application-ID is used if the user is authenticated
+		#if(isset($_SERVER['SHIBSP_SCHEMAS']) || isset($_SERVER['Shib-Application-ID'])) {
+			$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
+			// TODO: check slashes of conf-urls
+			// TODO: https
+			// TODO: urlencode des target
+			
+			$content='
+				<a href="http://' . t3lib_div::getIndpEnv('HTTP_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=http%3A%2F%2F' . t3lib_div::getIndpEnv('HTTP_HOST') . '">Shibboleth-Login</a>
+			';
+		#} else {
+		#	$content = 'The Shibboleth SP module is not installed.';
+		#}
 		
-		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
-		// TODO: check slashes of conf-urls
-		// TODO: https
-		// TODO: urlencode des target
-		
-		$content='
-			<a href="http://' . t3lib_div::getIndpEnv('HTTP_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=http%3A%2F%2F' . t3lib_div::getIndpEnv('HTTP_HOST') . '">Shibboleth-Login</a>
-		';
-	
 		return $this->pi_wrapInBaseClass($content);
 	}
 }
