@@ -71,15 +71,25 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 		
-		// check, if the user is Shibboleth authenticated
+			// check, if the user is Shibboleth authenticated
 		if(!isset($_SERVER['Shib-Session-ID'])) {
+			if($this->writeDevLog) t3lib_div::devlog('getUser: no Shibboleth session present','shibboleth',0,$_SERVER);
 			return false;
 		}
-			
+		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 		$userhandler = new $userhandler_classname($this->mode, $this->db_user, $this->db_groups);
 		
 		$user = $userhandler->getUserFromDB();
+		
+			// We expect the previous Shibboleth-Session-ID in 'tx_shibboleth_shibsessionid'
+			// TODO: What exactly do we need to do in case of a changed Shibboleth-Session?
+		if (is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
+			if($this->writeDevLog) t3lib_div::devlog('getUser: Shibboleth session mismatch','shibboleth',0,$_SERVER);
+			unset($user['tx_shibboleth_shibsessionid']);
+			// return false;
+		}
+			
 		if (!is_array($user)) {
 				// Got no matching user from DB
 			if($this->writeDevLog) t3lib_div::devlog('getUser: no matching user in DB','shibboleth');
