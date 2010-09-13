@@ -44,6 +44,7 @@ class tx_shibboleth_beform {
 		$params = array();
 		$scriptCode = t3lib_div::callUserFunction($function, $params, $pObj);
 #debug($formCode);
+			// TODO: This method of getting the host part of the URL possibly has to be changed to work with SSL (https)
 		$shiblinkUrl = 'http://' . t3lib_div::getIndpEnv('HTTP_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=http%3A%2F%2F' . t3lib_div::getIndpEnv('HTTP_HOST') . '/typo3/';
 			// add jquery core
 		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
