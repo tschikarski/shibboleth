@@ -41,12 +41,21 @@ class tx_shibboleth_userhandler {
 	var $user='';
 	var $db_user='';
 	var $db_group='';
+	var $config; // typoscript like configuration for the current loginType
+	var $cObj; // local cObj, needed to parse the typoscript configuration
 	
 	function __construct($loginType, $db_user, $db_group) {
 		t3lib_div::devlog('constructor','shibboleth',0,$db_user);
 		$this->loginType = $loginType;
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
+		$this->config = $this->getTyposcriptConfiguration();
+		
+		$localcObj = t3lib_div::makeInstance('tslib_cObj');
+		$localcObj->start($_SERVER);
+		
+		$this->cObj = $localcObj;
+		t3lib_div::devlog('cObj data','shibboleth',0,$localcObj->data);
 	}
 	
 	function getUserFromDB() {
@@ -106,17 +115,6 @@ class tx_shibboleth_userhandler {
 		t3lib_div::devlog('parsed TypoScript','shibboleth',0,$localSetup);
 		
 		return $localSetup;
-		
-		
-			// TODO: wrong place here ;-)
-		$localcObj = t3lib_div::makeInstance('tslib_cObj');
-		#$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], t3lib_div::_GET('id'), '0', 0, '','','','');
-		#$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
-		$localcObj->start($_SERVER);
-		
-		t3lib_div::devlog('cObj data','shibboleth',0,$localcObj->data);
-		
-		return $parser->setup[$this->mode . '.'];
 	}
 }
 
