@@ -58,7 +58,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		// If there's no reason for initialization you can remove this function.
 
 		global $TYPO3_CONF_VARS;
-		$this->$shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 		
 		return $available;
 	}
@@ -78,7 +78,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-		$userhandler = new $userhandler_classname($this->mode, $this->db_user, $this->db_groups);
+		$userhandler = new $userhandler_classname($this->authInfo->loginType, $this->db_user, $this->db_groups);
 		
 		$user = $userhandler->getUserFromDB();
 		

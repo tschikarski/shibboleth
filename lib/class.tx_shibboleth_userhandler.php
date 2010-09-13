@@ -37,16 +37,16 @@
  */
 
 class tx_shibboleth_userhandler {
-	var $mode=''; //FE or BE
+	var $loginType=''; //FE or BE
 	var $user='';
 	var $db_user='';
 	var $db_group='';
 	
-	function __construct($mode, $db_user, $db_group) {
+	function __construct($loginType, $db_user, $db_group) {
 		t3lib_div::devlog('constructor','shibboleth',0,$db_user);
-		$this->$mode = $mode;
-		$this->$db_user = $db_user;
-		$this->$db_group = $db_group;
+		$this->loginType = $loginType;
+		$this->db_user = $db_user;
+		$this->db_group = $db_group;
 	}
 	
 	function getUserFromDB() {
@@ -100,11 +100,14 @@ class tx_shibboleth_userhandler {
 		}
 		$parser = t3lib_div::makeInstance('t3lib_TSparser');
 		$parser->parse($configString);
-		$configArr = $parser->setup[$this->mode . '.'];
-		$configArr = $parser->setup;
-		t3lib_div::devlog('parsed TypoScript','shibboleth',0,$configArr);
+		$completeSetup = $parser->setup;
+		t3lib_div::devlog('mode','shibboleth',0,array($this->mode));
+		$localSetup = $completeSetup['tx_shibboleth.'][$this->mode . '.'];
+		#$configArr = $parser->setup['tx_shibboleth.'][$this->mode . '.'];
+		#$configArr = $parser->setup;
+		t3lib_div::devlog('parsed TypoScript','shibboleth',0,$localSetup);
 		
-		return $configArr;
+		return $localSetup;
 		
 		
 			// TODO: wrong place here ;-)
