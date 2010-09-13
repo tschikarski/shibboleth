@@ -93,9 +93,11 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if (!is_array($user)) {
 				// Got no matching user from DB
 			if($this->writeDevLog) t3lib_div::devlog('getUser: no matching user in DB','shibboleth');
-			if (!$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth'][$this->authInfo->loginType.'_autoImport']){
+			if (!$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']){
 					// No auto-import for this login type, no user found -> no login possible, don't return a user record.
-				if($this->writeDevLog) t3lib_div::devlog('getUser: no auto-import configured; will exit','shibboleth');
+				if($this->writeDevLog) t3lib_div::devlog('getUser: no auto-import configured; will exit','shibboleth',0,$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']);
+				if($this->writeDevLog) t3lib_div::devlog('getUser: extConf','shibboleth',0,$this->shibboleth_extConf);
+				
 				return false;
 			} else {
 				if($this->writeDevLog) t3lib_div::devlog('getUser: preparing $user for auto-import','shibboleth');
@@ -104,13 +106,15 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			// Fetched matching user successfully from DB or auto-import is allowed
 			// get some basic user data from shibboleth server-variables
 		$user = $userhandler->mapShibbolethAttributesToUserArray($user);
-			
-		if($this->writeDevLog) t3lib_div::devlog('geUser: offering $user for authentication','shibboleth',0,$user);
+//$user['username'] = $_SERVER['REMOTE_USER'];
+//$user['usergroup'] = '99';			
+		if($this->writeDevLog) t3lib_div::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
 		return $user;
 	}
 	
 	function authUser($user) {
 		if($this->writeDevLog) t3lib_div::devlog('authUser ($_SERVER)','shibboleth',0,$_SERVER);
+//if($this->writeDevLog) t3lib_div::devlog('authUser ($this->db_user)','shibboleth',0,$this->db_user); // db_user usergroup_column
 		
 			// TODO: Verify the following line! We want to know, if that user is already logged in.
 		if ($user['authenticated']) {
@@ -128,16 +132,18 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			}
 		} else {
 				// This user is not yet logged in
-			if (is_array($user) && $user[$usergroup_column]) {
+			if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
 					// User has group(s), i.e. he is not allowed to login
 					// Before we return our positiv result, we have to update/insert the user in DB
 				$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 				$userhandler = new $userhandler_classname($this->mode, $this->db_user, $this->db_groups);
 				
 				$userhandler->synchronizeUserData($user);
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Inserted/updated user in DB; Auth OK','shibboleth');
 				return 200;
 			}
 		}
+		if($this->writeDevLog) t3lib_div::devlog('authUser: Refusing auth based on criteria. (usergroup)','shibboleth',0,array($user[$this->db_user['usergroup_column']]));
 		return false; // To be safe: Default access is no access.
 	}
 
