@@ -54,6 +54,7 @@ class tx_shibboleth_userhandler {
 	}
 	
 	function mapShibbolethAttributesToUserArray($user) {
+			// TODO: Shibboleth-username prefix/postfix
 		
 		return $user;
 	}
