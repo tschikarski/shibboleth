@@ -55,15 +55,16 @@ class tx_shibboleth_userhandler {
 		$localcObj->start($_SERVER);
 		
 		$this->cObj = $localcObj;
-		t3lib_div::devlog('cObj data','shibboleth',0,$localcObj->data);
+		t3lib_div::devlog('cObj data','shibboleth',0,$this->cObj->data);
 	}
 	
 	function getUserFromDB() {
 		t3lib_div::devlog('inGetUserFromDB','shibboleth');
-		// TODO: user ID configuration
-		$conf = $this->getTyposcriptConfiguration();
+		
+		$idField = $this->config['IDMapping.']['typo3Field'];
+		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
 
-		$where = 'username=' . $_SERVER['REMOTE_USER'] . ' ';
+		$where = $idField . '=' . $idValue . ' ';
 		$where .= $this->db_user['enable_clause'] . ' ';
 		if($this->db_user['checkPidList']) {
 			$where .= $this->db_user['check_pid_clause'];
@@ -72,12 +73,14 @@ class tx_shibboleth_userhandler {
 		$table = $this->db_user['table'];
 		$groupBy = '';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
+		#$sql = $GLOBALS['TYPO3_DB']->SELECTquery (
 			'*',
 			$table,
 			$where
 		);
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
 			return $row;
+			t3lib_div::devlog('userFromDB','shibboleth',0,$row);
 		} else {
 			return false;
 		}
@@ -115,6 +118,15 @@ class tx_shibboleth_userhandler {
 		t3lib_div::devlog('parsed TypoScript','shibboleth',0,$localSetup);
 		
 		return $localSetup;
+	}
+	
+	function getSingle($conf,$subconf='') {
+		if(is_array($subconf)) {
+			$result = $this->cObj->cObjGetSingle($conf, $subconf);
+		} else {
+			$result = $conf;
+		}
+		return $result;
 	}
 }
 
