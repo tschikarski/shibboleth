@@ -51,8 +51,8 @@ class tx_shibboleth_beform {
 		$scriptCode .= '<script type="text/javascript">
 		//<![CDATA[
 		$(document).ready(function() {
-			$(\'#t3-login-form-fields\').before(\'<a href="" id="toggleLoginForm">toggleLoginForm</a>\');
-			$(\'#t3-login-form-fields\').after(\'<div><a href="' . $shiblinkUrl . '">shiblink</a></div>\');
+			$(\'#t3-login-form-fields\').before(\'<h1><a href="' . $shiblinkUrl . '">Login with Shibboleth</a></h1>\');
+			$(\'#t3-login-form-fields\').before(\'<a href="" id="toggleLoginForm">Login with the TYPO3 login form</a>\');
 			$(\'#t3-login-form-fields\').hide();
 			$(\'#toggleLoginForm\').click(function(){
 				$(\'#t3-login-form-fields\').toggle();

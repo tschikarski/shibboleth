@@ -27,7 +27,7 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-//require_once(PATH_t3lib.'class.t3lib_svbase.php');
+require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
 /**
  * Service "Shibboleth Authentication" for the "shibboleth" extension.
@@ -61,19 +61,25 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	
 	function getUser() {
 
-		if($this->writeDevLog) t3lib_div::devlog('getUser','shibboleth',0,$_SERVER);
+		if($this->writeDevLog) t3lib_div::devlog('inGetUser','shibboleth',0,$_SERVER);
+		if($this->writeDevLog) t3lib_div::devlog('mode: ' . $this->mode,'shibboleth'); // subtype
+		if($this->writeDevLog) t3lib_div::devlog('loginType: ' . $this->authInfo->loginType,'shibboleth'); // BE or FE
+		if($this->writeDevLog) t3lib_div::devlog('authInfo','shibboleth',0,$this->authInfo);
+		if($this->writeDevLog) t3lib_div::devlog('loginData','shibboleth',0,$this->login);
+		
 		// check, if the user is Shibboleth authenticated
 		if($_SERVER['Shib-Session-ID']) {
-			// get some basic user data from shibboleth server-variables
-			$user = array(
-				'username' => $_SERVER['REMOTE_USER'],
-				'password' => 'alkfdsjl4$',
-				'authenticated' => false,
-			);
-			// TODO: check, if the user exists already! (Learn about "anonymous FE user" - see devLog entries)
-			// TODO: Shibboleth-username prefix/postfix
+			$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
+			$userhandler = new $userhandler_classname($this->mode, $this->db_user, $this->db_groups);
+			
+			$userhandler->getUserFromDB(array());
+				// get some basic user data from shibboleth server-variables
+			
+			
+				// TODO: check, if the user exists already! (Learn about "anonymous FE user" - see devLog entries)
+				// TODO: Shibboleth-username prefix/postfix
 			if($this->writeDevLog) t3lib_div::devlog('user','shibboleth',0,$user);
-			return $user;
+			//return $user;
 		}
 	}
 	
