@@ -64,11 +64,12 @@ class tx_shibboleth_userhandler {
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
 
-		$where = $idField . '=' . $idValue . ' ';
+		$where = $idField . '=\'' . $idValue . '\' ';
 		$where .= $this->db_user['enable_clause'] . ' ';
 		if($this->db_user['checkPidList']) {
 			$where .= $this->db_user['check_pid_clause'];
 		}
+		t3lib_div::devlog('userFromDB:where-statement','shibboleth',0,array($where));
 		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
 		$table = $this->db_user['table'];
 		$groupBy = '';
