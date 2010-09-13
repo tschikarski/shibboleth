@@ -101,10 +101,8 @@ class tx_shibboleth_userhandler {
 		$parser = t3lib_div::makeInstance('t3lib_TSparser');
 		$parser->parse($configString);
 		$completeSetup = $parser->setup;
-		t3lib_div::devlog('mode','shibboleth',0,array($this->mode));
-		$localSetup = $completeSetup['tx_shibboleth.'][$this->mode . '.'];
-		#$configArr = $parser->setup['tx_shibboleth.'][$this->mode . '.'];
-		#$configArr = $parser->setup;
+		t3lib_div::devlog('mode','shibboleth',0,array($this->loginType));
+		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
 		t3lib_div::devlog('parsed TypoScript','shibboleth',0,$localSetup);
 		
 		return $localSetup;

@@ -67,7 +67,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 
 		if($this->writeDevLog) t3lib_div::devlog('getUser ($_SERVER)','shibboleth',0,$_SERVER);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: mode: ' . $this->mode,'shibboleth'); // subtype
-		if($this->writeDevLog) t3lib_div::devlog('getUser: loginType: ' . $this->authInfo->loginType,'shibboleth'); // BE or FE
+		if($this->writeDevLog) t3lib_div::devlog('getUser: loginType: ' . $this->authInfo['loginType'],'shibboleth'); // BE or FE
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 		
@@ -78,7 +78,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-		$userhandler = new $userhandler_classname($this->authInfo->loginType, $this->db_user, $this->db_groups);
+		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
 		
 		$user = $userhandler->getUserFromDB();
 		
