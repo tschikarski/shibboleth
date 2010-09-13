@@ -2,3 +2,7 @@
 sessions_handlerURL = /Shibboleth.sso
   # cat=basic/enable; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"
 sessionInitiator_Location = /Login
+  # cat=basic/enable; type=boolean; label=FE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as FE users
+FE_autoImport = 1
+  # cat=basic/enbale; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
+BE_autoImport = 0
