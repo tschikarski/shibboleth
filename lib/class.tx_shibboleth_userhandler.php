@@ -37,6 +37,7 @@
  */
 
 class tx_shibboleth_userhandler {
+	var $writeDevLog;
 	var $loginType=''; //FE or BE
 	var $user='';
 	var $db_user='';
@@ -45,7 +46,9 @@ class tx_shibboleth_userhandler {
 	var $cObj; // local cObj, needed to parse the typoscript configuration
 	
 	function __construct($loginType, $db_user, $db_group) {
-		t3lib_div::devlog('constructor','shibboleth',0,$db_user);
+		//t3lib_div::devlog('constructor: SC_OPTIONS','shibboleth',0,$TYPO3_CONF_VARS['SC_OPTIONS']);
+		$this->writeDevLog = 1; // TODO: Get from config var $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog']
+		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth',0,$db_user);
 		$this->loginType = $loginType;
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
@@ -59,7 +62,7 @@ class tx_shibboleth_userhandler {
 	}
 	
 	function getUserFromDB() {
-		t3lib_div::devlog('inGetUserFromDB','shibboleth');
+		t3lib_div::devlog('getUserFromDB','shibboleth');
 		
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
@@ -89,6 +92,7 @@ class tx_shibboleth_userhandler {
 	
 	function mapShibbolethAttributesToUserArray($user) {
 			// TODO: Shibboleth-username prefix/postfix
+		t3lib_div::devlog('mapShibbolethAttributesToUserArray','shibboleth',0,array('user' => $user, 'this_config' => $this->config));
 			// TODO: Shib-Sessin-ID mit speichern
 		return $user;
 	}

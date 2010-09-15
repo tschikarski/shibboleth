@@ -84,7 +84,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		
 			// We expect the previous Shibboleth-Session-ID in 'tx_shibboleth_shibsessionid'
 			// TODO: What exactly do we need to do in case of a changed Shibboleth-Session?
-		if (is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
+		if (false && is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
 			if($this->writeDevLog) t3lib_div::devlog('getUser: Shibboleth session mismatch','shibboleth',0,$_SERVER);
 			unset($user['tx_shibboleth_shibsessionid']);
 			// return false;
