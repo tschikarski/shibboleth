@@ -74,17 +74,25 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			// check, if the user is Shibboleth authenticated
 		if(!isset($_SERVER['Shib-Session-ID'])) {
 			if($this->writeDevLog) t3lib_div::devlog('getUser: no Shibboleth session present','shibboleth',0,$_SERVER);
-			return false;
+				// TODO: Do the following only, if the logged in user came from Shibboleth!
+			
+			if (is_array($this->authInfo['userSession'])) {
+					// unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
+				$this->pObj->logoff();
+			}
+			
+			return FALSE;
 		}
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
 		
 		$user = $userhandler->getUserFromDB();
+		if($this->writeDevLog) t3lib_div::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
 		
 			// We expect the previous Shibboleth-Session-ID in 'tx_shibboleth_shibsessionid'
 			// TODO: What exactly do we need to do in case of a changed Shibboleth-Session?
-		if (false && is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
+		if (is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
 			if($this->writeDevLog) t3lib_div::devlog('getUser: Shibboleth session mismatch','shibboleth',0,$_SERVER);
 			unset($user['tx_shibboleth_shibsessionid']);
 			// return false;
@@ -100,7 +108,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 				
 				return false;
 			} else {
-				if($this->writeDevLog) t3lib_div::devlog('getUser: preparing $user for auto-import','shibboleth');
+				if($this->writeDevLog) t3lib_div::devlog('getUser: preparing ($user) for auto-import','shibboleth',0,$user);
 			}
 		}
 			// Fetched matching user successfully from DB or auto-import is allowed
@@ -113,21 +121,22 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	}
 	
 	function authUser($user) {
-		if($this->writeDevLog) t3lib_div::devlog('authUser ($_SERVER)','shibboleth',0,$_SERVER);
-//if($this->writeDevLog) t3lib_div::devlog('authUser ($this->db_user)','shibboleth',0,$this->db_user); // db_user usergroup_column
+		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER['Shib-Session-ID'],'shibboleth',0,$user);
 		
 			// TODO: Verify the following line! We want to know, if that user is already logged in.
-		if ($user['authenticated']) {
-				// This user is already logged in, Shibboleth time-out?
+		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
+		if (is_array($this->authInfo['userSession'])) {
+		// if ($user['authenticated']) {
+				// This user is already logged in to TYPO3, check Shibboleth session (e.g. to detect time-out)?
 				// TODO: Should we check for a changed Shib-Session-ID?
-			if (isset($_SERVER['Shib-Session-ID'])) {
+			if (isset($_SERVER['Shib-Session-ID'])) {	// TODO: Change condition here for testing necessity of active logoff in case of changed Shib-Session-ID!
 					// Shibboleth session still exists, authenticate!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session-ID still there: authenticated','shibboleth');	
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Found Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER['Shib-Session-ID']));	
 				return 200;
 			} else {
 					// Shibboleth session gone, refuse authentication!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session gone, time-out? Log off!','shibboleth');
-					// TODO: Do we have to log off the user?	
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session gone, time-out? Log off!','shibboleth',0,$_SERVER);
+					// TODO: Do we have to log off the user? Test by manipulation of condition a few lines before!
 				return false;
 			}
 		} else {

@@ -3,12 +3,14 @@ if (!defined ('TYPO3_MODE')) {
  	die ('Access denied.');
 }
 
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1'; // default ****
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1'; // default ****
+	// TODO: Why did we comment "default" to the following lines?
+$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1'; // default 
+$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1'; // default 
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
 
 $subtypes = 'getUserFE,authUserFE,getUserBE,authUserBE';
+$subtypes = 'getUserFE,authUserFE'; // TODO: Test for BE login (Auto/Non-Auto)
 
 t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /* sv key */,
 		array(
