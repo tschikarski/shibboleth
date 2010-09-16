@@ -21,8 +21,8 @@ t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /
 			'subtype' => $subtypes,
 
 			'available' => TRUE,
-			'priority' => 500,
-			'quality' => 500,
+			'priority' => 5,
+			'quality' => 5,
 
 			'os' => '',
 			'exec' => '',

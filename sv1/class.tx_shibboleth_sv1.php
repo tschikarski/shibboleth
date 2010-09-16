@@ -27,6 +27,8 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
+	// TODO: Check if we can replace $_SERVER[~] by t3lib_div::getIndpEnv(~)
+
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
 /**
@@ -36,6 +38,7 @@ require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userha
  * @package	TYPO3
  * @subpackage	tx_shibboleth
  */
+
 class tx_shibboleth_sv1 extends tx_sv_authbase {
 	var $prefixId = 'tx_shibboleth_sv1';		// Same as class name
 	var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
@@ -74,12 +77,13 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			// check, if the user is Shibboleth authenticated
 		if(!isset($_SERVER['Shib-Session-ID'])) {
 			if($this->writeDevLog) t3lib_div::devlog('getUser: no Shibboleth session present','shibboleth',0,$_SERVER);
-				// TODO: Do the following only, if the logged in user came from Shibboleth!
-			
-			if (is_array($this->authInfo['userSession'])) {
-					// unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
+				// Unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
+				// But: Log off only, if the logged in user came from Shibboleth, i.e. has a non-empty special field!
+			if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
+				if($this->writeDevLog) t3lib_div::devlog('getUser: ... so logging off actively ($this->authInfo[\'userSession\'])','shibboleth',0,$this->authInfo['userSession']);
 				$this->pObj->logoff();
 			}
+				// TODO: ish: In BE check visibility of tx_shibb... for non-admin be users
 			
 			return FALSE;
 		}
@@ -92,6 +96,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		
 			// We expect the previous Shibboleth-Session-ID in 'tx_shibboleth_shibsessionid'
 			// TODO: What exactly do we need to do in case of a changed Shibboleth-Session?
+			// ....  Let's test it with another Testshib user. Difficult to test, maybe not relevant... 
 		if (is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
 			if($this->writeDevLog) t3lib_div::devlog('getUser: Shibboleth session mismatch','shibboleth',0,$_SERVER);
 			unset($user['tx_shibboleth_shibsessionid']);
@@ -114,17 +119,16 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			// Fetched matching user successfully from DB or auto-import is allowed
 			// get some basic user data from shibboleth server-variables
 		$user = $userhandler->mapShibbolethAttributesToUserArray($user);
-//$user['username'] = $_SERVER['REMOTE_USER'];
-//$user['usergroup'] = '99';			
 		if($this->writeDevLog) t3lib_div::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
+
 		return $user;
 	}
 	
 	function authUser($user) {
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER['Shib-Session-ID'],'shibboleth',0,$user);
 		
-			// TODO: Verify the following line! We want to know, if that user is already logged in.
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
+			// TODO: with ish: Verify the following line! 
 		if (is_array($this->authInfo['userSession'])) {
 		// if ($user['authenticated']) {
 				// This user is already logged in to TYPO3, check Shibboleth session (e.g. to detect time-out)?
@@ -141,14 +145,27 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			}
 		} else {
 				// This user is not yet logged in
+				// TODO: Test auto-import of FE user
+				// TODO: Remove special condition for testing FE auto-import
 			if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
 					// User has group(s), i.e. he is not allowed to login
 					// Before we return our positiv result, we have to update/insert the user in DB
 				$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 				$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
-				
-				$userhandler->synchronizeUserData($user);
-				if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB; Auth OK','shibboleth');
+					// TODO: Make sure not to auto-import, if not configured: Check "synchronizeUserData"
+				$uid = $userhandler->synchronizeUserData($user);
+				if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $uid . '; Auth OK','shibboleth');
+					// TODO: Returning 200 doesn't seem to be sufficient for logging in the newly added user; more info from devlog (after authUser):
+					/*
+					 * (newest)
+16-09-10 19:21:27		t3lib_userAuth	No user session found.	class.t3lib_userauth.php, line 274	Welcome to TYPO3		
+16-09-10 19:21:27		t3lib_userAuth	logoff: ses_id = 378fa104ddcdc1a6adc2c3695981692e	class.t3lib_userauth.php, line 814	Welcome to TYPO3		
+16-09-10 19:21:27		t3lib_userAuth	Fetch session ses_id = 378fa104ddcdc1a6adc2c3695981692e	class.t3lib_userauth.php, line 771	Welcome to TYPO3		
+16-09-10 19:21:27		t3lib_userAuth	User superego@testshib.org authenticated from 10.34.7.128 ()	class.t3lib_userauth.php, line 656	Welcome to TYPO3		
+16-09-10 19:21:27		t3lib_userAuth	Create session ses_id = 378fa104ddcdc1a6adc2c3695981692e	class.t3lib_userauth.php, line 722	Welcome to TYPO3		
+16-09-10 19:21:27		t3lib_userAuth	authUserFE auth services called: ,tx_sv_auth,tx_shibboleth_sv1	class.t3lib_userauth.php, line 621	Welcome to
+						(oldest) 
+					 */
 				return 200;
 			}
 		}
