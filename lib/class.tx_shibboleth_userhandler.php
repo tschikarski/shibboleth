@@ -94,11 +94,57 @@ class tx_shibboleth_userhandler {
 			// TODO: Shibboleth-username prefix/postfix
 		t3lib_div::devlog('mapShibbolethAttributesToUserArray','shibboleth',0,array('user' => $user, 'this_config' => $this->config));
 			// TODO: Shib-Sessin-ID mit speichern
+		foreach($this->config['fieldsMapping.'] as $field => $fieldConfig) {
+			$newFieldValue = $this->getSingle($this->config['fieldsMapping.'][$field],$this->config['fieldsMapping.'][$field . '.']);
+			if(substr(trim($field), -1) != '.') {
+				$user[$field] = $newFieldValue;
+			}
+		}
+			// TODO: Passwort random
+			
+			// Setting idfield and idvalue to make sure that they are the same like in getUserFromDB
+		$idField = $this->config['IDMapping.']['typo3Field'];
+		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
+		$user[$idField] = $idValue;
+		t3lib_div::devlog('mapShibbolethAttributesToUserArray: newUserArray','shibboleth',0,$user);
 		return $user;
 	}
 	
 	function synchronizeUserData($user) {
+		t3lib_div::devlog('synchronizeUserData','shibboleth',0,$user);
 		
+		if($user['uid']) {
+			$uid = $user['uid'];
+			unset($user['uid']);
+				// Prepare the user data a bit
+				// TODO: check, what has to be prepared, too
+			$user['tstamp'] = time();
+				// Update
+			$table = $this->db_user['table'];
+			$where = 'uid='.intval($uid);
+			#$where=$GLOBALS['TYPO3_DB']->fullQuoteStr($inputString,$table);
+			$fields_values = $user;
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+				$table, 
+				$where, 
+				$fields_values
+			);
+		} else {
+				// Prepare the user data a bit
+				// TODO: check, what has to be prepared, too
+			$user['tstamp'] = time();
+				// TODO: TYPO3_CONF_VAR für pid
+			$user['pid'] = 29;
+				// Insert
+			$table = $this->db_user['table'];
+			$insertFields = $user;
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
+				$table, 
+				$insertFields
+			);
+				// get uid
+			$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+		}
 		return $uid;
 	}
 	
@@ -117,8 +163,11 @@ class tx_shibboleth_userhandler {
 		}
 		$parser = t3lib_div::makeInstance('t3lib_TSparser');
 		$parser->parse($configString);
+
 		$completeSetup = $parser->setup;
-		t3lib_div::devlog('mode','shibboleth',0,array($this->loginType));
+
+		t3lib_div::devlog('loginType','shibboleth',0,array($this->loginType));
+		
 		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
 		t3lib_div::devlog('parsed TypoScript','shibboleth',0,$localSetup);
 		

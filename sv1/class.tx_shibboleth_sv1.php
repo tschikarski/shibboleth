@@ -122,7 +122,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 				// TODO: Should we check for a changed Shib-Session-ID?
 			if (isset($_SERVER['Shib-Session-ID'])) {
 					// Shibboleth session still exists, authenticate!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Time-out check successful','shibboleth');	
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session-ID still there: authenticated','shibboleth');	
 				return 200;
 			} else {
 					// Shibboleth session gone, refuse authentication!
@@ -136,10 +136,10 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 					// User has group(s), i.e. he is not allowed to login
 					// Before we return our positiv result, we have to update/insert the user in DB
 				$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-				$userhandler = new $userhandler_classname($this->mode, $this->db_user, $this->db_groups);
+				$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
 				
 				$userhandler->synchronizeUserData($user);
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Inserted/updated user in DB; Auth OK','shibboleth');
+				if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB; Auth OK','shibboleth');
 				return 200;
 			}
 		}

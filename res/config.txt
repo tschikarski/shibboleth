@@ -6,17 +6,9 @@ tx_shibboleth {
 			typo3Field = username
 		}
 		fieldsMapping {
-			email = REMOTE_USER
+			email = TEXT
+			email.field = REMOTE_USER
 		}
 	}
-	BE {
-		IDMapping {
-			shibID = TEXT
-			shibID.field = REMOTE_USER
-			typo3Field = username
-		}
-		fieldsMapping {
-			email = REMOTE_USER
-		}
-	}
+	BE < .FE
 }
