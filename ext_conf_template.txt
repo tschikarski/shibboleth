@@ -2,7 +2,11 @@
 sessions_handlerURL = /Shibboleth.sso
   # cat=basic/enable; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"
 sessionInitiator_Location = /Login
+  # cat=basic/enable; type=string; label=Path to field mapping config file: Relative path in extension directory pointing to text file mit typoscript-like configuration containing field mappings
+mappingConfigPath = res/config.txt
   # cat=basic/enable; type=boolean; label=FE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as FE users
 FE_autoImport = 1
+  # cat=basic/enable; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
+FE_autoImport_pid = 29
   # cat=basic/enbale; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
 BE_autoImport = 0

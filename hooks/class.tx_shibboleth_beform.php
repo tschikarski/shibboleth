@@ -43,10 +43,10 @@ class tx_shibboleth_beform {
 		$function = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'];
 		$params = array();
 		$scriptCode = t3lib_div::callUserFunction($function, $params, $pObj);
-#debug($formCode);
-			// TODO: This method of getting the host part of the URL possibly has to be changed to work with SSL (https)
-		$shiblinkUrl = 'http://' . t3lib_div::getIndpEnv('HTTP_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=http%3A%2F%2F' . t3lib_div::getIndpEnv('HTTP_HOST') . '/typo3/';
-			// add jquery core
+		$shiblinkUrl = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST')) . '/typo3/';
+			// TODO: with ish: This will only work, if the TYPO3 instance is on the DocumentRoot of the (virtual) host 
+			// TODO: ish: Better use 'TYPO3_SITE_URL' or similar, than 'TYPO3_REQUEST_HOST'?
+		// add jquery core
 		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
 			// add custom jquery
 		$scriptCode .= '<script type="text/javascript">

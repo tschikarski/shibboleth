@@ -28,6 +28,7 @@
  */
 
 	// TODO: Check if we can replace $_SERVER[~] by t3lib_div::getIndpEnv(~)
+	// TODO: with ish: Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.
 
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
@@ -88,28 +89,21 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			return FALSE;
 		}
 		
+			// TODO: with ish: shall we become sensitive for "Application-ID"? Optional by filling in a related config item?
+		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
 		
 		$user = $userhandler->getUserFromDB();
 		if($this->writeDevLog) t3lib_div::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
 		
-			// We expect the previous Shibboleth-Session-ID in 'tx_shibboleth_shibsessionid'
-			// TODO: What exactly do we need to do in case of a changed Shibboleth-Session?
-			// ....  Let's test it with another Testshib user. Difficult to test, maybe not relevant... 
-		if (is_array($user) && ($_SERVER['Shib-Session-ID'] != $user['tx_shibboleth_shibsessionid'])) {
-			if($this->writeDevLog) t3lib_div::devlog('getUser: Shibboleth session mismatch','shibboleth',0,$_SERVER);
-			unset($user['tx_shibboleth_shibsessionid']);
-			// return false;
-		}
-			
 		if (!is_array($user)) {
 				// Got no matching user from DB
 			if($this->writeDevLog) t3lib_div::devlog('getUser: no matching user in DB','shibboleth');
 			if (!$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']){
 					// No auto-import for this login type, no user found -> no login possible, don't return a user record.
 				if($this->writeDevLog) t3lib_div::devlog('getUser: no auto-import configured; will exit','shibboleth',0,$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']);
-				if($this->writeDevLog) t3lib_div::devlog('getUser: extConf','shibboleth',0,$this->shibboleth_extConf);
+				// if($this->writeDevLog) t3lib_div::devlog('getUser: extConf','shibboleth',0,$this->shibboleth_extConf);
 				
 				return false;
 			} else {
@@ -124,48 +118,35 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		return $user;
 	}
 	
-	function authUser($user) {
+	function authUser(&$user) {
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER['Shib-Session-ID'],'shibboleth',0,$user);
 		
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
 			// TODO: with ish: Verify the following line! 
 		if (is_array($this->authInfo['userSession'])) {
 		// if ($user['authenticated']) {
-				// This user is already logged in to TYPO3, check Shibboleth session (e.g. to detect time-out)?
-				// TODO: Should we check for a changed Shib-Session-ID?
-			if (isset($_SERVER['Shib-Session-ID'])) {	// TODO: Change condition here for testing necessity of active logoff in case of changed Shib-Session-ID!
+				// This user is already logged in to TYPO3, check Shibboleth session (e.g. to detect time-out or even change of Shibboleth Session)?
+			if (isset($_SERVER['Shib-Session-ID']) && ($_SERVER['Shib-Session-ID'] == $user['tx_shibboleth_shibbolethsessionid'])) {
 					// Shibboleth session still exists, authenticate!
 				if($this->writeDevLog) t3lib_div::devlog('authUser: Found Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER['Shib-Session-ID']));	
 				return 200;
 			} else {
-					// Shibboleth session gone, refuse authentication!
+					// Shibboleth session gone, refuse authentication, even log off a logged in user!
 				if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session gone, time-out? Log off!','shibboleth',0,$_SERVER);
-					// TODO: Do we have to log off the user? Test by manipulation of condition a few lines before!
-				return false;
+					// Just returning FALSE will not log off an already active user!
+				$this->pObj->logoff();
+				return FALSE;
 			}
 		} else {
 				// This user is not yet logged in
-				// TODO: Test auto-import of FE user
-				// TODO: Remove special condition for testing FE auto-import
 			if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
-					// User has group(s), i.e. he is not allowed to login
+					// User has group(s), i.e. he is allowed to login
 					// Before we return our positiv result, we have to update/insert the user in DB
 				$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 				$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
-					// TODO: Make sure not to auto-import, if not configured: Check "synchronizeUserData"
-				$uid = $userhandler->synchronizeUserData($user);
-				if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $uid . '; Auth OK','shibboleth');
-					// TODO: Returning 200 doesn't seem to be sufficient for logging in the newly added user; more info from devlog (after authUser):
-					/*
-					 * (newest)
-16-09-10 19:21:27		t3lib_userAuth	No user session found.	class.t3lib_userauth.php, line 274	Welcome to TYPO3		
-16-09-10 19:21:27		t3lib_userAuth	logoff: ses_id = 378fa104ddcdc1a6adc2c3695981692e	class.t3lib_userauth.php, line 814	Welcome to TYPO3		
-16-09-10 19:21:27		t3lib_userAuth	Fetch session ses_id = 378fa104ddcdc1a6adc2c3695981692e	class.t3lib_userauth.php, line 771	Welcome to TYPO3		
-16-09-10 19:21:27		t3lib_userAuth	User superego@testshib.org authenticated from 10.34.7.128 ()	class.t3lib_userauth.php, line 656	Welcome to TYPO3		
-16-09-10 19:21:27		t3lib_userAuth	Create session ses_id = 378fa104ddcdc1a6adc2c3695981692e	class.t3lib_userauth.php, line 722	Welcome to TYPO3		
-16-09-10 19:21:27		t3lib_userAuth	authUserFE auth services called: ,tx_sv_auth,tx_shibboleth_sv1	class.t3lib_userauth.php, line 621	Welcome to
-						(oldest) 
-					 */
+					// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
+				$user['uid'] = $userhandler->synchronizeUserData($user);				
+				if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
 				return 200;
 			}
 		}

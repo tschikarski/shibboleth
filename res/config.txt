@@ -18,5 +18,13 @@ tx_shibboleth {
 			usergroup.Staff.value = 1
 		}
 	}
-	BE < .FE
+	BE {
+		IDMapping {
+			shibID = myself@testshib.org
+			typo3Field = username
+		}
+		fieldsMapping {
+			email = myself@testshib.org
+		}
+	}
 }

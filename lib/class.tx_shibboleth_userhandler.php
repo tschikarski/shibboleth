@@ -42,13 +42,15 @@ class tx_shibboleth_userhandler {
 	var $user='';
 	var $db_user='';
 	var $db_group='';
+	var $shibboleth_extConf;
 	var $config; // typoscript like configuration for the current loginType
 	var $cObj; // local cObj, needed to parse the typoscript configuration
 	
 	function __construct($loginType, $db_user, $db_group) {
 		global $TYPO3_CONF_VARS;
 		$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
-		
+		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+				
 		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth',0,$db_user);
 		
 		$this->loginType = $loginType;
@@ -68,7 +70,7 @@ class tx_shibboleth_userhandler {
 		
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
-			// TODO: Shibboleth-username prefix/postfix
+			// TODO 2: Shibboleth-username prefix/postfix
 
 		$where = $idField . '=\'' . $idValue . '\' ';
 		$where .= $this->db_user['enable_clause'] . ' ';
@@ -101,19 +103,25 @@ class tx_shibboleth_userhandler {
 				$user[$field] = $newFieldValue;
 			}
 		}
-			// TODO: Shibboleth-username prefix/postfix
-			// TODO: For TS config of usergroup field: We can't use $db_user['usergroup_column'] in our Typoscript, right? (= TS needs to use "usergroup" hard-coded.)
+			// TODO 2: Shibboleth-username prefix/postfix, possibly also stripping of substring from username
+			// TODO: ish: For TS config of usergroup field: We can't use $db_user['usergroup_column'] in our Typoscript, right? (= TS needs to use "usergroup" hard-coded.)
 		
 		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER['Shib-Session-ID'];
-			// TODO: Think about field definition TINYTEXT (255 chars), enough?
-			// TODO: Hard-coded ok? Do it here, or in getUser?
+			// TODO: ish: Think about field definition TINYTEXT (255 chars), is that length enough?
+			// TODO: ish: Hard-coded ok? Do it here, or in getUser?
 
-			// TODO: Password random
-		$user[$this->db_user['userident_column']] = sha1(mt_rand());
-			// Setting idfield and idvalue to make sure that they are the same like in getUserFromDB
+			// Create random password, if the user is new#
+			// TODO: ish: This behaviour correct?
+		if (!isset($user['uid'])) {
+			$user[$this->db_user['userident_column']] = sha1(mt_rand());
+		}
+
+			// Force idField and idValue to be consistent with the IDMapping config, overwriting 
+			// any possible mis-configuration from the fieldsMapping config
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
 		$user[$idField] = $idValue;
+		
 		if ($this->writeDevLog) t3lib_div::devlog('mapShibbolethAttributesToUserArray: newUserArray','shibboleth',0,$user);
 		return $user;
 	}
@@ -122,11 +130,13 @@ class tx_shibboleth_userhandler {
 		if ($this->writeDevLog) t3lib_div::devlog('synchronizeUserData','shibboleth',0,$user);
 		
 		if($user['uid']) {
+				// User is in DB, so we have to update, therefore remove uid from DB record and save it for later
 			$uid = $user['uid'];
 			unset($user['uid']);
-				// Prepare the user data a bit
-				// TODO: check, what has to be prepared, too
+			
+				// We have to update the tstamp field, too.
 			$user['tstamp'] = time();
+
 				// Update
 			$table = $this->db_user['table'];
 			$where = 'uid='.intval($uid);
@@ -138,13 +148,17 @@ class tx_shibboleth_userhandler {
 				$fields_values
 			);
 		} else {
-				// Prepare the user data a bit
-				// TODO: check, what has to be prepared, too
-				// .... crdate!!!
+				// We will insert a new user
+				// We have to set crdate and tstamp correctly
 			$user['crdate'] = time();
 			$user['tstamp'] = time();
-				// TODO: TYPO3_CONF_VAR for pid
-			$user['pid'] = 29;
+				// Determine correct pid for new user
+			if ($this->loginType == 'FE') {
+				$user['pid'] = intval($this->shibboleth_extConf['FE_autoImport_pid']);
+			} else {
+				$user['pid'] = 0;
+			}
+			
 				// Insert
 			$table = $this->db_user['table'];
 			$insertFields = $user;
@@ -155,6 +169,8 @@ class tx_shibboleth_userhandler {
 				// get uid
 			$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
 		}
+		
+		if ($this->writeDevLog) t3lib_div::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth');
 		return $uid;
 	}
 	
@@ -163,8 +179,8 @@ class tx_shibboleth_userhandler {
 		#$incFile = $GLOBALS['TSFE']->tmpl->getFileName($fName);
 		#$GLOBALS['TSFE']->tmpl->fileContent($incFile);
 		
-			// TODO: put path in typo3confvars
-		$configString = t3lib_div::getURL(t3lib_extMgm::extPath('shibboleth') . 'res/config.txt');
+			// TODO: with ish: Security! Directory traversal vulnerability? DoS, because of possible parsing errors?
+		$configString = t3lib_div::getURL(t3lib_extMgm::extPath('shibboleth') . $this->shibboleth_extConf['mappingConfigPath']);
 
 		if ($this->writeDevLog) t3lib_div::devlog('configString','shibboleth',0,array($configString));
 
