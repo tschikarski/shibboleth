@@ -27,4 +27,17 @@ $tempColumns = array (
 t3lib_div::loadTCA('fe_users');
 t3lib_extMgm::addTCAcolumns('fe_users',$tempColumns,1);
 t3lib_extMgm::addToAllTCAtypes('fe_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
+
+$tempColumns = array (
+	'tx_shibboleth_shibbolethsessionid' => array (		
+		'config' => array (
+			'type' => 'passthrough',
+		)
+	),
+);
+
+
+t3lib_div::loadTCA('be_groups');
+t3lib_extMgm::addTCAcolumns('be_groups',$tempColumns,1);
+t3lib_extMgm::addToAllTCAtypes('be_groups','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 ?>

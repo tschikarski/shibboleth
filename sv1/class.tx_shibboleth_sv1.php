@@ -122,6 +122,12 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER['Shib-Session-ID'],'shibboleth',0,$user);
 		
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
+		
+		if (!$user['tx_shibboleth_shibbolethsessionid'] || ($user['tx_shibboleth_shibbolethsessionid'] != $_SERVER['Shib-Session-ID'])) {
+			if($this->writeDevLog) t3lib_div::devlog('authUser: This is not our user. Return 100','shibboleth');
+			return 100;
+		}
+		
 			// TODO: with ish: Verify the following line! 
 		if (is_array($this->authInfo['userSession'])) {
 		// if ($user['authenticated']) {
