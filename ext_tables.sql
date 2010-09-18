@@ -8,8 +8,8 @@ CREATE TABLE fe_users (
 
 
 #
-# Table structure for table 'be_groups'
+# Table structure for table 'be_users'
 #
-CREATE TABLE be_groups (
+CREATE TABLE be_users (
 	tx_shibboleth_shibbolethsessionid tinytext
 );

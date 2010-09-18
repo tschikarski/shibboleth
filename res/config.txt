@@ -20,11 +20,19 @@ tx_shibboleth {
 	}
 	BE {
 		IDMapping {
-			shibID = myself@testshib.org
+			shibID = TEXT
+			shibID.field = REMOTE_USER
 			typo3Field = username
 		}
 		fieldsMapping {
-			email = myself@testshib.org
+			email = TEXT
+			email.field = REMOTE_USER
+			usergroup = CASE
+			usergroup.key.field = unscoped-affiliation
+			usergroup.default = TEXT
+			usergroup.default.value = 0
+			usergroup.Staff = TEXT
+			usergroup.Staff.value = 1
 		}
 	}
 }

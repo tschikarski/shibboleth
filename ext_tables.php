@@ -37,7 +37,7 @@ $tempColumns = array (
 );
 
 
-t3lib_div::loadTCA('be_groups');
-t3lib_extMgm::addTCAcolumns('be_groups',$tempColumns,1);
-t3lib_extMgm::addToAllTCAtypes('be_groups','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
+t3lib_div::loadTCA('be_users');
+t3lib_extMgm::addTCAcolumns('be_users',$tempColumns,1);
+t3lib_extMgm::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 ?>
