@@ -38,6 +38,7 @@
 
 class tx_shibboleth_userhandler {
 	var $writeDevLog;
+	var $tsfeDetected = FALSE;
 	var $loginType=''; //FE or BE
 	var $user='';
 	var $db_user='';
@@ -60,13 +61,16 @@ class tx_shibboleth_userhandler {
 		
 		$localcObj = t3lib_div::makeInstance('tslib_cObj');
 		$localcObj->start($_SERVER);
+		if (!$this->tsfeDetected) {
+			unset($GLOBALS['TSFE']);
+		}
 		
 		$this->cObj = $localcObj;
 		if ($this->writeDevLog) t3lib_div::devlog('cObj data','shibboleth',0,$this->cObj->data);
 	}
 	
 	function getUserFromDB() {
-		if ($this->writeDevLog) t3lib_div::devlog('getUserFromDB','shibboleth');
+		if ($this->writeDevLog) t3lib_div::devlog('getUserFromDB: start','shibboleth');
 		
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
@@ -205,6 +209,9 @@ class tx_shibboleth_userhandler {
 			$result = $this->cObj->cObjGetSingle($conf, $subconf);
 		} else {
 			$result = $conf;
+		}
+		if (!$this->tsfeDetected) {
+			unset($GLOBALS['TSFE']);
 		}
 		return $result;
 	}

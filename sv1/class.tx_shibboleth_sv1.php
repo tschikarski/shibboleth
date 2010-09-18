@@ -68,7 +68,11 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	}
 	
 	function getUser() {
-
+		
+		if (is_object($GLOBALS['TSFE'])) {
+			$isAlreadyThere = TRUE;
+		}
+		
 		if($this->writeDevLog) t3lib_div::devlog('getUser ($_SERVER)','shibboleth',0,$_SERVER);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: mode: ' . $this->mode,'shibboleth'); // subtype
 		if($this->writeDevLog) t3lib_div::devlog('getUser: loginType: ' . $this->authInfo['loginType'],'shibboleth'); // BE or FE
@@ -115,6 +119,10 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		$user = $userhandler->mapShibbolethAttributesToUserArray($user);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
 
+		if (!$isAlreadyThere) {
+			unset($GLOBALS['TSFE']);
+		}
+		
 		return $user;
 	}
 	
