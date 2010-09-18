@@ -57,7 +57,8 @@ class tx_shibboleth_userhandler {
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
 		$this->config = $this->getTyposcriptConfiguration();
-		
+
+			// get cObject for typoscript configuration
 		$localcObj = t3lib_div::makeInstance('tslib_cObj');
 		$localcObj->start($_SERVER);
 		
@@ -97,12 +98,25 @@ class tx_shibboleth_userhandler {
 	
 	function mapShibbolethAttributesToUserArray($user) {
 		if ($this->writeDevLog) t3lib_div::devlog('mapShibbolethAttributesToUserArray','shibboleth',0,array('user' => $user, 'this_config' => $this->config));
+		
+		if(!is_object($GLOBALS['TSFE'])) {
+			include_once(PATH_tslib . 'class.tslib_fe.php');
+			include_once(PATH_t3lib . 'class.t3lib_page.php');
+			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], $pid, '0', 0, '','','','');
+			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
+			$tsfeIsLocal = TRUE;
+		}
+		
 		foreach($this->config['fieldsMapping.'] as $field => $fieldConfig) {
 			$newFieldValue = $this->getSingle($this->config['fieldsMapping.'][$field],$this->config['fieldsMapping.'][$field . '.']);
 			if(substr(trim($field), -1) != '.') {
 				$user[$field] = $newFieldValue;
 			}
 		}
+		if($tsfeIsLocal) {
+			unset($GLOBALS['TSFE']);
+		}
+		
 			// TODO 2: Shibboleth-username prefix/postfix, possibly also stripping of substring from username
 			// TODO: ish: For TS config of usergroup field: We can't use $db_user['usergroup_column'] in our Typoscript, right? (= TS needs to use "usergroup" hard-coded.)
 		
