@@ -8,6 +8,7 @@
 		<languageKey index="default" type="array">
 			<label index="tt_content.list_type_pi1">Shibboleth Login</label>
 			<label index="fe_users.tx_shibboleth_shibbolethsessionid">Shibboleth Session ID</label>
+			<label index="be_users.tx_shibboleth_shibbolethsessionid">Shibboleth Session ID</label>
 		</languageKey>
 	</data>
 </T3locallang>

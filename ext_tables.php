@@ -30,8 +30,10 @@ t3lib_extMgm::addToAllTCAtypes('fe_users','tx_shibboleth_shibbolethsessionid;;;;
 
 $tempColumns = array (
 	'tx_shibboleth_shibbolethsessionid' => array (		
+		'exclude' => 1,		
+		'label' => 'LLL:EXT:shibboleth/locallang_db.xml:be_users.tx_shibboleth_shibbolethsessionid',		
 		'config' => array (
-			'type' => 'passthrough',
+			'type' => 'none',
 		)
 	),
 );

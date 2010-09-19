@@ -57,8 +57,7 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		global $TYPO3_CONF_VARS;
 		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
 		
-		fixSlashes($extConf['sessions_handlerURL']);
-		fixSlashes($extConf['sessionInitiator_Location']);
+			// TODO: Add description to ext conf that indicates, where we need a leading slash and were not. Change defaults.
 			// TODO: Remove the following disabled code, after some FE tests:
 		/*
 		if ($_SERVER['HTTPS'] && (strtolower($_SERVER['HTTPS']) == 'on')) {
@@ -78,13 +77,6 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		return $this->pi_wrapInBaseClass($content);
 	}
 }
-
-		// TODO: Move this method to a static helper class under 'lib'. Include that with "include_once".
-	function fixSlashes(&$partialPath) {
-		$stripped = trim($partialPath);
-		$stripped = str_replace('/', '', $stripped);
-		$partialPath = '/'.$stripped;
-	}
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/shibboleth/pi1/class.tx_shibboleth_pi1.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/shibboleth/pi1/class.tx_shibboleth_pi1.php']);

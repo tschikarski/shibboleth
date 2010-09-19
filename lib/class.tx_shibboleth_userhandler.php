@@ -59,6 +59,9 @@ class tx_shibboleth_userhandler {
 		$this->db_group = $db_group;
 		$this->config = $this->getTyposcriptConfiguration();
 		
+		if (is_object($GLOBALS['TSFE'])) {
+			$this->tsfeDetected = TRUE;
+		}
 		$localcObj = t3lib_div::makeInstance('tslib_cObj');
 		$localcObj->start($_SERVER);
 		if (!$this->tsfeDetected) {
