@@ -77,8 +77,7 @@ class tx_shibboleth_userhandler {
 		
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
-			// TODO 2: Shibboleth-username prefix/postfix
-
+		
 		$where = $idField . '=\'' . $idValue . '\' ';
 		$where .= $this->db_user['enable_clause'] . ' ';
 		if($this->db_user['checkPidList']) {
@@ -110,15 +109,10 @@ class tx_shibboleth_userhandler {
 				$user[$field] = $newFieldValue;
 			}
 		}
-			// TODO 2: Shibboleth-username prefix/postfix, possibly also stripping of substring from username
-			// TODO: ish: For TS config of usergroup field: We can't use $db_user['usergroup_column'] in our Typoscript, right? (= TS needs to use "usergroup" hard-coded.)
 		
 		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER['Shib-Session-ID'];
-			// TODO: ish: Think about field definition TINYTEXT (255 chars), is that length enough?
-			// TODO: ish: Hard-coded ok? Do it here, or in getUser?
 
 			// Create random password, if the user is new#
-			// TODO: ish: This behaviour correct?
 		if (!isset($user['uid'])) {
 			$user[$this->db_user['userident_column']] = sha1(mt_rand());
 		}
@@ -186,7 +180,7 @@ class tx_shibboleth_userhandler {
 		#$incFile = $GLOBALS['TSFE']->tmpl->getFileName($fName);
 		#$GLOBALS['TSFE']->tmpl->fileContent($incFile);
 		
-			// TODO: with ish: Security! Directory traversal vulnerability? DoS, because of possible parsing errors?
+			// TODO: Change base path to idp-dingsda 'TYPO3_SITE_URL', change default value in conf respectively!
 		$configString = t3lib_div::getURL(t3lib_extMgm::extPath('shibboleth') . $this->shibboleth_extConf['mappingConfigPath']);
 
 		if ($this->writeDevLog) t3lib_div::devlog('configString','shibboleth',0,array($configString));
