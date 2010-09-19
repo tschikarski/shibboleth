@@ -27,8 +27,8 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-	// TODO: Check if we can replace $_SERVER[~] by t3lib_div::getIndpEnv(~)
-	// TODO: with ish: Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.
+	// Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.
+	// TODO: ish (optional) Change behaviour of timeout-window of T3 BE? Maybe, teaching BE users is sufficient. 
 
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 

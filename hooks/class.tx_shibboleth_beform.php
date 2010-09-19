@@ -43,12 +43,13 @@ class tx_shibboleth_beform {
 		$function = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'];
 		$params = array();
 		$scriptCode = t3lib_div::callUserFunction($function, $params, $pObj);
-		$shiblinkUrl = t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST')) . '/typo3/';
-			// TODO: with ish: This will only work, if the TYPO3 instance is on the DocumentRoot of the (virtual) host 
-			// TODO: ish: Better use 'TYPO3_SITE_URL' or similar, than 'TYPO3_REQUEST_HOST'?
+		$shiblinkUrl = t3lib_div::getIndpEnv('TYPO3_SITE_URL') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . '/typo3/';
+			// TODO: test after change from 'TYPO3_REQUEST_HOST' to 'TYPO3_SITE_URL' 
 		// add jquery core
 		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
 			// add custom jquery
+			// TODO: JS error in IE
+			// TODO: Make link text/image user configurable
 		$scriptCode .= '<script type="text/javascript">
 		//<![CDATA[
 		$(document).ready(function() {

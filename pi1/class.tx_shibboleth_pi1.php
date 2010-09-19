@@ -55,36 +55,31 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 		global $TYPO3_CONF_VARS;
-#debug($_SERVER);
-			// TODO: Detect if extension not installed and/or shibd daemon not present/running?
-			// check, if the (apache) module is available.
-			// SCHEMAS is if the user is not authenticated, Application-ID is used if the user is authenticated
-		#if(isset($_SERVER['SHIBSP_SCHEMAS']) || isset($_SERVER['Shib-Application-ID'])) {
-			$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
-				// TODO: ish: Check this kind of fixing wrong slashes
-			fixSlashes($extConf['sessions_handlerURL']);
-			fixSlashes($extConf['sessionInitiator_Location']);
-				// TODO: with ish: This will only work, if the TYPO3 instance is on the DocumentRoot of the (virtual) host 
-				// TODO: ish: Replacement of $_SERVER by some T3 lib method, however, already tried t3lib_div::getIndpEnv('~'), using 'HTTPS' and 'scheme'
-			if ($_SERVER['HTTPS'] && (strtolower($_SERVER['HTTPS']) == 'on')) {
-				$protocol = 'https';
-			} else {
-				$protocol = 'http';
-			}
+		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
+		
+		fixSlashes($extConf['sessions_handlerURL']);
+		fixSlashes($extConf['sessionInitiator_Location']);
+			// TODO: Remove the following disabled code, after some FE tests:
+		/*
+		if ($_SERVER['HTTPS'] && (strtolower($_SERVER['HTTPS']) == 'on')) {
+			$protocol = 'https';
+		} else {
+			$protocol = 'http';
+		}
+		*/
 
-			$content='
-				<a href="' . t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_REQUEST_HOST')) . '">Shibboleth-Login</a>
-			';
-				// TODO: ish: Better use 'TYPO3_SITE_URL' or similar, than 'TYPO3_REQUEST_HOST'?
-				// TODO: ish: hard-coded link text?
-		#} else {
-		#	$content = 'The Shibboleth SP module is not installed.';
-		#}
+			// TODO: Test with another virtual host on the same server!
+		$content='
+			<a href="' . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . '">Shibboleth-Login</a>
+		';
+			// TODO: test after change from 'TYPO3_REQUEST_HOST' to 'TYPO3_SITE_URL'
+			// TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
 		
 		return $this->pi_wrapInBaseClass($content);
 	}
 }
 
+		// TODO: Move this method to a static helper class under 'lib'. Include that with "include_once".
 	function fixSlashes(&$partialPath) {
 		$stripped = trim($partialPath);
 		$stripped = str_replace('/', '', $stripped);
