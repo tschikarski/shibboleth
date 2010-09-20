@@ -43,7 +43,15 @@ class tx_shibboleth_beform {
 		$function = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'];
 		$params = array();
 		$scriptCode = t3lib_div::callUserFunction($function, $params, $pObj);
-		$shiblinkUrl = t3lib_div::getIndpEnv('TYPO3_SITE_URL') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . '/typo3/';
+		$entityIDparam = $extConf['entityID'];
+		if ($entityIDparam != '') {
+			$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+		}
+		$typo3_site_url = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
+		if ($extConf['forceSSL']) {
+			$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
+		}
+		$shiblinkUrl = $typo3_site_url . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . '/typo3/' . $entityIDparam;
 			// TODO: test after change from 'TYPO3_REQUEST_HOST' to 'TYPO3_SITE_URL' 
 		// add jquery core
 		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';

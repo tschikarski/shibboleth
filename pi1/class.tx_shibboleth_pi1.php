@@ -57,23 +57,41 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		global $TYPO3_CONF_VARS;
 		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);	
 		
-			// TODO: Add description to ext conf that indicates, where we need a leading slash and were not. Change defaults.
-			// TODO: Remove the following disabled code, after some FE tests:
-		/*
-		if ($_SERVER['HTTPS'] && (strtolower($_SERVER['HTTPS']) == 'on')) {
-			$protocol = 'https';
-		} else {
-			$protocol = 'http';
-		}
-		*/
-
-			// TODO: Test with another virtual host on the same server!
-		$content='
-			<a href="' . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . '">Shibboleth-Login</a>
-		';
-			// TODO: test after change from 'TYPO3_REQUEST_HOST' to 'TYPO3_SITE_URL'
-			// TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
+			// TODO: Move the following information to some place more appropriate
+			/*
+			About virtual hosts in connection with Shibboleth:
+			Think in terms of applications: An application needs an entry in shibboleth2.xml and is identified by it's application ID
+			Default application ID is "default". Application is a set of protected resources. See RequestMapper section in xml or 
+			set application ID directly in Apache config (or by .htaccess). We protect our TYPO3 instance, possibly we use an alternative 
+			application ID for the /typo3 directory, i.e. we make another application out of the backend.
+			
+			Typically an application does not span multiple virtual hosts. However, an application may be accessible by more than one
+			domain, i.e. virtual host. In that case, it is unclear to me, if one has do define multiple applications in the xml file.
+			
+			See also: http://kb.ucla.edu/articles/shibboleth-apache-multiple-virtual-host-configuration-for-moodle
+			*/
+			
+			// TODO 2: Make logout possible? https://spaces.internet2.edu/display/SHIB2/NativeSPLogoutInitiator
+			// Allow adding of entityID parameter to IdP-Link, if configured in ext conf.
 		
+		$entityIDparam = $extConf['entityID'];
+		if ($entityIDparam != '') {
+			$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+		}
+		
+		$typo3_site_url = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
+		if ($extConf['forceSSL']) {
+			$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
+		}
+		
+			// TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
+		$linkText = 'Login ueber Shibboleth';
+		
+		$content='
+			<a href="' . $typo3_site_url . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . 
+			rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . $entityIDparam . '">' . $linkText . '</a>
+		';
+
 		return $this->pi_wrapInBaseClass($content);
 	}
 }

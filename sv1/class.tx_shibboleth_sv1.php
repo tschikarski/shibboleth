@@ -29,6 +29,8 @@
 
 	// Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.
 	// TODO: ish (optional) Change behaviour of timeout-window of T3 BE? Maybe, teaching BE users is sufficient. 
+	
+	// TODO: Change ext icon?
 
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
@@ -79,9 +81,12 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 		
-			// check, if the user is Shibboleth authenticated
-		if(!isset($_SERVER['Shib-Session-ID'])) {
-			if($this->writeDevLog) t3lib_div::devlog('getUser: no Shibboleth session present','shibboleth',0,$_SERVER);
+			// check, if there is a user that is Shibboleth authenticated (with a correct application ID, if required by configuration)
+		if(!isset($_SERVER['Shib-Session-ID']) || 
+			($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
+			$this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER['Shib-Application-ID'])
+		) {
+			if($this->writeDevLog) t3lib_div::devlog('getUser: no applicable Shibboleth session present','shibboleth',0,$_SERVER);
 				// Unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
 				// But: Log off only, if the logged in user came from Shibboleth, i.e. has a non-empty special field!
 			if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
@@ -91,8 +96,6 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			
 			return FALSE;
 		}
-		
-			// TODO: We should become sensitive for "Application-ID", if a related ext conf is filled in by Admin!
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);

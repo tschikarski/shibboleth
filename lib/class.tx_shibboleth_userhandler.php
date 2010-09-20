@@ -180,11 +180,10 @@ class tx_shibboleth_userhandler {
 		#$incFile = $GLOBALS['TSFE']->tmpl->getFileName($fName);
 		#$GLOBALS['TSFE']->tmpl->fileContent($incFile);
 		
-			// TODO: Change base path to idp-dingsda 'TYPO3_SITE_URL', change default value in conf respectively!
-		$configString = t3lib_div::getURL(t3lib_extMgm::extPath('shibboleth') . $this->shibboleth_extConf['mappingConfigPath']);
-
+		$configString = t3lib_div::getURL(t3lib_div::getIndpEnv('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath']);
+		
 		if ($this->writeDevLog) t3lib_div::devlog('configString','shibboleth',0,array($configString));
-
+		
 		if(!class_exists('t3lib_TSparser') && defined('PATH_t3lib')) {
 			require_once(PATH_t3lib.'class.t3lib_TSparser.php');
 		}

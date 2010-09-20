@@ -9,8 +9,9 @@ $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1'; //
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
 
+	// TODO: Test for BE login (Auto/Non-Auto)
 $subtypes = 'getUserFE,authUserFE,getUserBE,authUserBE';
-#$subtypes = 'getUserFE,authUserFE'; // TODO: Test for BE login (Auto/Non-Auto)
+#$subtypes = 'getUserFE,authUserFE';
 
 t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /* sv key */,
 		array(

@@ -1,12 +1,20 @@
-  # cat=basic/enable; type=string; label=URL of Shibboleth handler: See your shibboleth xml config file (shibboleth2.xml): attribute "handlerURL" of tag "Sessions"
-sessions_handlerURL = /Shibboleth.sso
-  # cat=basic/enable; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"
+  # cat=basic/enable; type=string; label=entityID of our ServiceProvider: See your shibboleth xml config file (shibboleth2.xml): attribute "entityID" of relevant Application definition
+entityID=
+  # cat=basic/enable; type=string; label=URL of Shibboleth handler: See your shibboleth xml config file (shibboleth2.xml): attribute "handlerURL" of tag "Sessions"; no leading slash!
+sessions_handlerURL = Shibboleth.sso
+  # cat=basic/enable; type=boolean; label=Force SSL (recommended): Check to enforce using SSL for connection to the local Shibboleth handlers, even if the application is used without SSL
+forceSSL = 1
+  # cat=basic/enable; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"; with leading slash!
 sessionInitiator_Location = /Login
-  # cat=basic/enable; type=string; label=Path to field mapping config file: Relative path in extension directory pointing to text file mit typoscript-like configuration containing field mappings
-mappingConfigPath = res/config.txt
+  # cat=basic/enable; type=string; label=Path to field mapping config file: Path from TYPO3 root directory pointing to text file mit typoscript-like configuration containing field mappings
+mappingConfigPath = /typo3conf/ext/shibboleth/res/config.txt
+  # cat=basic/enable; type=string; label=FE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
+FE_applicationID =
   # cat=basic/enable; type=boolean; label=FE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as FE users
 FE_autoImport = 1
   # cat=basic/enable; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
 FE_autoImport_pid = 29
-  # cat=basic/enbale; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
+  # cat=basic/enable; type=string; label=BE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
+BE_applicationID =
+  # cat=basic/enable; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
 BE_autoImport = 0
