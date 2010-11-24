@@ -70,6 +70,8 @@ class tx_shibboleth_userhandler {
 		
 		$this->cObj = $localcObj;
 		if ($this->writeDevLog) t3lib_div::devlog('cObj data','shibboleth',0,$this->cObj->data);
+#		$methodExistsArr['methodExists'] = method_exists($this->cObj,'cObjGetSingle');
+#		if ($this->writeDevLog) t3lib_div::devlog('cObj cObjGetSingle exists','shibboleth',0,$methodExistsArr);
 	}
 	
 	function getUserFromDB() {
@@ -201,6 +203,7 @@ class tx_shibboleth_userhandler {
 	}
 	
 	function getSingle($conf,$subconf='') {
+if ($this->writeDevLog) t3lib_div::devlog('getSingle ($conf,$subconf)','shibboleth',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			$result = $this->cObj->cObjGetSingle($conf, $subconf);
 		} else {
@@ -209,7 +212,24 @@ class tx_shibboleth_userhandler {
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
+if ($this->writeDevLog) t3lib_div::devlog('getSingle ($result)','shibboleth',0,array('result' => $result));
 		return $result;
+	}
+	
+	/**
+	 * Creating a single static cached instance of TSFE to use with this class.
+	 *
+	 * @return	tslib_fe		New instance of tslib_fe
+	 */
+	private static function getTSFE() {
+		// Cached instance
+		static $tsfe = null;
+
+		if (is_null($tsfe)) {
+			$tsfe = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], 0, 0);
+		}
+
+		return $tsfe;
 	}
 }
 
