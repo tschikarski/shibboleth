@@ -46,17 +46,19 @@ class tx_shibboleth_userhandler {
 	var $shibboleth_extConf;
 	var $config; // typoscript like configuration for the current loginType
 	var $cObj; // local cObj, needed to parse the typoscript configuration
+	var $ShibSessionID;
 	
-	function __construct($loginType, $db_user, $db_group) {
-		global $TYPO3_CONF_VARS;
-		$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
-		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
-				
+	function __construct($loginType, $db_user, $db_group, $shibSessionIDname) {
 		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth',0,$db_user);
 		
+		global $TYPO3_CONF_VARS;
+#$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
+		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+				
 		$this->loginType = $loginType;
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
+		$this->ShibSessionID = $shibSessionIDname;
 		$this->config = $this->getTyposcriptConfiguration();
 		
 		if (is_object($GLOBALS['TSFE'])) {
@@ -112,7 +114,7 @@ class tx_shibboleth_userhandler {
 			}
 		}
 		
-		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER['Shib-Session-ID'];
+		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
 
 			// Create random password, if the user is new#
 		if (!isset($user['uid'])) {

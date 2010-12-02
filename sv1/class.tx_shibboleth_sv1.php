@@ -91,7 +91,6 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 		
 			// check, if there is a user that is Shibboleth authenticated (with a correct application ID, if required by configuration)
-			// TODO: On TUM system server variables use _ instead of -
 			// Remark: Best recognition of Shibboleth session by $_SERVER['AUTH_TYPE'] == 'shibboleth', as other Shibboleth-specific 
 			// server vars may have differing syntax/names on different systems
 		if(!isset($_SERVER['AUTH_TYPE']) || $_SERVER['AUTH_TYPE'] != 'shibboleth' ||
@@ -110,7 +109,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
+		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
 		
 		$user = $userhandler->getUserFromDB();
 		if($this->writeDevLog) t3lib_div::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
@@ -185,7 +184,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 				// User has group(s), i.e. he is allowed to login
 				// Before we return our positiv result, we have to update/insert the user in DB
 			$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-			$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups);
+			$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
 			$user['uid'] = $userhandler->synchronizeUserData($user);				
 			if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');

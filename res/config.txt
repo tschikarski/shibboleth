@@ -2,7 +2,7 @@ tx_shibboleth {
 	FE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = REMOTE_USER
+			shibID.field = eppn
 			typo3Field = username
 		}
 		fieldsMapping {
@@ -21,7 +21,7 @@ tx_shibboleth {
 	BE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = REMOTE_USER
+			shibID.field = eppn
 			typo3Field = username
 		}
 		fieldsMapping {
