@@ -2,20 +2,20 @@ tx_shibboleth {
 	FE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = eppn
+			shibID.field = mail
 			typo3Field = username
 		}
 		fieldsMapping {
 			email = TEXT
-			email.field = REMOTE_USER
+			email.field = mail
 			usergroup = CASE
-			usergroup.key.field = unscoped-affiliation
+			usergroup.key.field = sn
 			usergroup.default = TEXT
 			usergroup.default.value = 0
 			usergroup.Member = TEXT
 			usergroup.Member.value = 2
-			usergroup.Staff = TEXT
-			usergroup.Staff.value = 1
+			usergroup.Typo3 = TEXT
+			usergroup.Typo3.value = 1
 		}
 	}
 	BE {
