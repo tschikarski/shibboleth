@@ -47,6 +47,8 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
 	var $extKey = 'shibboleth';	// The extension key.
 	var $shibboleth_extConf = ''; // Extension configuration.
+	var $ShibSessionID = 'Shib-Session-ID';
+	var $ShibApplicationID = 'Shib-Application-ID';
 
 	/**
 	 * [Put your description here]
@@ -66,6 +68,13 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		global $TYPO3_CONF_VARS;
 		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 		
+		if (isset($_SERVER['AUTH_TYPE']) && $_SERVER['AUTH_TYPE'] == 'shibboleth') {
+			if (isset($_SERVER['Shib_Session_ID']) && $_SERVER['Shib_Session_ID'] != '') {
+				$this->ShibSessionID = 'Shib_Session_ID';
+				$this->ShibApplicationID = 'Shib_Application_ID';
+			}
+		}
+		
 		return $available;
 	}
 	
@@ -82,9 +91,12 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if($this->writeDevLog) t3lib_div::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 		
 			// check, if there is a user that is Shibboleth authenticated (with a correct application ID, if required by configuration)
-		if(!isset($_SERVER['Shib-Session-ID']) || 
+			// TODO: On TUM system server variables use _ instead of -
+			// Remark: Best recognition of Shibboleth session by $_SERVER['AUTH_TYPE'] == 'shibboleth', as other Shibboleth-specific 
+			// server vars may have differing syntax/names on different systems
+		if(!isset($_SERVER['AUTH_TYPE']) || $_SERVER['AUTH_TYPE'] != 'shibboleth' ||
 			($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
-			$this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER['Shib-Application-ID'])
+			$this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->ShibApplicationID])
 		) {
 			if($this->writeDevLog) t3lib_div::devlog('getUser: no applicable Shibboleth session present','shibboleth',0,$_SERVER);
 				// Unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
@@ -129,12 +141,12 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	}
 	
 	function authUser(&$user) {
-		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER['Shib-Session-ID'],'shibboleth',0,$user);
+		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->ShibSessionID],'shibboleth',0,$user);
 		
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
 		
 			// If the user come not from shibboleth getUser, we will ignore it.
-		#if (!$user['tx_shibboleth_shibbolethsessionid'] || ($user['tx_shibboleth_shibbolethsessionid'] != $_SERVER['Shib-Session-ID'])) {
+		#if (!$user['tx_shibboleth_shibbolethsessionid'] || ($user['tx_shibboleth_shibbolethsessionid'] != $_SERVER[$this->ShibSessionID])) {
 		if (!$user['tx_shibboleth_shibbolethsessionid']) {
 			if($this->writeDevLog) t3lib_div::devlog('authUser: This is not our user. Exiting.','shibboleth');
 			return 100;
@@ -144,21 +156,21 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 				// Some user is already logged in to TYPO3, check if it is a Shibboleth user 
 			if (!$this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
 					// The presently logged in user is not a shibboleth user, we do nothing
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER['Shib-Session-ID']));	
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));	
 				return 100;
 			}
 			
 				// For safety: Check for existing Shibboleth-Session and return FALSE, otherwise!
-			if (!$_SERVER['Shib-Session-ID']) {
+			if (!$_SERVER[$this->ShibSessionID]) {
 					// With no Shibboleth session we won't authenticate anyone!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER['Shib-Session-ID']));
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
 				return FALSE;
 			}
 			
 				// The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, Session-ID might have changed on some miraculous way
-			if ($_SERVER['Shib-Session-ID'] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
+			if ($_SERVER[$this->ShibSessionID] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
 					// Shibboleth session still the same, authenticate!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER['Shib-Session-ID']));	
+				if($this->writeDevLog) t3lib_div::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER[$this->ShibSessionID]));	
 				return 200;
 			}
 			
