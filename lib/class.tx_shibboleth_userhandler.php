@@ -52,7 +52,7 @@ class tx_shibboleth_userhandler {
 		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth',0,$db_user);
 		
 		global $TYPO3_CONF_VARS;
-#$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
+$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
 		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 				
 		$this->loginType = $loginType;
@@ -207,6 +207,9 @@ class tx_shibboleth_userhandler {
 	function getSingle($conf,$subconf='') {
 if ($this->writeDevLog) t3lib_div::devlog('getSingle ($conf,$subconf)','shibboleth',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
+			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
+				$GLOBALS['TSFE']->cObjectDepthCounter = 100;
+			}
 			$result = $this->cObj->cObjGetSingle($conf, $subconf);
 		} else {
 			$result = $conf;

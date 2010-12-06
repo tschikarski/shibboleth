@@ -27,12 +27,8 @@ tx_shibboleth {
 		fieldsMapping {
 			email = TEXT
 			email.field = REMOTE_USER
-			usergroup = CASE
-			usergroup.key.field = unscoped-affiliation
-			usergroup.default = TEXT
-			usergroup.default.value = 0
-			usergroup.Staff = TEXT
-			usergroup.Staff.value = 1
+			usergroup = TEXT
+			usergroup.value = 4
 		}
 	}
 }
