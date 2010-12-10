@@ -30,10 +30,10 @@
 	// TODO: New observation: .htaccess necessary in typo3 folder for BE auth. Re-check!
 
 	// Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.
-	// TODO: ish (optional) Change behaviour of timeout-window of T3 BE? Maybe, teaching BE users is sufficient. 
+	// TODO: ish (!) After auto-import: No access (modules, mount point)!
+	// TODO: ish (?) Auto-Import BE user as Administrator (flag)? 
+	// TODO: ish (optional) Change behaviour of timeout-window of T3 BE? Maybe, teaching BE users is sufficient.
 	
-	// TODO: Change ext icon?
-
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
 /**
