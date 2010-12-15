@@ -27,12 +27,9 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-	// TODO: New observation: .htaccess necessary in typo3 folder for BE auth. Re-check!
-
-	// Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.
-	// TODO: ish (!) After auto-import: No access (modules, mount point)!
-	// TODO: ish (?) Auto-Import BE user as Administrator (flag)? 
+	// TODO: Documentation: How to prepare auto-import in BE (Admin flag, group settings)
 	// TODO: ish (optional) Change behaviour of timeout-window of T3 BE? Maybe, teaching BE users is sufficient.
+	// (Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.)
 	
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
@@ -131,9 +128,6 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 			// Fetched matching user successfully from DB or auto-import is allowed
 			// get some basic user data from shibboleth server-variables
-			// TODO: Tests to be done: 
-			// 		Without auto-import, what is meaning and consequence of usergroup config (config.txt)?
-			// 		With auto-import: Does it work correctly?
 		$user = $userhandler->mapShibbolethAttributesToUserArray($user);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
 

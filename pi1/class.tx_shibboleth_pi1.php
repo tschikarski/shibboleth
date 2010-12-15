@@ -71,7 +71,6 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 			See also: http://kb.ucla.edu/articles/shibboleth-apache-multiple-virtual-host-configuration-for-moodle
 			*/
 			
-			// TODO 2: Make logout possible? https://spaces.internet2.edu/display/SHIB2/NativeSPLogoutInitiator
 			// Allow adding of entityID parameter to IdP-Link, if configured in ext conf.
 		
 		$entityIDparam = $extConf['entityID'];
