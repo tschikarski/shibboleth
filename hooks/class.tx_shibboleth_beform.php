@@ -51,7 +51,13 @@ class tx_shibboleth_beform {
 		if ($extConf['forceSSL']) {
 			$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
 		}
-		$shiblinkUrl = $typo3_site_url . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
+		$sessionHandlerUrl = $extConf['sessions_handlerURL'];
+		
+		if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
+			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
+		}
+			// TODO: Test BE-Login using absolute handlerURL
+		$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
 		// add jquery core
 		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
 			// add custom jquery

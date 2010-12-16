@@ -86,8 +86,14 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 			// TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
 		$linkText = 'Login ueber Shibboleth';
 		
+		$sessionHandlerUrl = $extConf['sessions_handlerURL'];
+		
+		if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
+			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
+		}
+		
 		$content='
-			<a href="' . $typo3_site_url . '' . $extConf['sessions_handlerURL'] . $extConf['sessionInitiator_Location'] . '?target=' . 
+			<a href="' . $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . 
 			rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . $entityIDparam . '">' . $linkText . '</a>
 		';
 

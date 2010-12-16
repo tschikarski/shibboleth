@@ -17,7 +17,7 @@ https://spaces.internet2.edu/display/SHIB2/NativeSPConfiguration
     <InProcess logger="native.logger">
         <ISAPI normalizeRequest="true">
             <!-- Maps IIS Instance ID values to the host name. -->
-            <Site id="1" name="shibblocal.abezet.de"/>
+            <Site id="1" name="sub.yourdomain.tld"/>
         </ISAPI>
 
     </InProcess>
@@ -28,22 +28,23 @@ https://spaces.internet2.edu/display/SHIB2/NativeSPConfiguration
     <SessionCache type="StorageService" StorageService="mem" cacheTimeout="3600" inprocTimeout="900" cleanupInterval="900"/>
     <ReplayCache StorageService="mem"/>
 
-    <!-- The RequestMap defines portions of the webspace to protect; shibblocal.abezet.de/secure here. -->
+    <!-- The RequestMap defines portions of the webspace to protect; *.yourdomain.tld/ here. -->
     <RequestMapper type="Native">
-
         <RequestMap applicationId="default">
-            <Host name="shibblocal.abezet.de">
-                <Path name="secure" authType="shibboleth" requireSession="true"/>
-            </Host>
+            <HostRegex regex="/.yourdomain.tld/">
+                <Path name="" authType="shibboleth" requireSession="false"/>
+            </HostRegex>
         </RequestMap>
     </RequestMapper>
 
-    <!-- The entityID is the name TestShib made for your SP. -->
+    <!-- The entityID is the name that will be registered at the IdP; looks like a URL, but isn't. -->
     <ApplicationDefaults id="default" policyId="default" REMOTE_USER="eppn"
-        entityID="https://shibblocal.abezet.de/shibboleth-sp"
-        homeURL="https://shibblocal.abezet.de/">
+        entityID="https://your.shib-sp.entity.id/shibboleth-sp"
+        homeURL="https://site1.yourdomain.tld/">
 
-        <Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/Shibboleth.sso" handlerSSL="false">
+				<!-- You might want to use an absolute URL as "handlerURL". This is necessary, if you want to use one session initiator for 
+				a number of sub-domains. -->
+        <Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/Shibboleth.sso" handlerSSL="true">
 
             <!--
             SessionInitiators can request login many different ways.  This example sends users directly to the
