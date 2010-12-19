@@ -13,15 +13,15 @@ tx_shibboleth {
 			usergroup.default = TEXT
 			usergroup.default.value = 0
 			usergroup.Member = TEXT
-			usergroup.Member.value = 2
-			usergroup.Typo3 = TEXT
-			usergroup.Typo3.value = 1
+			usergroup.Member.value = 1
+			usergroup.Staff = TEXT
+			usergroup.Staff.value = 1
 		}
 	}
 	BE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = eppn
+			shibID.field = REMOTE_USER
 			typo3Field = username
 		}
 		fieldsMapping {
@@ -32,9 +32,9 @@ tx_shibboleth {
 			usergroup.default = TEXT
 			usergroup.default.value = 0
 			usergroup.Member = TEXT
-			usergroup.Member.value = 4
+			usergroup.Member.value = 1
 			usergroup.Staff = TEXT
-			usergroup.Staff.value = 4
+			usergroup.Staff.value = 1
 		}
 	}
 }

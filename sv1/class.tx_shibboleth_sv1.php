@@ -144,7 +144,6 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
 		
 			// If the user come not from shibboleth getUser, we will ignore it.
-		#if (!$user['tx_shibboleth_shibbolethsessionid'] || ($user['tx_shibboleth_shibbolethsessionid'] != $_SERVER[$this->ShibSessionID])) {
 		if (!$user['tx_shibboleth_shibbolethsessionid']) {
 			if($this->writeDevLog) t3lib_div::devlog('authUser: This is not our user. Exiting.','shibboleth');
 			return 100;

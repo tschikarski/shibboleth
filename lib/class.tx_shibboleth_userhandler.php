@@ -72,8 +72,6 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 		
 		$this->cObj = $localcObj;
 		if ($this->writeDevLog) t3lib_div::devlog('cObj data','shibboleth',0,$this->cObj->data);
-#		$methodExistsArr['methodExists'] = method_exists($this->cObj,'cObjGetSingle');
-#		if ($this->writeDevLog) t3lib_div::devlog('cObj cObjGetSingle exists','shibboleth',0,$methodExistsArr);
 	}
 	
 	function getUserFromDB() {
@@ -116,7 +114,7 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 		
 		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
 
-			// Create random password, if the user is new#
+			// Create random password, if the user is new.
 		if (!isset($user['uid'])) {
 			$user[$this->db_user['userident_column']] = sha1(mt_rand());
 		}
@@ -163,7 +161,10 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 			} else {
 				$user['pid'] = 0;
 			}
-			
+				// In BE Autoimport might be done with disable=1, i.e. BE User has to be enabled manually after first login attempt.
+			if ($this->loginType == 'BE' && $this->shibboleth_extConf['BE_autoImportDisableUser']) {
+				$user['disable'] = 1;
+			}
 				// Insert
 			$table = $this->db_user['table'];
 			$insertFields = $user;

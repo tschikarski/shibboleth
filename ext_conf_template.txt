@@ -18,3 +18,5 @@ FE_autoImport_pid = 29
 BE_applicationID =
   # cat=basic/enable; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
 BE_autoImport = 0
+  # cat=basic/enable; type=boolean; label=BE User Autoimport in Disabled State: If this is checked and BE Autoimport is enabled, new BE users are disabled
+BE_autoImportDisableUser = 1
