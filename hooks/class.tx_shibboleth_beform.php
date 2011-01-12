@@ -39,7 +39,7 @@
 class tx_shibboleth_beform {
 	function addShibbolethJavaScript($params, $pObj) {
 		global $TYPO3_CONF_VARS;
-		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']); 
 		$function = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'];
 		$params = array();
 		$scriptCode = t3lib_div::callUserFunction($function, $params, $pObj);
@@ -57,6 +57,18 @@ class tx_shibboleth_beform {
 			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
 		}
 		$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
+		
+		if ($GLOBALS['_REQUEST']['redirecttoshibboleth'] == 'yes') {
+			return '<script language="javascript" type="text/javascript">
+				<!-- // JavaScript-Bereich für ältere Browser auskommentieren
+window.location.href = \'' . $shiblinkUrl . '\';
+// -->
+</script>
+			';
+		}
+		
+		// Modify BE login form only, if config option is set
+		if ($extConf['BE_linkInLoginForm'] == 0) return '';
 		// add jquery core
 		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
 			// add custom jquery
