@@ -6,8 +6,12 @@ if (!defined ('TYPO3_MODE')) {
 	// TODO: Why did we comment "default" to the following lines?
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1'; // default 
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1'; // default 
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
+# Don't re-check after user is logged in!
+# This would forbid to log off. Additionally, it would make necessary that the 
+# Shibboleth SP daemon will keep login information all over your session, which
+# is problematic, especially in load balancing situations.
+#$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
+#$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
 
 	// TODO: Test for BE login (Auto/Non-Auto)
 $subtypes = 'getUserFE,authUserFE,getUserBE,authUserBE';
