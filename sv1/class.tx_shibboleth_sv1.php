@@ -178,7 +178,10 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 		
 			// This user is not yet logged in
-		if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
+		if (is_array($user)) {
+#		if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
+				// TODO: Remove condition existing group from above line
+				// TODO: Test after removed condition. How to exclude user from BE/FE on Shibboleth-Criteria?
 				// User has group(s), i.e. he is allowed to login
 				// Before we return our positiv result, we have to update/insert the user in DB
 			$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');

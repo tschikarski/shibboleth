@@ -85,7 +85,7 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 		if($this->db_user['checkPidList']) {
 			$where .= $this->db_user['check_pid_clause'];
 		}
-		if ($this->writeDevLog) t3lib_div::devlog('userFromDB:where-statement','shibboleth',0,array($where));
+		if ($this->writeDevLog) t3lib_div::devlog('userFromDB: where-statement','shibboleth',0,array($where));
 		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
 		$table = $this->db_user['table'];
 		$groupBy = '';
@@ -96,8 +96,8 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 			$where
 		);
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
-			return $row;
 			if ($this->writeDevLog) t3lib_div::devlog('userFromDB','shibboleth',0,$row);
+			return $row;
 		} else {
 			return false;
 		}
@@ -137,6 +137,9 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 			$uid = $user['uid'];
 			unset($user['uid']);
 			
+				// Don't automatically change groups after first creation
+				// TODO: Do we need a config for that?
+			unset($user['usergroup']);
 				// We have to update the tstamp field, too.
 			$user['tstamp'] = time();
 
@@ -151,6 +154,7 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 				$fields_values
 			);
 		} else {
+				// TODO: 2011-01-18 Found problem after having deleted myself@testshib.org - now 2 new users are generated in disabled state (Try not to use Logout button, but close browser!)
 				// We will insert a new user
 				// We have to set crdate and tstamp correctly
 			$user['crdate'] = time();

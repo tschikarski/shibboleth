@@ -58,7 +58,7 @@ class tx_shibboleth_beform {
 		}
 		$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
 		
-		if ($GLOBALS['_GET']['redirecttoshibboleth'] == 'yes') {
+		if (t3lib_div::_GP('redirecttoshibboleth') == 'yes') {
 			$scriptCode .= '<script language="javascript" type="text/javascript">
 				window.location.href = \'' . $shiblinkUrl . '\';
 				</script>
