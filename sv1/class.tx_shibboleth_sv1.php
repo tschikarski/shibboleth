@@ -177,17 +177,19 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			$this->pObj->logoff();
 		}
 		
+		if($this->writeDevLog) t3lib_div::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
+		
 			// This user is not yet logged in
-		if (is_array($user)) {
-#		if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
-				// TODO: Remove condition existing group from above line
-				// TODO: Test after removed condition. How to exclude user from BE/FE on Shibboleth-Criteria?
-				// User has group(s), i.e. he is allowed to login
+		if (is_array($user) && $user['_allowUser']) {
+			unset ($user['_allowUser']);
+				// TODO: Test after removed condition. 
+				// TODO: Removed condition (see next comment line); however, now we have nothing that prevents creating lot's of users on login attempts.
+					#		if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
 				// Before we return our positiv result, we have to update/insert the user in DB
 			$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 			$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
-			$user['uid'] = $userhandler->synchronizeUserData($user);				
+			$user['uid'] = $userhandler->synchronizeUserData($user);
 			if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
 			return 200;
 		}

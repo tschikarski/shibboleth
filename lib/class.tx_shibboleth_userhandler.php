@@ -49,10 +49,11 @@ class tx_shibboleth_userhandler {
 	var $ShibSessionID;
 	
 	function __construct($loginType, $db_user, $db_group, $shibSessionIDname) {
+		global $TYPO3_CONF_VARS;
+			// TODO: Test: Is config option for devlog valid in both settings?
+		$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
 		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth',0,$db_user);
 		
-		global $TYPO3_CONF_VARS;
-$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
 		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 				
 		$this->loginType = $loginType;
@@ -81,7 +82,9 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
 		
 		$where = $idField . '=\'' . $idValue . '\' ';
-		$where .= $this->db_user['enable_clause'] . ' ';
+			// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e. 
+			// will create new users on every log in attempt until user is unhidden by admin.
+		$where .= ' AND deleted = 0 ';
 		if($this->db_user['checkPidList']) {
 			$where .= $this->db_user['check_pid_clause'];
 		}
@@ -139,6 +142,7 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 			
 				// Don't automatically change groups after first creation
 				// TODO: Do we need a config for that?
+				//       How about defining a positive list of override fields?
 			unset($user['usergroup']);
 				// We have to update the tstamp field, too.
 			$user['tstamp'] = time();
@@ -154,7 +158,6 @@ $this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shi
 				$fields_values
 			);
 		} else {
-				// TODO: 2011-01-18 Found problem after having deleted myself@testshib.org - now 2 new users are generated in disabled state (Try not to use Logout button, but close browser!)
 				// We will insert a new user
 				// We have to set crdate and tstamp correctly
 			$user['crdate'] = time();

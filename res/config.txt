@@ -27,8 +27,8 @@ tx_shibboleth {
 		fieldsMapping {
 			email = TEXT
 			email.field = REMOTE_USER
-			usergroup = TEXT
-			usergroup.value = 1
+			_allowUser = TEXT
+			_allowUser.value = 1
 		}
 	}
 }
