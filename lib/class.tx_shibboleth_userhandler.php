@@ -150,7 +150,6 @@ class tx_shibboleth_userhandler {
 			unset($user['tx_shibboleth_config']);
 			
 				// TODO: (On TUM server) Move and change working copy of config.txt
-				// TODO: Change config.txt to be a good general sample
 
 				// Update
 			$table = $this->db_user['table'];
