@@ -5,17 +5,17 @@ tx_shibboleth {
 			shibID.field = REMOTE_USER
 			typo3Field = username
 		}
-		fieldsMapping {
-			email = TEXT
-			email.field = mail
-			usergroup = CASE
-			usergroup.key.field = unscoped-affiliation
-			usergroup.default = TEXT
-			usergroup.default.value = 0
-			usergroup.Member = TEXT
-			usergroup.Member.value = 1
-			usergroup.Staff = TEXT
-			usergroup.Staff.value = 1
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				email = TEXT
+				email.field = REMOTE_USER
+			}
+			updateUserFieldsMapping {
+				email = TEXT
+				email.field = REMOTE_USER
+			}
 		}
 	}
 	BE {
@@ -24,11 +24,17 @@ tx_shibboleth {
 			shibID.field = REMOTE_USER
 			typo3Field = username
 		}
-		fieldsMapping {
-			email = TEXT
-			email.field = REMOTE_USER
-			_allowUser = TEXT
-			_allowUser.value = 1
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				email = TEXT
+				email.field = REMOTE_USER
+			}
+			updateUserFieldsMapping {
+				admin = TEXT
+				admin.value = 0
+			}
 		}
 	}
 }

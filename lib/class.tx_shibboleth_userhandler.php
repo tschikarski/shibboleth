@@ -50,9 +50,8 @@ class tx_shibboleth_userhandler {
 	
 	function __construct($loginType, $db_user, $db_group, $shibSessionIDname) {
 		global $TYPO3_CONF_VARS;
-			// TODO: Test: Is config option for devlog valid in both settings?
 		$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeDevLog'];
-		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth',0,$db_user);
+		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth');
 		
 		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 				
@@ -72,7 +71,7 @@ class tx_shibboleth_userhandler {
 		}
 		
 		$this->cObj = $localcObj;
-		if ($this->writeDevLog) t3lib_div::devlog('cObj data','shibboleth',0,$this->cObj->data);
+		#if ($this->writeDevLog) t3lib_div::devlog('cObj data','shibboleth',0,$this->cObj->data);
 	}
 	
 	function getUserFromDB() {
@@ -88,7 +87,7 @@ class tx_shibboleth_userhandler {
 		if($this->db_user['checkPidList']) {
 			$where .= $this->db_user['check_pid_clause'];
 		}
-		if ($this->writeDevLog) t3lib_div::devlog('userFromDB: where-statement','shibboleth',0,array($where));
+		#if ($this->writeDevLog) t3lib_div::devlog('userFromDB: where-statement','shibboleth',0,array($where));
 		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
 		$table = $this->db_user['table'];
 		$groupBy = '';
@@ -99,36 +98,34 @@ class tx_shibboleth_userhandler {
 			$where
 		);
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
-			if ($this->writeDevLog) t3lib_div::devlog('userFromDB','shibboleth',0,$row);
+			if ($this->writeDevLog) t3lib_div::devlog('getUserFromDB returning user record ($row)','shibboleth',0,$row);
 			return $row;
 		} else {
+			if ($this->writeDevLog) t3lib_div::devlog('getUserFromDB returning FALSE (no record found)','shibboleth',0,$row);
 			return false;
 		}
 	}
 	
-	function mapShibbolethAttributesToUserArray($user) {
-		if ($this->writeDevLog) t3lib_div::devlog('mapShibbolethAttributesToUserArray','shibboleth',0,array('user' => $user, 'this_config' => $this->config));
-		foreach($this->config['fieldsMapping.'] as $field => $fieldConfig) {
-			$newFieldValue = $this->getSingle($this->config['fieldsMapping.'][$field],$this->config['fieldsMapping.'][$field . '.']);
-			if(substr(trim($field), -1) != '.') {
-				$user[$field] = $newFieldValue;
-			}
-		}
-		
+	function transferShibbolethAttributesToUserArray($user) {
+		if ($this->writeDevLog) t3lib_div::devlog('transferShibbolethAttributesToUserArray','shibboleth',0,array('user' => $user, 'this_config' => $this->config));
+			// We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
+		$user['tx_shibboleth_config'] = $this->config['userControls.'];
 		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
-
+			
+		$user['_allowUser'] = $this->getSingle($user['tx_shibboleth_config']['allowUser'],$user['tx_shibboleth_config']['allowUser.']);
+		
 			// Create random password, if the user is new.
 		if (!isset($user['uid'])) {
 			$user[$this->db_user['userident_column']] = sha1(mt_rand());
 		}
 
 			// Force idField and idValue to be consistent with the IDMapping config, overwriting 
-			// any possible mis-configuration from the fieldsMapping config
+			// any possible mis-configuration from the other fields mapping entries
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
 		$user[$idField] = $idValue;
 		
-		if ($this->writeDevLog) t3lib_div::devlog('mapShibbolethAttributesToUserArray: newUserArray','shibboleth',0,$user);
+		if ($this->writeDevLog) t3lib_div::devlog('transferShibbolethAttributesToUserArray: newUserArray','shibboleth',0,$user);
 		return $user;
 	}
 	
@@ -139,13 +136,21 @@ class tx_shibboleth_userhandler {
 				// User is in DB, so we have to update, therefore remove uid from DB record and save it for later
 			$uid = $user['uid'];
 			unset($user['uid']);
+				// We have to update the tstamp field, in any case.
+			$user['tstamp'] = time();
 			
 				// Don't automatically change groups after first creation
-				// TODO: Do we need a config for that?
-				//       How about defining a positive list of override fields?
-			unset($user['usergroup']);
-				// We have to update the tstamp field, too.
-			$user['tstamp'] = time();
+			foreach($user['tx_shibboleth_config']['updateUserFieldsMapping.'] as $field => $fieldConfig) {
+				$newFieldValue = $this->getSingle($user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field],$user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field . '.']);
+				if(substr(trim($field), -1) != '.') {
+					$user[$field] = $newFieldValue;
+				}
+			}
+				// Remove that data from $user - otherwise we get an error updating the user record in DB
+			unset($user['tx_shibboleth_config']);
+			
+				// TODO: (On TUM server) Move and change working copy of config.txt
+				// TODO: Change config.txt to be a good general sample
 
 				// Update
 			$table = $this->db_user['table'];
@@ -162,6 +167,14 @@ class tx_shibboleth_userhandler {
 				// We have to set crdate and tstamp correctly
 			$user['crdate'] = time();
 			$user['tstamp'] = time();
+			foreach($user['tx_shibboleth_config']['createUserFieldsMapping.'] as $field => $fieldConfig) {
+				$newFieldValue = $this->getSingle($user['tx_shibboleth_config']['createUserFieldsMapping.'][$field],$user['tx_shibboleth_config']['createUserFieldsMapping.'][$field . '.']);
+				if(substr(trim($field), -1) != '.') {
+					$user[$field] = $newFieldValue;
+				}
+			}
+				// Remove that data from $user - otherwise we get an error inserting the user record into DB
+			unset($user['tx_shibboleth_config']);
 				// Determine correct pid for new user
 			if ($this->loginType == 'FE') {
 				$user['pid'] = intval($this->shibboleth_extConf['FE_autoImport_pid']);

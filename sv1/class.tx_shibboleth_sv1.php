@@ -27,9 +27,7 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-	// TODO: Documentation: How to prepare auto-import in BE (Admin flag, group settings)
-	// TODO: ish (optional) Change behaviour of timeout-window of T3 BE? Maybe, teaching BE users is sufficient.
-	// (Observation: If logged in to BE using Shibboleth and TYPO3 timeout occurs, you have to click Logout to re-login.)
+	// TODO: Documentation: How to prepare auto-import in BE (Admin flag, etc.)
 	
 require_once(t3lib_extMgm::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
@@ -54,14 +52,14 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	 *
 	 * @return	[type]		...
 	 */
-	function init()	{
+	function init() {
 		$available = parent::init();
-
+		
 		// Here you can initialize your class.
-
+		
 		// The class have to do a strict check if the service is available.
 		// The needed external programs are already checked in the parent class.
-
+		
 		// If there's no reason for initialization you can remove this function.
 
 		global $TYPO3_CONF_VARS;
@@ -128,7 +126,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 			// Fetched matching user successfully from DB or auto-import is allowed
 			// get some basic user data from shibboleth server-variables
-		$user = $userhandler->mapShibbolethAttributesToUserArray($user);
+		$user = $userhandler->transferShibbolethAttributesToUserArray($user);
 		if($this->writeDevLog) t3lib_div::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
 
 		if (!$isAlreadyThere) {
@@ -182,9 +180,6 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			// This user is not yet logged in
 		if (is_array($user) && $user['_allowUser']) {
 			unset ($user['_allowUser']);
-				// TODO: Test after removed condition. 
-				// TODO: Removed condition (see next comment line); however, now we have nothing that prevents creating lot's of users on login attempts.
-					#		if (is_array($user) && $user[$this->db_user['usergroup_column']]) {
 				// Before we return our positiv result, we have to update/insert the user in DB
 			$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 			$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
@@ -194,7 +189,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			return 200;
 		}
 		
-		if($this->writeDevLog) t3lib_div::devlog('authUser: Refusing auth based on criteria. (usergroup)','shibboleth',0,array($user[$this->db_user['usergroup_column']]));
+		if($this->writeDevLog) t3lib_div::devlog('authUser: Refusing auth based because _allowUser = 0','shibboleth',0,$user);
 		return false; // To be safe: Default access is no access.
 	}
 
