@@ -1,4 +1,4 @@
-  # cat=basic/enable; type=string; label=entityID of our ServiceProvider: See your shibboleth xml config file (shibboleth2.xml): attribute "entityID" of relevant Application definition
+  # cat=basic/enable; type=string; label=entityID of your Identity Provider (IdP): Can be used to overwrite any discovery method defined in your shibboleth xml config file (shibboleth2.xml)
 entityID=
   # cat=basic/enable; type=string; label=URL of Shibboleth handler: See your shibboleth xml config file (shibboleth2.xml): attribute "handlerURL" of tag "Sessions"; no leading slash!
 sessions_handlerURL = Shibboleth.sso

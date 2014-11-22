@@ -107,7 +107,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
 		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
-		
+
 		$user = $userhandler->getUserFromDB();
 		if($this->writeDevLog) t3lib_div::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
 		

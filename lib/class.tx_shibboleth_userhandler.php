@@ -75,7 +75,9 @@ class tx_shibboleth_userhandler {
 	}
 	
 	function getUserFromDB() {
-		if ($this->writeDevLog) t3lib_div::devlog('getUserFromDB: start','shibboleth');
+		if ($this->writeDevLog) {
+			t3lib_div::devlog('getUserFromDB: start','shibboleth');
+		}
 		
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
@@ -225,7 +227,7 @@ class tx_shibboleth_userhandler {
 	}
 	
 	function getSingle($conf,$subconf='') {
-if ($this->writeDevLog) t3lib_div::devlog('getSingle ($conf,$subconf)','shibboleth',0,array('conf' => $conf, 'subconf' => $subconf));
+		if ($this->writeDevLog) t3lib_div::devlog('getSingle ($conf,$subconf)','shibboleth',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
 				$GLOBALS['TSFE']->cObjectDepthCounter = 100;
@@ -237,7 +239,7 @@ if ($this->writeDevLog) t3lib_div::devlog('getSingle ($conf,$subconf)','shibbole
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
-if ($this->writeDevLog) t3lib_div::devlog('getSingle ($result)','shibboleth',0,array('result' => $result));
+		if ($this->writeDevLog) t3lib_div::devlog('getSingle ($result)','shibboleth',0,array('result' => $result));
 		return $result;
 	}
 	
