@@ -93,7 +93,7 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		}
 		
 		$content='
-			<a href="' . $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . 
+			<a href="' . $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' .
 			rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . $entityIDparam . '">' . $linkText . '</a>
 		';
 
