@@ -75,7 +75,7 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		
 		$entityIDparam = $extConf['entityID'];
 		if ($entityIDparam != '') {
-			$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+			$entityIDparam = 'entityID='. rawurldecode($entityIDparam);
 		}
 		
 		$typo3_site_url = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
@@ -91,10 +91,21 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
 			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
 		}
+
+		$targetParam = 'target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL'));
+
+		if (($entityIDparam != '') and ($targetParam != '')) {
+			$params = $entityIDparam . '&' . $targetParam;
+		} else {
+			$params = $entityIDparam . $targetParam;
+		}
+
+		if ($params != '') {
+			$params = '?' . $params;
+		}
 		
 		$content='
-			<a href="' . $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' .
-			rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . $entityIDparam . '">' . $linkText . '</a>
+			<a href="' . $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . $params . '">' . $linkText . '</a>
 		';
 
 		return $this->pi_wrapInBaseClass($content);
