@@ -84,7 +84,7 @@ class tx_shibboleth_pi1 extends tslib_pibase {
 		}
 		
 			// TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
-		$linkText = 'Login ueber Shibboleth';
+		$linkText = 'Login &uuml;ber Shibboleth';
 		
 		$sessionHandlerUrl = $extConf['sessions_handlerURL'];
 		
