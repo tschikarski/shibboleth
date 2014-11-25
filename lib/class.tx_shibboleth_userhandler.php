@@ -51,7 +51,6 @@ class tx_shibboleth_userhandler {
 	function __construct($loginType, $db_user, $db_group, $shibSessionIDname, $writeDevLog = FALSE) {
 		global $TYPO3_CONF_VARS;
 		$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog;
-		//die('this->writeDevLog = '. ($this->writeDevLog?'T':'F'));
 		if ($this->writeDevLog) t3lib_div::devlog('constructor','shibboleth');
 		
 		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
