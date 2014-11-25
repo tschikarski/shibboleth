@@ -106,7 +106,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 		}
 		
 		$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
+		$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 
 		$user = $userhandler->getUserFromDB();
 		if($this->writeDevLog) t3lib_div::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
@@ -184,7 +184,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 			unset ($user['_allowUser']);
 				// Before we return our positiv result, we have to update/insert the user in DB
 			$userhandler_classname = t3lib_div::makeInstanceClassName('tx_shibboleth_userhandler');
-			$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID);
+			$userhandler = new $userhandler_classname($this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
 			$user['uid'] = $userhandler->synchronizeUserData($user);
 			if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
