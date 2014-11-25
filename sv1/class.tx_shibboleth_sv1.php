@@ -169,10 +169,12 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 				return 200;
 			}
 			
-				// Shibboleth session gone or changed, refuse authentication, even log off a logged in user!
-			if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session changed. Log off present user!','shibboleth',0,$_SERVER);
-				// Just returning FALSE will not log off an already active user!
-			$this->pObj->logoff();
+//				// Shibboleth session gone or changed, refuse authentication, even log off a logged in user!
+//			if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session changed. Log off present user!','shibboleth',0,$_SERVER);
+//				// Just returning FALSE will not log off an already active user!
+//			$this->pObj->logoff();
+
+				// Shibboleth session gone or changed, this is just a re-authentication via Shibboleth, nothing to do
 		}
 		
 		if($this->writeDevLog) t3lib_div::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
