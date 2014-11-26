@@ -28,8 +28,8 @@ t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /
 			'subtype' => $subtypes,
 
 			'available' => TRUE,
-			'priority' => 50,
-			'quality' => 50,
+			'priority' => 65,       // tx_svauth_sv1 has 50, t3sec_saltedpw has 55, rsaauth has 60. This service must have higher priority!
+			'quality' => 65,
 
 			'os' => '',
 			'exec' => '',
