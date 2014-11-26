@@ -69,8 +69,10 @@ class tx_shibboleth_beform {
 		// Modify BE login form only, if config option is set
 		if ($extConf['BE_linkInLoginForm'] == 0) return $scriptCode;
 		// add jquery core
-		$scriptCode .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
-			// add custom jquery
+		$scriptCode .= '<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
+			// Explanation: Use "protocol-less" reference to always use http or https as used by the page; see
+			// http://encosia.com/cripple-the-google-cdns-caching-with-a-single-character/ for a motivation
+			// TODO: add custom jquery
 			// TODO: JS error in IE
 			// TODO: Make link text/image user configurable
 		$scriptCode .= '<script type="text/javascript">
