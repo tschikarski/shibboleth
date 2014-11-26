@@ -1,4 +1,6 @@
-  # cat=basic/enable; type=string; label=entityID of your Identity Provider (IdP): Can be used to overwrite any discovery method defined in your shibboleth xml config file (shibboleth2.xml)
+  # cat=basic/enable; type=boolean; label=Enable alwaysFetchUser: Detects a local Shibboleth session at any circumstances. You might have to set to FALSE, if living behind a load balancer.
+enableAlwaysFetchUser = 1
+  # cat=basic/enable; type=string; label=entityID of your IdP: Can be used to overwrite any discovery method defined in your shibboleth config file (shibboleth2.xml)
 entityID=
   # cat=basic/enable; type=string; label=URL of Shibboleth handler: See your shibboleth xml config file (shibboleth2.xml): attribute "handlerURL" of tag "Sessions"; no leading slash!
 sessions_handlerURL = Shibboleth.sso

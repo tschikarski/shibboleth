@@ -6,15 +6,22 @@ if (!defined ('TYPO3_MODE')) {
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1';
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1'; 
 
-// Activate the following two lines, in case you want to give your Shibboleth-SP
-// full control over logging in and out. However, in that case you have to ensure
-// that the Shibboleth-SP is maintaining it's session during the whole user session,
-// which might be a problem, if used in connection with load balancing.
-// Additionally, this will imply a strange behaviour of the Logout button as well as
-// the BE timeout warning window.
 
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
+// Configuration of authentication service.
+$EXT_CONFIG = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+
+if ($EXT_CONFIG['enableAlwaysFetchUser']) {
+	// Activate the following two lines, in case you want to give your Shibboleth-SP
+	// full control over logging in and out. However, in that case you have to ensure
+	// that the Shibboleth-SP is maintaining it's session during the whole user session,
+	// which might be a problem, if used in connection with load balancing.
+	// Additionally, this will imply a strange behaviour of the Logout button as well as
+	// the BE timeout warning window.
+
+	$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
+	$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
+
+}
 
 $subtypes = 'getUserFE,authUserFE,getUserBE,authUserBE';
 #$subtypes = 'getUserFE,authUserFE';
