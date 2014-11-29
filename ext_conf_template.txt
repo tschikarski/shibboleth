@@ -16,8 +16,8 @@ FE_applicationID =
 FE_autoImport = 1
   # cat=basic/enable; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
 FE_autoImport_pid = 29
-  # cat=basic/enable; type=boolean; label=BE Link in Log In Form: If checked, the BE log in form is modified and contains a link to the Shibboleth login
-BE_linkInLoginForm = 1
+  # cat=basic/enable; type=boolean; label=BE Link in Log In Form (EXPERIMENTAL!): If checked, the BE log in form is modified and contains a link to the Shibboleth login
+BE_linkInLoginForm = 0
   # cat=basic/enable; type=string; label=BE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
 BE_applicationID =
   # cat=basic/enable; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
