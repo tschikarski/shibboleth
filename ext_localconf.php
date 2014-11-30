@@ -23,8 +23,20 @@ if ($EXT_CONFIG['enableAlwaysFetchUser']) {
 
 }
 
-$subtypes = 'getUserFE,authUserFE,getUserBE,authUserBE';
-#$subtypes = 'getUserFE,authUserFE';
+if ($EXT_CONFIG['FE_enable']) {
+	$subtypesArray[] = 'getUserFE';
+	$subtypesArray[] = 'authUserFE';
+}
+
+if ($EXT_CONFIG['BE_enable']) {
+	$subtypesArray[] = 'getUserBE';
+	$subtypesArray[] = 'authUserBE';
+}
+
+if (is_array($subtypesArray)) {
+	$subtypesArray = array_unique($subtypesArray);
+	$subtypes = implode(',',$subtypesArray);
+}
 
 t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /* sv key */,
 		array(
@@ -51,10 +63,10 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'] 
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginScriptHook']['sv'] = 'EXT:' . $_EXTKEY . '/hooks/class.tx_shibboleth_beform.php:tx_shibboleth_beform->addShibbolethJavaScript';
 
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLog'] = FALSE;
-$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogFE'] = TRUE;
-$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogBE'] = FALSE;
+$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogFE'] = FALSE;
+$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogBE'] = TRUE;
 
-$TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] = TRUE;
+//$TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] = TRUE;
 
 t3lib_extMgm::addPItoST43($_EXTKEY, 'pi1/class.tx_shibboleth_pi1.php', '_pi1', 'list_type', 0);
 ?>

@@ -10,12 +10,16 @@ forceSSL = 1
 sessionInitiator_Location = /Login
   # cat=basic/enable; type=string; label=Path to field mapping config file: Path from TYPO3 root directory pointing to text file mit typoscript-like configuration containing field mappings
 mappingConfigPath = /typo3conf/ext/shibboleth/res/config.txt
+  # cat=basic/enable; type=boolean; label=Enable Shibboleth for FE
+FE_enable = 1
   # cat=basic/enable; type=string; label=FE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
 FE_applicationID =
   # cat=basic/enable; type=boolean; label=FE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as FE users
 FE_autoImport = 1
   # cat=basic/enable; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
 FE_autoImport_pid = 29
+  # cat=basic/enable; type=boolean; label=Enable Shibboleth for BE
+BE_enable = 0
   # cat=basic/enable; type=boolean; label=BE Link in Log In Form (EXPERIMENTAL!): If checked, the BE log in form is modified and contains a link to the Shibboleth login
 BE_linkInLoginForm = 0
   # cat=basic/enable; type=string; label=BE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
