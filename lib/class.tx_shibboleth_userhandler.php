@@ -116,10 +116,8 @@ class tx_shibboleth_userhandler {
 			
 		$user['_allowUser'] = $this->getSingle($user['tx_shibboleth_config']['allowUser'],$user['tx_shibboleth_config']['allowUser.']);
 		
-			// Create random password, if the user is new.
-		if (!isset($user['uid'])) {
-			$user[$this->db_user['userident_column']] = sha1(mt_rand());
-		}
+			// Always create random password, as might have to fight against attempts to set a known password for the user.
+		$user[$this->db_user['userident_column']] = 'shibb:' . sha1(mt_rand());
 
 			// Force idField and idValue to be consistent with the IDMapping config, overwriting 
 			// any possible mis-configuration from the other fields mapping entries
