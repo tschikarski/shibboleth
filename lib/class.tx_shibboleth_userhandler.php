@@ -208,9 +208,6 @@ class tx_shibboleth_userhandler {
 		
 		if ($this->writeDevLog) t3lib_div::devlog('configString','shibboleth',0,array($configString));
 		
-		if(!class_exists('t3lib_TSparser') && defined('PATH_t3lib')) {
-			require_once(PATH_t3lib.'class.t3lib_TSparser.php');
-		}
 		$parser = t3lib_div::makeInstance('t3lib_TSparser');
 		$parser->parse($configString);
 
