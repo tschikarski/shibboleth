@@ -18,6 +18,8 @@ FE_applicationID =
 FE_autoImport = 1
   # cat=basic/enable; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
 FE_autoImport_pid = 29
+  # cat=basic/enable; type=boolean; label=FE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
+FE_devLog = 0
   # cat=basic/enable; type=boolean; label=Enable Shibboleth for BE: ATTENTION! Take care to disable all imported Shibboleth users, when deactivating this or uninstalling the extension!
 BE_enable = 0
   # cat=basic/enable; type=boolean; label=BE Link in Log In Form (EXPERIMENTAL!): If checked, the BE log in form is modified and contains a link to the Shibboleth login
@@ -28,3 +30,5 @@ BE_applicationID =
 BE_autoImport = 0
   # cat=basic/enable; type=boolean; label=BE User Autoimport in Disabled State: If this is checked and BE Autoimport is enabled, new BE users are disabled
 BE_autoImportDisableUser = 1
+  # cat=basic/enable; type=boolean; label=BE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
+BE_devLog = 0
