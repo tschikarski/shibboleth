@@ -137,7 +137,6 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 	}
 	
 	function authUser(&$user) {
-		t3lib_div::devlog('writeDevLog: ' . $this->writeDevLog?'TRUE':'FALSE','shibboleth');
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->ShibSessionID],'shibboleth',0,$user);
 		
 		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
