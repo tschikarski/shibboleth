@@ -8,7 +8,7 @@ sessions_handlerURL = Shibboleth.sso
 forceSSL = 1
   # cat=basic/enable; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"; with leading slash!
 sessionInitiator_Location = /Login
-  # cat=basic/enable; type=string; label=Path to field mapping config file: Path from TYPO3 root directory pointing to text file mit typoscript-like configuration containing field mappings
+  # cat=basic/enable; type=string; label=Path to field mapping config file: Path from TYPO3 root directory pointing to text file mit typoscript-like configuration containing field mappings. ATTENTION: This file is crucial for allowing / disallowing Shibboleth users into FE, BE, groups etc.
 mappingConfigPath = /typo3conf/ext/shibboleth/res/config.txt
   # cat=basic/enable; type=boolean; label=Enable Shibboleth for FE: ATTENTION! Take care to disable all imported Shibboleth users, when deactivating this or uninstalling the extension!
 FE_enable = 1
