@@ -186,7 +186,7 @@ class tx_shibboleth_sv1 extends tx_sv_authbase {
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
 			$user['uid'] = $userhandler->synchronizeUserData($user);
 			if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
-			return 200;
+			if (! $user['disable']) return 200;
 		}
 		
 		if($this->writeDevLog) t3lib_div::devlog('authUser: Refusing auth based because _allowUser = 0','shibboleth',0,$user);
