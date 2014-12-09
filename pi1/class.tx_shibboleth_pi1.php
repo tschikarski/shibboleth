@@ -34,7 +34,7 @@
  * @package	TYPO3
  * @subpackage	tx_shibboleth
  */
-class tx_shibboleth_pi1 extends tslib_pibase {
+class tx_shibboleth_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	var $prefixId      = 'tx_shibboleth_pi1';		// Same as class name
 	var $scriptRelPath = 'pi1/class.tx_shibboleth_pi1.php';	// Path to this script relative to the extension dir.
 	var $extKey        = 'shibboleth';	// The extension key.
