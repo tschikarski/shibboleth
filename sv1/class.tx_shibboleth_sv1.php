@@ -39,7 +39,7 @@ require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibbo
  * @subpackage	tx_shibboleth
  */
 
-class tx_shibboleth_sv1 extends tx_sv_authbase {
+class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 	var $prefixId = 'tx_shibboleth_sv1';		// Same as class name
 	var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
 	var $extKey = 'shibboleth';	// The extension key.
