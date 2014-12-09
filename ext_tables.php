@@ -1,4 +1,5 @@
 <?php
+
 if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
@@ -6,10 +7,10 @@ if (!defined ('TYPO3_MODE')) {
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1']='layout,select_key';
 
 
-t3lib_extMgm::addPlugin(array(
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(array(
 	'LLL:EXT:shibboleth/locallang_db.xml:tt_content.list_type_pi1',
 	$_EXTKEY . '_pi1',
-	t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($_EXTKEY) . 'ext_icon.gif'
 ),'list_type');
 
 $tempColumns = array (
@@ -23,8 +24,8 @@ $tempColumns = array (
 );
 
 
-t3lib_extMgm::addTCAcolumns('fe_users',$tempColumns);
-t3lib_extMgm::addToAllTCAtypes('fe_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('fe_users',$tempColumns);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('fe_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 
 $tempColumns = array (
 	'tx_shibboleth_shibbolethsessionid' => array (		
@@ -37,6 +38,6 @@ $tempColumns = array (
 );
 
 
-t3lib_extMgm::addTCAcolumns('be_users',$tempColumns);
-t3lib_extMgm::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('be_users',$tempColumns);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 ?>
