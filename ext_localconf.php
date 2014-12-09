@@ -53,7 +53,6 @@ t3lib_extMgm::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /
 			'os' => '',
 			'exec' => '',
 
-			'classFile' => t3lib_extMgm::extPath($_EXTKEY).'sv1/class.tx_shibboleth_sv1.php',
 			'className' => 'tx_shibboleth_sv1',
 		)
 	);
