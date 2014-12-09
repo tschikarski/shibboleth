@@ -3,7 +3,6 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
-t3lib_div::loadTCA('tt_content');
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1']='layout,select_key';
 
 
@@ -24,7 +23,6 @@ $tempColumns = array (
 );
 
 
-t3lib_div::loadTCA('fe_users');
 t3lib_extMgm::addTCAcolumns('fe_users',$tempColumns);
 t3lib_extMgm::addToAllTCAtypes('fe_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 
@@ -39,7 +37,6 @@ $tempColumns = array (
 );
 
 
-t3lib_div::loadTCA('be_users');
 t3lib_extMgm::addTCAcolumns('be_users',$tempColumns);
 t3lib_extMgm::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 ?>
