@@ -25,7 +25,7 @@ $tempColumns = array (
 
 
 t3lib_div::loadTCA('fe_users');
-t3lib_extMgm::addTCAcolumns('fe_users',$tempColumns,1);
+t3lib_extMgm::addTCAcolumns('fe_users',$tempColumns);
 t3lib_extMgm::addToAllTCAtypes('fe_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 
 $tempColumns = array (
@@ -40,6 +40,6 @@ $tempColumns = array (
 
 
 t3lib_div::loadTCA('be_users');
-t3lib_extMgm::addTCAcolumns('be_users',$tempColumns,1);
+t3lib_extMgm::addTCAcolumns('be_users',$tempColumns);
 t3lib_extMgm::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 ?>
