@@ -27,6 +27,8 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Plugin 'Shibboleth Login' for the 'shibboleth' extension.
  *
@@ -75,7 +77,7 @@ class tx_shibboleth_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 			$entityIDparam = 'entityID='. rawurldecode($entityIDparam);
 		}
 		
-		$typo3_site_url = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
+		$typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
 		if ($extConf['forceSSL']) {
 			$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
 		}
@@ -89,7 +91,7 @@ class tx_shibboleth_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
 		}
 
-		$targetParam = 'target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL'));
+		$targetParam = 'target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'));
 
 		if (($entityIDparam != '') and ($targetParam != '')) {
 			$params = $entityIDparam . '&' . $targetParam;

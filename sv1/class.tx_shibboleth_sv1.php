@@ -27,8 +27,8 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-	// TODO: Documentation: How to prepare auto-import in BE (Admin flag, etc.)
-	
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
 
 /**
@@ -80,12 +80,12 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 		if (is_object($GLOBALS['TSFE'])) {
 			$isAlreadyThere = TRUE;
 		}
-		
-		if($this->writeDevLog) t3lib_div::devlog('getUser ($_SERVER)','shibboleth',0,$_SERVER);
-		if($this->writeDevLog) t3lib_div::devlog('getUser: mode: ' . $this->mode,'shibboleth'); // subtype
-		if($this->writeDevLog) t3lib_div::devlog('getUser: loginType: ' . $this->authInfo['loginType'],'shibboleth'); // BE or FE
-		if($this->writeDevLog) t3lib_div::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
-		if($this->writeDevLog) t3lib_div::devlog('getUser: (loginData)','shibboleth',0,$this->login);
+
+		if($this->writeDevLog) GeneralUtility::devlog('getUser ($_SERVER)','shibboleth',0,$_SERVER);
+		if($this->writeDevLog) GeneralUtility::devlog('getUser: mode: ' . $this->mode,'shibboleth'); // subtype
+		if($this->writeDevLog) GeneralUtility::devlog('getUser: loginType: ' . $this->authInfo['loginType'],'shibboleth'); // BE or FE
+		if($this->writeDevLog) GeneralUtility::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
+		if($this->writeDevLog) GeneralUtility::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 		
 			// check, if there is a user that is Shibboleth authenticated (with a correct application ID, if required by configuration)
 			// Remark: Best recognition of Shibboleth session by $_SERVER['AUTH_TYPE'] == 'shibboleth', as other Shibboleth-specific 
@@ -94,39 +94,39 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 			($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
 			$this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->ShibApplicationID])
 		) {
-			if($this->writeDevLog) t3lib_div::devlog('getUser: no applicable Shibboleth session present','shibboleth',0,$_SERVER);
+			if($this->writeDevLog) GeneralUtility::devlog('getUser: no applicable Shibboleth session present','shibboleth',0,$_SERVER);
 				// Unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
 				// But: Log off only, if the logged in user came from Shibboleth, i.e. has a non-empty special field!
 			if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
-				if($this->writeDevLog) t3lib_div::devlog('getUser: ... so logging off actively ($this->authInfo[\'userSession\'])','shibboleth',0,$this->authInfo['userSession']);
+				if($this->writeDevLog) GeneralUtility::devlog('getUser: ... so logging off actively ($this->authInfo[\'userSession\'])','shibboleth',0,$this->authInfo['userSession']);
 				$this->pObj->logoff();
 			}
 			
 			return FALSE;
 		}
 		
-		$userhandler = t3lib_div::makeInstance('tx_shibboleth_userhandler',$this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
+		$userhandler = GeneralUtility::makeInstance('tx_shibboleth_userhandler',$this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 
 		$user = $userhandler->getUserFromDB();
-		if($this->writeDevLog) t3lib_div::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
+		if($this->writeDevLog) GeneralUtility::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
 		
 		if (!is_array($user)) {
 				// Got no matching user from DB
-			if($this->writeDevLog) t3lib_div::devlog('getUser: no matching user in DB','shibboleth');
+			if($this->writeDevLog) GeneralUtility::devlog('getUser: no matching user in DB','shibboleth');
 			if (!$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']){
 					// No auto-import for this login type, no user found -> no login possible, don't return a user record.
-				if($this->writeDevLog) t3lib_div::devlog('getUser: no auto-import configured; will exit','shibboleth',0,$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']);
-				// if($this->writeDevLog) t3lib_div::devlog('getUser: extConf','shibboleth',0,$this->shibboleth_extConf);
+				if($this->writeDevLog) GeneralUtility::devlog('getUser: no auto-import configured; will exit','shibboleth',0,$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']);
+				// if($this->writeDevLog) GeneralUtility::devlog('getUser: extConf','shibboleth',0,$this->shibboleth_extConf);
 				
 				return false;
 			} else {
-				if($this->writeDevLog) t3lib_div::devlog('getUser: preparing ($user) for auto-import','shibboleth',0,$user);
+				if($this->writeDevLog) GeneralUtility::devlog('getUser: preparing ($user) for auto-import','shibboleth',0,$user);
 			}
 		}
 			// Fetched matching user successfully from DB or auto-import is allowed
 			// get some basic user data from shibboleth server-variables
 		$user = $userhandler->transferShibbolethAttributesToUserArray($user);
-		if($this->writeDevLog) t3lib_div::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
+		if($this->writeDevLog) GeneralUtility::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
 
 		if (!$isAlreadyThere) {
 			unset($GLOBALS['TSFE']);
@@ -136,13 +136,13 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 	}
 	
 	function authUser(&$user) {
-		if($this->writeDevLog) t3lib_div::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->ShibSessionID],'shibboleth',0,$user);
+		if($this->writeDevLog) GeneralUtility::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->ShibSessionID],'shibboleth',0,$user);
 		
-		if($this->writeDevLog) t3lib_div::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
+		if($this->writeDevLog) GeneralUtility::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
 		
 			// If the user come not from shibboleth getUser, we will ignore it.
 		if (!$user['tx_shibboleth_shibbolethsessionid']) {
-			if($this->writeDevLog) t3lib_div::devlog('authUser: This is not our user. Exiting.','shibboleth');
+			if($this->writeDevLog) GeneralUtility::devlog('authUser: This is not our user. Exiting.','shibboleth');
 			return 100;
 		}
 			// Check, if we have an already logged in TYPO3 user.
@@ -150,46 +150,46 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 				// Some user is already logged in to TYPO3, check if it is a Shibboleth user 
 			if (!$this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
 					// The presently logged in user is not a shibboleth user, we do nothing
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));	
+				if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));	
 				return 100;
 			}
 			
 				// For safety: Check for existing Shibboleth-Session and return FALSE, otherwise!
 			if (!$_SERVER[$this->ShibSessionID]) {
 					// With no Shibboleth session we won't authenticate anyone!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
+				if($this->writeDevLog) GeneralUtility::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
 				return FALSE;
 			}
 			
 				// The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, Session-ID might have changed on some miraculous way
 			if ($_SERVER[$this->ShibSessionID] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
 					// Shibboleth session still the same, authenticate!
-				if($this->writeDevLog) t3lib_div::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER[$this->ShibSessionID]));	
+				if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
 				return 200;
 			}
 			
 //				// Shibboleth session gone or changed, refuse authentication, even log off a logged in user!
-//			if($this->writeDevLog) t3lib_div::devlog('authUser: Shib-Session changed. Log off present user!','shibboleth',0,$_SERVER);
+//			if($this->writeDevLog) GeneralUtility::devlog('authUser: Shib-Session changed. Log off present user!','shibboleth',0,$_SERVER);
 //				// Just returning FALSE will not log off an already active user!
 //			$this->pObj->logoff();
 
 				// Shibboleth session gone or changed, this is just a re-authentication via Shibboleth, nothing to do
 		}
 		
-		if($this->writeDevLog) t3lib_div::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
+		if($this->writeDevLog) GeneralUtility::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
 		
 			// This user is not yet logged in
 		if (is_array($user) && $user['_allowUser']) {
 			unset ($user['_allowUser']);
 				// Before we return our positiv result, we have to update/insert the user in DB
-			$userhandler = t3lib_div::makeInstance('tx_shibboleth_userhandler',$this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
+			$userhandler = GeneralUtility::makeInstance('tx_shibboleth_userhandler',$this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
 			$user['uid'] = $userhandler->synchronizeUserData($user);
-			if($this->writeDevLog) t3lib_div::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
+			if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
 			if (! $user['disable']) return 200;
 		}
 		
-		if($this->writeDevLog) t3lib_div::devlog('authUser: Refusing auth based because _allowUser = 0','shibboleth',0,$user);
+		if($this->writeDevLog) GeneralUtility::devlog('authUser: Refusing auth based because _allowUser = 0','shibboleth',0,$user);
 		return false; // To be safe: Default access is no access.
 	}
 

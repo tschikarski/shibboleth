@@ -27,6 +27,7 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Hook for creating the link to the shibboleth authentication in the backend form.
@@ -42,12 +43,12 @@ class tx_shibboleth_beform {
 		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']); 
 		$function = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'];
 		$params = array();
-		$scriptCode = t3lib_div::callUserFunction($function, $params, $pObj);
+		$scriptCode = GeneralUtility::callUserFunction($function, $params, $pObj);
 		$entityIDparam = $extConf['entityID'];
 		if ($entityIDparam != '') {
 			$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
 		}
-		$typo3_site_url = t3lib_div::getIndpEnv('TYPO3_SITE_URL');
+		$typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
 		if ($extConf['forceSSL']) {
 			$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
 		}
@@ -56,9 +57,9 @@ class tx_shibboleth_beform {
 		if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
 			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
 		}
-		$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(t3lib_div::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
+		$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
 		
-		if (t3lib_div::_GP('redirecttoshibboleth') == 'yes') {
+		if (GeneralUtility::_GP('redirecttoshibboleth') == 'yes') {
 			$scriptCode .= '<script language="javascript" type="text/javascript">
 				window.location.href = \'' . $shiblinkUrl . '\';
 				</script>
