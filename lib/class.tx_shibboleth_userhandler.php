@@ -132,7 +132,7 @@ class tx_shibboleth_userhandler {
 		return $user;
 	}
 	
-	function synchronizeUserData($user) {
+	function synchronizeUserData(&$user) {
 		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','shibboleth',0,$user);
 		
 		if($user['uid']) {
