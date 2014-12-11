@@ -11,6 +11,8 @@ tx_shibboleth {
 			createUserFieldsMapping {
 				email = TEXT
 				email.field = REMOTE_USER
+				usergroup = TEXT
+				usergroup.value = 1
 			}
 			updateUserFieldsMapping {
 				email = TEXT
