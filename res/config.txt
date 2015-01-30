@@ -13,6 +13,13 @@ tx_shibboleth {
 				email.field = REMOTE_USER
 				usergroup = TEXT
 				usergroup.value = 1
+
+				realName = COA
+				realName.1 = TEXT
+				realName.1.field = sn
+				realName.3 = TEXT
+				realName.3.field = givenName
+				realName.3.noTrimWrap  = |, ||
 			}
 			updateUserFieldsMapping {
 				email = TEXT

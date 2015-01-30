@@ -187,11 +187,11 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 			$userhandler = GeneralUtility::makeInstance('TrustCnct\\Shibboleth\\tx_shibboleth_userhandler',$this->authInfo['loginType'], $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
 			$user['uid'] = $userhandler->synchronizeUserData($user);
-			if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; Auth OK','shibboleth');
-			if (! $user['disable']) return 200;
+			if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; ($user attached).','shibboleth',0,$user);
+			if ((! $user['disable']) AND ($user['uid']>0)) return 200;
 		}
 		
-		if($this->writeDevLog) GeneralUtility::devlog('authUser: Refusing auth based because _allowUser = 0','shibboleth',0,$user);
+		if($this->writeDevLog) GeneralUtility::devlog('authUser: Refusing auth','shibboleth',0,$user);
 		return false; // To be safe: Default access is no access.
 	}
 

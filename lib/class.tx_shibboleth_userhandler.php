@@ -154,6 +154,7 @@ class tx_shibboleth_userhandler {
 			
 				// TODO: (On TUM server) Move and change working copy of config.txt
 
+			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth',0,$user);
 				// Update
 			$table = $this->db_user['table'];
 			$where = 'uid='.intval($uid);
@@ -190,12 +191,17 @@ class tx_shibboleth_userhandler {
 				// Insert
 			$table = $this->db_user['table'];
 			$insertFields = $user;
+			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table '.$table,'shibboleth',0,$user);
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
 				$table, 
 				$insertFields
 			);
 				// get uid
 			$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+			if (!$uid) {
+				unset($user);
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth');
+			}
 		}
 		
 		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth');
