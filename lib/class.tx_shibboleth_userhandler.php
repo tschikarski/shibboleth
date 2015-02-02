@@ -160,11 +160,16 @@ class tx_shibboleth_userhandler {
 			$where = 'uid='.intval($uid);
 			#$where=$GLOBALS['TYPO3_DB']->fullQuoteStr($inputString,$table);
 			$fields_values = $user;
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				$table, 
 				$where, 
 				$fields_values
 			);
+			if (! $res) {
+				unset($user);
+				$uid = 0;
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth');
+			}
 		} else {
 				// We will insert a new user
 				// We have to set crdate and tstamp correctly
