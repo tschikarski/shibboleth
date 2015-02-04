@@ -151,19 +151,22 @@ class tx_shibboleth_userhandler {
 			}
 				// Remove that data from $user - otherwise we get an error updating the user record in DB
 			unset($user['tx_shibboleth_config']);
-			
-				// TODO: (On TUM server) Move and change working copy of config.txt
-
+			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth',0,$user);
 				// Update
 			$table = $this->db_user['table'];
 			$where = 'uid='.intval($uid);
 			#$where=$GLOBALS['TYPO3_DB']->fullQuoteStr($inputString,$table);
 			$fields_values = $user;
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				$table, 
 				$where, 
 				$fields_values
 			);
+			if (! $res) {
+				unset($user);
+				$uid = 0;
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth');
+			}
 		} else {
 				// We will insert a new user
 				// We have to set crdate and tstamp correctly
@@ -190,12 +193,17 @@ class tx_shibboleth_userhandler {
 				// Insert
 			$table = $this->db_user['table'];
 			$insertFields = $user;
+			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table '.$table,'shibboleth',0,$user);
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
 				$table, 
 				$insertFields
 			);
 				// get uid
 			$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+			if (!$uid) {
+				unset($user);
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth');
+			}
 		}
 		
 		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth');
