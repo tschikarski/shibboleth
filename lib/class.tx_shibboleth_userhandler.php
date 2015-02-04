@@ -151,9 +151,6 @@ class tx_shibboleth_userhandler {
 			}
 				// Remove that data from $user - otherwise we get an error updating the user record in DB
 			unset($user['tx_shibboleth_config']);
-			
-				// TODO: (On TUM server) Move and change working copy of config.txt
-
 			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth',0,$user);
 				// Update
 			$table = $this->db_user['table'];
