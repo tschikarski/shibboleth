@@ -15,8 +15,8 @@ tx_shibboleth {
 			updateUserFieldsMapping {
 				email = TEXT
 				email.field = REMOTE_USER
-				name = TEXT
-				name.value = Testname
+				dname = TEXT
+				dname.value = Testname
 				first_name = TEXT
 				first_name.value = Vorname
 				middle_name = TEXT
