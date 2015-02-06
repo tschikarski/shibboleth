@@ -32,3 +32,5 @@ BE_linkInLoginForm = 0
 FE_devLog = 0
   # cat=Debugging/enable/200; type=boolean; label=BE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
 BE_devLog = 0
+  # cat=Debugging/enable/210; type=boolean; label=Activate extra devLog'ging for FE/BE: Includes information on DB operations.
+database_devLog = 0

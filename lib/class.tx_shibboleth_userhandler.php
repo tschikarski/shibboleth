@@ -54,7 +54,7 @@ class tx_shibboleth_userhandler {
 	function __construct($loginType, $db_user, $db_group, $shibSessionIDname, $writeDevLog = FALSE) {
 		global $TYPO3_CONF_VARS;
 		$this->writeDevLog = $TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog;
-		if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth');
+		if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
 		
 		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 				
@@ -74,12 +74,12 @@ class tx_shibboleth_userhandler {
 		}
 		
 		$this->cObj = $localcObj;
-		#if ($this->writeDevLog) GeneralUtility::devlog('cObj data','shibboleth',0,$this->cObj->data);
+		#if ($this->writeDevLog) GeneralUtility::devlog('cObj data','shibboleth_userhandler',0,$this->cObj->data);
 	}
 	
 	function getUserFromDB() {
 		if ($this->writeDevLog) {
-			GeneralUtility::devlog('getUserFromDB: start','shibboleth');
+			GeneralUtility::devlog('getUserFromDB: start','shibboleth_userhandler');
 		}
 		
 		$idField = $this->config['IDMapping.']['typo3Field'];
@@ -92,7 +92,7 @@ class tx_shibboleth_userhandler {
 		if($this->db_user['checkPidList']) {
 			$where .= $this->db_user['check_pid_clause'];
 		}
-		#if ($this->writeDevLog) GeneralUtility::devlog('userFromDB: where-statement','shibboleth',0,array($where));
+		#if ($this->writeDevLog) GeneralUtility::devlog('userFromDB: where-statement','shibboleth_userhandler',0,array($where));
 		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
 		$table = $this->db_user['table'];
 		$groupBy = '';
@@ -103,16 +103,16 @@ class tx_shibboleth_userhandler {
 			$where
 		);
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth',0,$row);
+			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth_userhandler',0,$row);
 			return $row;
 		} else {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth',0,$row);
+			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
 			return false;
 		}
 	}
 	
 	function transferShibbolethAttributesToUserArray($user) {
-		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray','shibboleth',0,array('user' => $user, 'this_config' => $this->config));
+		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray','shibboleth_userhandler',0,array('user' => $user, 'this_config' => $this->config));
 			// We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
 		$user['tx_shibboleth_config'] = $this->config['userControls.'];
 		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
@@ -128,12 +128,12 @@ class tx_shibboleth_userhandler {
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
 		$user[$idField] = $idValue;
 		
-		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray: newUserArray','shibboleth',0,$user);
+		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray: newUserArray','shibboleth_userhandler',0,$user);
 		return $user;
 	}
 	
 	function synchronizeUserData(&$user) {
-		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','shibboleth',0,$user);
+		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','shibboleth_userhandler',0,$user);
 		
 		if($user['uid']) {
 				// User is in DB, so we have to update, therefore remove uid from DB record and save it for later
@@ -151,7 +151,7 @@ class tx_shibboleth_userhandler {
 			}
 				// Remove that data from $user - otherwise we get an error updating the user record in DB
 			unset($user['tx_shibboleth_config']);
-			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth',0,$user);
+			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth_userhandler',0,$user);
 				// Update
 			$table = $this->db_user['table'];
 			$where = 'uid='.intval($uid);
@@ -165,7 +165,7 @@ class tx_shibboleth_userhandler {
 			if (! $res) {
 				unset($user);
 				$uid = 0;
-				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth');
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth_userhandler');
 			}
 		} else {
 				// We will insert a new user
@@ -193,7 +193,7 @@ class tx_shibboleth_userhandler {
 				// Insert
 			$table = $this->db_user['table'];
 			$insertFields = $user;
-			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table '.$table,'shibboleth',0,$user);
+			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table '.$table,'shibboleth_userhandler',0,$user);
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
 				$table, 
 				$insertFields
@@ -202,11 +202,11 @@ class tx_shibboleth_userhandler {
 			$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
 			if (!$uid) {
 				unset($user);
-				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth');
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth_userhandler');
 			}
 		}
 		
-		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth');
+		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth_userhandler');
 		return $uid;
 	}
 	
@@ -217,23 +217,23 @@ class tx_shibboleth_userhandler {
 		
 		$configString = GeneralUtility::getURL(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath']);
 		
-		if ($this->writeDevLog) GeneralUtility::devlog('configString','shibboleth',0,array($configString));
+		if ($this->writeDevLog) GeneralUtility::devlog('configString','shibboleth_userhandler',0,array($configString));
 		
 		$parser = GeneralUtility::makeInstance('t3lib_TSparser');
 		$parser->parse($configString);
 
 		$completeSetup = $parser->setup;
 
-		if ($this->writeDevLog) GeneralUtility::devlog('loginType','shibboleth',0,array($this->loginType));
+		if ($this->writeDevLog) GeneralUtility::devlog('loginType','shibboleth_userhandler',0,array($this->loginType));
 		
 		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
-		if ($this->writeDevLog) GeneralUtility::devlog('parsed TypoScript','shibboleth',0,$localSetup);
+		if ($this->writeDevLog) GeneralUtility::devlog('parsed TypoScript','shibboleth_userhandler',0,$localSetup);
 		
 		return $localSetup;
 	}
 	
 	function getSingle($conf,$subconf='') {
-		if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth',0,array('conf' => $conf, 'subconf' => $subconf));
+		if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth_userhandler',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
 				$GLOBALS['TSFE']->cObjectDepthCounter = 100;
@@ -245,7 +245,7 @@ class tx_shibboleth_userhandler {
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
-		if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($result)','shibboleth',0,array('result' => $result));
+		if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($result)','shibboleth_userhandler',0,array('result' => $result));
 		return $result;
 	}
 	
