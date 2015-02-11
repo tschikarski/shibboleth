@@ -230,6 +230,10 @@ class tx_shibboleth_userhandler {
 		#$GLOBALS['TSFE']->tmpl->fileContent($incFile);
 		
 		$configString = GeneralUtility::getURL(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath']);
+		if($configString === FALSE) {
+			if ($this->writeDevLog) GeneralUtility::devlog('Could not find config file, please check extension setting for correct path!','shibboleth_userhandler',3);
+			return array();
+		}
 		
 		if ($this->writeDevLog) GeneralUtility::devlog('configString','shibboleth_userhandler',0,array($configString));
 		
