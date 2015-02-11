@@ -11,6 +11,15 @@ tx_shibboleth {
 			createUserFieldsMapping {
 				usergroup = TEXT
 				usergroup.value = 1
+
+				email = TEXT
+				email.field = REMOTE_USER
+				first_name = TEXT
+				first_name.value = Vorname
+				middle_name = TEXT
+				middle_name.value = M.
+				last_name = TEXT
+				last_name.value = Nachname
 			}
 			updateUserFieldsMapping {
 				email = TEXT
@@ -36,12 +45,19 @@ tx_shibboleth {
 			allowUser = TEXT
 			allowUser.value = 1
 			createUserFieldsMapping {
-				email = TEXT
-				email.field = REMOTE_USER
-			}
-			updateUserFieldsMapping {
 				admin = TEXT
 				admin.value = 0
+
+				email = TEXT
+				email.field = REMOTE_USER
+				realName = COA
+				realName.1 = TEXT
+				realName.1.value = Nachname
+				realName.3 = TEXT
+				realName.3.value = Vorname
+				realName.3.noTrimWrap  = |, ||
+			}
+			updateUserFieldsMapping {
 				email = TEXT
 				email.field = REMOTE_USER
 				realName = COA
