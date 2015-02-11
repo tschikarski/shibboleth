@@ -162,10 +162,16 @@ class tx_shibboleth_userhandler {
 				$where, 
 				$fields_values
 			);
-			if (! $res) {
+			$sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
+			if ($sql_errno) {
+				if ($this->writeDevLog) {
+					GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
+					if ($sql_errno > 0) {
+						GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(), 'shibboleth_userhandler');
+					}
+				}
 				unset($user);
 				$uid = 0;
-				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth_userhandler');
 			}
 		} else {
 				// We will insert a new user
@@ -198,11 +204,19 @@ class tx_shibboleth_userhandler {
 				$table, 
 				$insertFields
 			);
-				// get uid
-			$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-			if (!$uid) {
+			$sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
+			if ($sql_errno) {
+				if ($this->writeDevLog) {
+					GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
+					if ($sql_errno > 0) {
+						GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(), 'shibboleth_userhandler');
+					}
+				}
 				unset($user);
-				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: MySQL-Error: '.$GLOBALS['TYPO3_DB']->sql_error(),'shibboleth_userhandler');
+				$uid = 0;
+			} else {
+				$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: Got new uid '.$uid,'shibboleth_userhandler');
 			}
 		}
 		
