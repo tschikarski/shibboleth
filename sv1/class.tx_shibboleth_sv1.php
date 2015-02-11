@@ -179,7 +179,7 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 				// Shibboleth session gone or changed, this is just a re-authentication via Shibboleth, nothing to do
 		}
 		
-		if($this->writeDevLog) GeneralUtility::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
+		// if($this->writeDevLog) GeneralUtility::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
 		
 			// This user is not yet logged in
 		if (is_array($user) && $user['_allowUser']) {
