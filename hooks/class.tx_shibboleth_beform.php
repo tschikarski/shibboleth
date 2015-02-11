@@ -27,8 +27,6 @@
  * Hint: use extdeveval to insert/update function index above.
  */
 
-namespace TrustCnct\Shibboleth;
-
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
