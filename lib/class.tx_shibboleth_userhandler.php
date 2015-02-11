@@ -233,7 +233,7 @@ class tx_shibboleth_userhandler {
 	}
 	
 	function getSingle($conf,$subconf='') {
-		if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth_userhandler',0,array('conf' => $conf, 'subconf' => $subconf));
+		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth_userhandler',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
 				$GLOBALS['TSFE']->cObjectDepthCounter = 100;
@@ -245,7 +245,7 @@ class tx_shibboleth_userhandler {
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
-		if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($result)','shibboleth_userhandler',0,array('result' => $result));
+		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($result)','shibboleth_userhandler',0,array('result' => $result));
 		return $result;
 	}
 	
