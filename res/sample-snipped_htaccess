@@ -1,0 +1,36 @@
+# Sample .htaccess snippets for usage within the project root (for FE login) or
+# within /typo3 (for BE login only)
+# You might have to merge these commands into your own .htaccess file
+
+# Activate Shibboleth mechanism, but do not require a valid session.
+# This allows anonymous access.
+AuthType shibboleth
+require shibboleth
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	# Skip any other rewrite for Shibboleth handler URL.
+	RewriteRule ^(Shibboleth.sso/) - [L]
+
+	# HTTPS fuer Backend (typically, Shibboleth does not work without HTTPS)
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^(typo3/.*)$ https://%{SERVER_NAME}/$1 [L,R=301]
+
+	# Force HTTPS also for FE pages, add RewriteCond or edit pattern for RewriteRule to confine to certain FE pages
+	#RewriteCond %{HTTPS} !=on
+	#RewriteRule ^(.*)$ https://%{SERVER_NAME}/$1 [L,R=301]
+
+	# Forcing Shibboleth login as default, allowing exceptions for local login:
+	# /typo3/noshib | /typo3/?redirecttoshibboleth=no
+	RewriteRule ^(typo3/)noshib https://%{SERVER_NAME}/$1?redirecttoshibboleth=no [L,R=301]
+	RewriteCond %{REQUEST_URI} ^/typo3/(index\.php)?$
+	RewriteCond %{QUERY_STRING} !redirecttoshibboleth
+	# Avoid redirect during and after login or logout
+	RewriteCond %{HTTP_COOKIE} !shibsession
+	RewriteCond %{HTTP_REFERER} !backend
+	RewriteCond %{REQUEST_METHOD} GET
+	RewriteRule	^(typo3/.*)$ https://%{SERVER_NAME}/$1?redirecttoshibboleth=yes [L,R=301]
+
+	# Other TYPO3 related redirect rules may follow here
+</IfModule>
+

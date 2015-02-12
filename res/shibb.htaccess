@@ -1,7 +1,0 @@
-	  AuthType shibboleth                    
-		#ShibRequireSession On                                                                          
-	  require shibboleth                                                                            
-		#ShibRequestSetting applicationId myappname                                                        
-
-  	#	Zugang für Shibboleth- Nutzer bei denen das Attribut "orgUnitNumber" den Wert 134200 hat       
-		 #require orgUnitNumber 134200                                                                 
