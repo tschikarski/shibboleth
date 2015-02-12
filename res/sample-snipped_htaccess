@@ -22,14 +22,14 @@ require shibboleth
 
 	# Forcing Shibboleth login as default, allowing exceptions for local login:
 	# /typo3/noshib | /typo3/?redirecttoshibboleth=no
-	RewriteRule ^(typo3/)noshib https://%{SERVER_NAME}/$1?redirecttoshibboleth=no [L,R=301]
+	RewriteRule ^(typo3/)noshib https://%{SERVER_NAME}/$1?redirecttoshibboleth=no [L,R=302]
 	RewriteCond %{REQUEST_URI} ^/typo3/(index\.php)?$
 	RewriteCond %{QUERY_STRING} !redirecttoshibboleth
 	# Avoid redirect during and after login or logout
 	RewriteCond %{HTTP_COOKIE} !shibsession
 	RewriteCond %{HTTP_REFERER} !backend
 	RewriteCond %{REQUEST_METHOD} GET
-	RewriteRule	^(typo3/.*)$ https://%{SERVER_NAME}/$1?redirecttoshibboleth=yes [L,R=301]
+	RewriteRule	^(typo3/.*)$ https://%{SERVER_NAME}/$1?redirecttoshibboleth=yes [L,R=302]
 
 	# Other TYPO3 related redirect rules may follow here
 </IfModule>
