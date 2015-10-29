@@ -4,14 +4,19 @@ if (!defined ('TYPO3_MODE')) {
 }
 
 $TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1';
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1'; 
-
+$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1';
 
 // Configuration of authentication service.
 $EXT_CONFIG = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 
-// see comment in ext_conf_template.txt
 if ($EXT_CONFIG['enableAlwaysFetchUser']) {
+	// Activate the following two lines, in case you want to give your Shibboleth-SP
+	// full control over logging in and out. However, in that case you have to ensure
+	// that the Shibboleth-SP is maintaining it's session during the whole user session,
+	// which might be a problem, if used in connection with load balancing.
+	// Additionally, this will imply a strange behaviour of the Logout button as well as
+	// the BE timeout warning window.
+
 	$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
 	$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
 }
@@ -31,28 +36,33 @@ if (is_array($subtypesArray)) {
 	$subtypes = implode(',',$subtypesArray);
 }
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService($_EXTKEY,  'auth' /* sv type */,  'tx_shibboleth_sv1' /* sv key */,
-		array(
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
+	$_EXTKEY,
+	'auth' /* sv type */,
+	'tx_shibboleth_sv1' /* sv key */,
+	array(
+		'title' => 'Shibboleth Authentication',
+		'description' => '',
+		'subtype' => $subtypes,
+		'available' => TRUE,
+		'priority' => 80,       // tx_svauth_sv1 has 50, t3sec_saltedpw has 70, rsaauth has 60. This service must have higher priority!
+		'quality' => 80,
+		'os' => '',
+		'exec' => '',
+		'className' => 'TrustCnct\\Shibboleth\\tx_shibboleth_sv1',
+	)
+);
 
-			'title' => 'Shibboleth Authentication',
-			'description' => '',
-
-			'subtype' => $subtypes,
-
-			'available' => TRUE,
-			'priority' => 80,       // tx_svauth_sv1 has 50, t3sec_saltedpw has 70, rsaauth has 60. This service must have higher priority!
-			'quality' => 80,
-
-			'os' => '',
-			'exec' => '',
-
-			'className' => 'TrustCnct\\Shibboleth\\tx_shibboleth_sv1',
-		)
-	);
-
-// Hook for the link in the backendform
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'] = $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginScriptHook']['sv'];
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginScriptHook']['sv'] = 'EXT:' . $_EXTKEY . '/hooks/class.tx_shibboleth_beform.php:tx_shibboleth_beform->addShibbolethJavaScript';
+// Hook for the BE login page
+if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'])) {
+	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array();
+}
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array_merge(
+	array(
+		'shibboleth' => 'EXT:shibboleth/hooks/class.tx_shibboleth_beform.php:tx_shibboleth_beform->process'
+	),
+	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook']
+);
 
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLog'] = FALSE;
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogFE'] = FALSE;

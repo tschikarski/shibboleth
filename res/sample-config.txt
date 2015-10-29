@@ -9,7 +9,6 @@ tx_shibboleth {
 			allowUser = TEXT
 			allowUser.value = 1
 			createUserFieldsMapping {
-				# initial user group; TYPO3 needs at least one for login
 				usergroup = TEXT
 				usergroup.value = 1
 
@@ -23,7 +22,6 @@ tx_shibboleth {
 				last_name.value = Nachname
 			}
 			updateUserFieldsMapping {
-				# Always update email and Name from IdP
 				email = TEXT
 				email.field = REMOTE_USER
 				name = TEXT
@@ -47,12 +45,8 @@ tx_shibboleth {
 			allowUser = TEXT
 			allowUser.value = 1
 			createUserFieldsMapping {
-				# Don't create an admin
 				admin = TEXT
 				admin.value = 0
-				# Mount from groups: DB Mounts & File Mounts
-				options = TEXT
-				options.value = 3
 
 				email = TEXT
 				email.field = REMOTE_USER
@@ -64,7 +58,6 @@ tx_shibboleth {
 				realName.3.noTrimWrap  = |, ||
 			}
 			updateUserFieldsMapping {
-				# Always update email and Name from IdP
 				email = TEXT
 				email.field = REMOTE_USER
 				realName = COA

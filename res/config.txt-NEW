@@ -1,0 +1,44 @@
+tx_shibboleth {
+	FE {
+		IDMapping {
+			shibID = TEXT
+			shibID.field = uid
+			typo3Field = username
+		}
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 0
+			createUserFieldsMapping {
+			}
+			updateUserFieldsMapping {
+			}
+		}
+	}
+	BE {
+		IDMapping {
+			shibID = TEXT
+			shibID.field = uid
+			typo3Field = username
+		}
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				email = TEXT
+				email.field = mail
+				
+				realName = COA
+				realName.1 = TEXT
+				realName.1.field = sn
+				realName.3 = TEXT
+				realName.3.field = givenName
+				realName.3.noTrimWrap  = |, ||
+				
+				options = TEXT
+				options.value = 3
+			}
+			updateUserFieldsMapping {
+			}
+		}
+	}
+}

@@ -30,71 +30,80 @@
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Hook for creating the link to the shibboleth authentication in the backend form.
+ * Hook for redirecting to the shibboleth authentication or modifying the backend form.
  *
  * @author	Irene Höppner <irene.hoeppner@abezet.de>
+ * @author	Andreas Groth <andreas.groth@tum.de>
  * @package	TYPO3
  * @subpackage	tx_shibboleth
  */
 
 class tx_shibboleth_beform {
-	function addShibbolethJavaScript($params, $pObj) {
-		global $TYPO3_CONF_VARS;
-		$extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']); 
-		$function = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['shibboleth']['originalLoginScriptHook'];
-		$params = array();
-		$scriptCode = GeneralUtility::callUserFunction($function, $params, $pObj);
-		$entityIDparam = $extConf['entityID'];
-		if ($entityIDparam != '') {
-			$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+
+	/** Old hook function (deprecated)
+	 *
+	 * This is the old hook function. It is called when the ext_localconf.php of an existing installation is
+	 * still active, which may happen if the extension code is updated but the system cache has not yet been cleared
+	 * in the TYPO3 installation using it (when many installations use a global source). The function has
+	 * been rewritten to enable the BE form redirect during transition.
+	 * Deprecated. Remove in next version.
+	 */
+	function XaddShibbolethJavaScript($params, $pObj) {
+		if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
+				// Redirect to Shibboleth login
+			$entityIDparam = $extConf['entityID'];
+			if ($entityIDparam != '') {
+				$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+			}
+			$typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+			if ($extConf['forceSSL']) {
+				$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
+			}
+			$sessionHandlerUrl = $extConf['sessions_handlerURL'];
+			if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
+				$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
+			}
+			$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
+			\TYPO3\CMS\Core\Utility\HttpUtility::redirect($shiblinkUrl, \TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_302);
 		}
-		$typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-		if ($extConf['forceSSL']) {
-			$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
-		}
-		$sessionHandlerUrl = $extConf['sessions_handlerURL'];
-		
-		if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
-			$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
-		}
-		$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
-		
-		if (GeneralUtility::_GP('redirecttoshibboleth') == 'yes') {
-			$scriptCode .= '<script language="javascript" type="text/javascript">
-				window.location.href = \'' . $shiblinkUrl . '\';
-				</script>
-			';
-			return $scriptCode;
-		}
-		
-		// Modify BE login form only, if config option is set
-		if ($extConf['BE_linkInLoginForm'] == 0) return $scriptCode;
-		// add jquery core
-		$scriptCode .= '<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>';
-			// Explanation: Use "protocol-less" reference to always use http or https as used by the page; see
-			// http://encosia.com/cripple-the-google-cdns-caching-with-a-single-character/ for a motivation
-			// TODO: add custom jquery
-			// TODO: JS error in IE
-			// TODO: Make link text/image user configurable
-		$scriptCode .= '<script type="text/javascript">
-		//<![CDATA[
-		$(document).ready(function() {
-			$(\'#t3-login-form-fields\').before(\'<h1><a href="' . $shiblinkUrl . '">Login with Shibboleth</a></h1>\');
-			$(\'#t3-login-form-fields\').before(\'<a href="" id="toggleLoginForm">Login with the TYPO3 login form</a>\');
-			$(\'#t3-login-form-fields\').hide();
-			$(\'#toggleLoginForm\').click(function(){
-				$(\'#t3-login-form-fields\').toggle();
-				return false;
-			});
-			
-		});
-		//]]>
-		</script>';
-		
-		
-		
-		return $scriptCode;
 	}
+
+
+	/**
+	 * @return void
+	 */
+	public function process() {
+		$extConf =  unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth']);
+
+		if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
+				// Redirect to Shibboleth login
+			$entityIDparam = $extConf['entityID'];
+			if ($entityIDparam != '') {
+				$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+			}
+			$typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+			if ($extConf['forceSSL']) {
+				$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
+			}
+			$sessionHandlerUrl = $extConf['sessions_handlerURL'];
+			if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
+				$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
+			}
+			$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
+			\TYPO3\CMS\Core\Utility\HttpUtility::redirect($shiblinkUrl, \TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_302);
+		}
+
+			// Else: Display local login form
+		if ($extConf['BE_loginTemplatePath']) {
+			$GLOBALS['TBE_TEMPLATE']->moduleTemplate = $GLOBALS['TBE_TEMPLATE']->getHtmlTemplate(PATH_site.$extConf['BE_loginTemplatePath']);
+		}
+		if ($extConf['BE_loginTemplateCss']) {
+			$GLOBALS['TBE_TEMPLATE']->getPageRenderer()->addCssFile($extConf['BE_loginTemplateCss']);
+		}
+
+		return NULL;
+	}
+
 }
 
 ?>

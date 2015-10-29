@@ -28,6 +28,12 @@ FE_applicationID =
 BE_applicationID =
   # cat=Advanced/enable/180; type=boolean; label=BE Link in Log In Form (EXPERIMENTAL!): If checked, the BE log in form is modified and contains a link to the Shibboleth login
 BE_linkInLoginForm = 0
+  # cat=Advanced/enable/190; type=string; label=Custom BE login page, Template path:Specify a path relative to the site root (e.g. fileadmin/my_templates/login.html) with a custom HTML template. The default template is typo3/sysext/t3skin/Resources/Private/Templates/login.html.
+BE_loginTemplatePath =
+  # cat=Advanced/enable/200; type=string; label=Custom BE login page, CSS file:Specify a path relative to the backend directory (e.g. ../fileadmin/my_templates/login.css) with a CSS file to include in the login page.
+BE_loginTemplateCss =
+  # cat=Advanced/enable/210; type=string; label=Redirect after logout:Specify a (local) URL to wich the user will be redirected after logout (i.e. /Shibboleth.sso/Logout)
+BE_logoutRedirectUrl =
   # cat=Debugging/enable/190; type=boolean; label=FE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
 FE_devLog = 0
   # cat=Debugging/enable/200; type=boolean; label=BE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
