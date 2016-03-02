@@ -49,6 +49,8 @@ tx_shibboleth {
 			updateUserFieldsMapping {
 				email = TEXT
 				email.field = eppn
+				realName = TEXT
+				realName.field = eppn
 			}
 		}
 	}
