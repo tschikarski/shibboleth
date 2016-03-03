@@ -1,0 +1,136 @@
+html {
+	background-color: #666;
+	margin: 0px;
+	padding: 0px;
+}
+
+body {
+	border: 1px solid #000;
+	background-color: #FFF;
+	max-width: 800px;
+	min-width: 300px;
+	margin: 0px auto;
+	font-family: arial, sans-serif;
+	font-size: 80%;
+}
+
+header, nav, section, footer {
+	display: block;
+}
+
+header a,
+div.header a {
+	display: block;
+	width: auto;
+	height: 88px;
+	background-image: url('/typo3conf/ext/shibboleth/res/be_form/Shibboleth-logo-smaller.jpg');
+	background-repeat: no-repeat;
+	background-position: left top;
+	line-height: 200px;
+	overflow: hidden;
+}
+
+nav, div.nav {
+	text-align: right;
+	padding: 2px 4px;
+	background-color: #F7F7F7;
+}
+
+nav a, nav a:link, nav a:hover, nav a:active, nav a:visited
+.nav a, .nav a:link, .nav a:hover, .nav a:active, .nav a:visited {
+	color: #888;
+	text-decoration: none;
+}
+
+section,
+div.section {
+	padding: 10px 20px;
+	overflow: auto;
+}
+
+#loginExplanation {
+	background-color: #F7F7F7;
+}
+
+#loginError {
+	background-color: #FFD7D7;
+	font-weight: bold;
+}
+
+.error {
+	background-color: #FFD7D7;
+}
+
+.section strong {
+	text-transform: uppercase;
+}
+
+footer,
+div.footer {
+	background-color: #dedede;
+	padding: 10px 20px;
+	font-size: 80%;
+}
+
+a, a:link, a:visited {
+	color: #0a5096;
+	text-decoration: none;
+}
+
+a:hover, a:active {
+	text-decoration: underline;
+}
+
+h2 span {
+	color:#0a5096;
+}
+
+.loginLabel,
+.loginInput,
+.loginCheckboxFrame,
+.loginBtnFrame,
+.loginBtn {
+	float: left;
+	display: block;
+	/* border-radius: 8px; */
+	margin: 5px 0px;
+}
+
+
+.loginLabel {
+	width: 110px;
+	border: 1px solid #FFF;
+	padding: 8px 0px;
+	font-weight: bold;
+	clear: left;
+}
+
+.loginLabelDummy {
+	height: 1px;
+	padding: 0px;
+	margin: 0px;
+}
+
+
+.loginInput {
+	width: 200px;
+	border: 1px solid #888;
+	padding: 8px;
+}
+
+.loginCheckboxFrame,
+.loginBtnFrame {
+	width: 218px;
+}
+
+.loginBtn {
+	border: 1px solid #888;
+	padding: 10px 16px;
+	font-weight: bold;
+	color: #FFF;
+	background-color: #004682;
+	background: linear-gradient(#004682, #0072bd);
+	cursor: pointer;
+}
+
+
