@@ -40,35 +40,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class tx_shibboleth_beform {
 
-	/** Old hook function (deprecated)
-	 *
-	 * This is the old hook function. It is called when the ext_localconf.php of an existing installation is
-	 * still active, which may happen if the extension code is updated but the system cache has not yet been cleared
-	 * in the TYPO3 installation using it (when many installations use a global source). The function has
-	 * been rewritten to enable the BE form redirect during transition.
-	 * Deprecated. Remove in next version.
-	 */
-	function XaddShibbolethJavaScript($params, $pObj) {
-		if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
-				// Redirect to Shibboleth login
-			$entityIDparam = $extConf['entityID'];
-			if ($entityIDparam != '') {
-				$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
-			}
-			$typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-			if ($extConf['forceSSL']) {
-				$typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
-			}
-			$sessionHandlerUrl = $extConf['sessions_handlerURL'];
-			if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
-				$sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
-			}
-			$shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
-			\TYPO3\CMS\Core\Utility\HttpUtility::redirect($shiblinkUrl, \TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_302);
-		}
-	}
-
-
 	/**
 	 * @return void
 	 */
