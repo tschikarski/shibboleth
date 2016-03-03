@@ -16,6 +16,8 @@ BE_enable = 0
 BE_autoImport = 0
   # cat=BE authentication/enable/070; type=boolean; label=BE User Autoimport in Disabled State: If this is checked and BE Autoimport is enabled, new BE users start in disabled state
 BE_autoImportDisableUser = 1
+  # cat=BE authentication/enable/210; type=string; label=Redirect after logout: User will be redirected to this URL after backend logout. This avoids re-login to the backend. No redirect, if empty.
+BE_logoutRedirectUrl = /typo3conf/ext/shibboleth/res/be_form/logout.html
   # cat=Advanced/enable/110; type=boolean; label=Enable alwaysFetchUser: Detects a local Shibboleth session at any circumstances. You might have to set to FALSE, if living behind a load balancer.
 enableAlwaysFetchUser = 1
   # cat=Advanced/enable/120; type=string; label=entityID of your IdP: Can be used to overwrite any discovery method defined in your shibboleth config file (shibboleth2.xml)
@@ -32,8 +34,6 @@ BE_linkInLoginForm = 0
 BE_loginTemplatePath =
   # cat=Advanced/enable/200; type=string; label=Custom BE login page, CSS file:Specify a path relative to the backend directory (e.g. ../fileadmin/my_templates/login.css) with a CSS file to include in the login page.
 BE_loginTemplateCss =
-  # cat=Advanced/enable/210; type=string; label=Redirect after logout:Specify a (local) URL to wich the user will be redirected after logout (i.e. /Shibboleth.sso/Logout)
-BE_logoutRedirectUrl =
   # cat=Debugging/enable/190; type=boolean; label=FE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
 FE_devLog = 0
   # cat=Debugging/enable/200; type=boolean; label=BE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
