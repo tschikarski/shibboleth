@@ -12,9 +12,9 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Shibboleth Authentication and SSO',
-	'description' => '',
+	'description' => 'Shibboleth login for TYPO3',
 	'category' => 'services',
-	'author' => 'Thomas Schikarski, Irene Höppner, Andreas Groth (TYPO3-Team der TU München)',
+	'author' => 'Thomas Schikarski (Trusting Connections UG), Andreas Groth (TYPO3-Team der TU München), Irene Höppner',
 	'author_email' => 'thomas.schikarski@trusting-connections.net',
 	'shy' => '',
 	'dependencies' => 'cms',
