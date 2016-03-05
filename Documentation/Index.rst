@@ -23,19 +23,19 @@ EXT: Shibboleth
         en
 
     :Description:
-        Description goes here...
+        Shibboleth login for TYPO3
 
     :Keywords:
         forAdmins, forDevelopers, forAdvanced
 
     :Copyright:
-        2010-2011
+        2010-2016
 
     :Author:
-        Irene Höppner
+        Thomas Schikarski (Trusting Connections UG), Andreas Groth (TYPO3-Team der TU München), Irene Höppner
 
     :Email:
-        irene.hoeppner@abezet.de
+        thomas.schikarski@trusting-connections.net
 
     :License:
         This document is published under the Open Publication License

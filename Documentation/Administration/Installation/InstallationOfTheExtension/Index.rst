@@ -18,4 +18,3 @@ site.
 After installing the extension you **must**  edit some of the extension configuration parameters, as
 described in the “Configuration” section below.
 
-In case, you want to offer FE login through Shibboleth, you will 

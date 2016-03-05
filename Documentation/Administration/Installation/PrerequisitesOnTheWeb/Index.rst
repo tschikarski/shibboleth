@@ -13,8 +13,8 @@ Prerequisites on the web server
 
 You need to install and configure the “Native Service Provider” components of Shibboleth with
 your Apache web server. There are installers for various operating systems, including Linux and
-Windows. Details on how to install a Shiboleth service provider on an Apache web server are found in
-the Shibboleth documentation (https://spaces.internet2.edu/display/SHIB2/Installation).
+Windows. Details on how to install a Shibboleth service provider on an Apache web server are found in
+the Shibboleth documentation (https://wiki.shibboleth.net/confluence/display/SHIB2/Installation).
 
 There are two components that interact to form the service provider: The Shibboleth daemon and the
 mod_shib Apache module.
