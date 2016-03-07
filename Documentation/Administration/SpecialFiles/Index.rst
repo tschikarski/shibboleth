@@ -19,8 +19,7 @@ Sample files
 +=======+====================+============+================================+============================================================+
 | res/  | _.htaccess         | Yes        | Yes (add/rename to .htaccess)  | Always insert as first lines of your global .htaccess [#]_ |
 +-------+--------------------+------------+--------------------------------+------------------------------------------------------------+
-| res/  | config.txt or      | Yes        | Yes (define access etc.)       | Path and name configurable                                 |
-|       | sample-config.txt  |            |                                |                                                            |
+| res/  | sample-config.txt  | Yes        | Yes (New file name!)           | Path and name configurable                                 |
 +-------+--------------------+------------+--------------------------------+------------------------------------------------------------+
 
 .. [#] In case you only want to protect the backend, edit/add to an .htaccess file within the typo3 directory, instead.

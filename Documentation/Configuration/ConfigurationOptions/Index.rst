@@ -17,89 +17,125 @@ General
 =========================  ==========  ===========================================================================================================  ==========================================
 Property:                  Data type:  Description:                                                                                                 Default:
 =========================  ==========  ===========================================================================================================  ==========================================
-mappingConfigPath          path        Point this to your mapping configuration file (for                                                           /typo3conf/ ext/shibboleth/ res/config.txt
+mappingConfigPath          path        Point this to your mapping configuration file (for                                                           ``/typo3conf/ext/shibboleth/res/config.txt``
                                        usage of this file, see below). **In most cases you
                                        will have to change this.**  (Never apply your changes
-                                       to the original config.txt, as these would be
+                                       to directly to the sample config files, as these would be
                                        overridden on extension updates.)
 
                                        Instead, put your configuration file somewhere outside
                                        the extension directory and point to this file by this
                                        configuration option!
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-entityID                   string      (optional) Here you can specify an entityID (= unique
-                                       identifier for your SP). Influences how the link to
-                                       your session initiator is generated. If set, the value
-                                       will be added as “entityID”-parameter to the
-                                       session initiator link.
+sessions_handlerURL        string      Shibboleth session handler URL. If you didn't change the handlerURL attribute within                         ``/Shibboleth.sso``
+                                       ``shibboleth2.xml``, the default value would do.
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-sessions_handlerURL        string      We need to create the link for Login, i.e. ...  <a                                                           /Shibboleth.sso
-                                       href="`http://www.example.org
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `**/Shibboleth.sso**
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `/Login?target=
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `http://www.example.org
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       ">Shibboleth-Login</a>  Must coincide with the
-                                       handlerURL attribute of the Sessions element in your
-                                       shibboleth2.xml file, for example: <Sessions
-                                       lifetime="28800" timeout="3600" checkAddress="false"
-                                       handlerURL="**/Shibboleth.sso** " handlerSSL="false">
+sessionInitiator_Location  string      Session initiator location (relative to handlerURL). Default value is okay, unless you changed this in       ``/Login``
+                                       ``shibboleth2.xml``
+=========================  ==========  ===========================================================================================================  ==========================================
+
+
+FE Authentication
+-----------------
+
+=========================  ==========  ===========================================================================================================  ==========================================
+Property:                  Data type:  Description:                                                                                                 Default:
+=========================  ==========  ===========================================================================================================  ==========================================
+FE_enable                  boolean     Activate Shibboleth for frontend authentication                                                              FALSE
+
+                                       **ATTENTION**:
+                                       Switching this from TRUE to FALSE doesn't deactivate users that might have been imported/
+                                       activated for Shibboleth. In special circumstances, these user accounts might be misused to get
+                                       unauthorized access to the system. **The same** is true, if you uninstall the shibboleth extension.
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+FE_autoImport              boolean     Check this to allow automatic import of new Shibboleth                                                       FALSE
+                                       users, based on Shibboleth attributes.
+
+                                       **If you don't activate this option, all users must be
+                                       manually added to TYPO3, before they can login.**
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+FE_autoImport_pid          int         New users will be put into page with this pid. Define a sysfolder, e.g. ``FE_USER`` for this.
+
+                                       **Must edit!**
+=========================  ==========  ===========================================================================================================  ==========================================
+
+
+BE Authentication
+-----------------
+
+=========================  ==========  ===========================================================================================================  ==========================================
+Property:                  Data type:  Description:                                                                                                 Default:
+=========================  ==========  ===========================================================================================================  ==========================================
+BE_enable                  boolean     Activate Shibboleth for backend authentication                                                               FALSE
+
+                                       **ATTENTION**:
+                                       Switching this from TRUE to FALSE doesn't deactivate users that might have been imported/
+                                       activated for Shibboleth. In special circumstances, these user accounts might be misused to get
+                                       unauthorized access to the system. **The same** is true, if you uninstall the shibboleth extension.
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_autoImport              boolean     Check this to allow automatic import of new Shibboleth                                                       FALSE
+                                       users, based on Shibboleth attributes. If set, any Shibboleth user will get imported as TYPO3
+                                       backend user. **Take care to activate this only, if you know exactly that you want this.**
+
+                                       In connection with the ``BE_autoImportDisableuser``, you can automatically create the user and fill in
+                                       metadata from Shibboleth, without actually allowing immediate access to the user.
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_autoImportDisableUser   boolean     If this is set and BE_autoImport is active, new BE                                                           TRUE
+                                       users will be created in disabled state, yet to be
+                                       activated manually by an admin.
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_loginTemplatePath       string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login.html``
+
+                                       Backend login page is not modified, if this option is empty.
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_loginTemplateCss        string      CSS file for ``BE_loginTemplatePath`` (relative to ``/typo3``)                                               ``../typo3conf/ext/shibboleth/res/be_form/login.css``
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_logoutRedirectUrl       string      Redirect to this URL after backend logout. (**Without redirect, backend logout is followed by                ``/typo3conf/ext/shibboleth/res/be_form/logout.html``
+                                       immediate re-login.**)
+=========================  ==========  ===========================================================================================================  ==========================================
+
+
+Advanced
+--------
+
+=========================  ==========  ===========================================================================================================  ==========================================
+Property:                  Data type:  Description:                                                                                                 Default:
+=========================  ==========  ===========================================================================================================  ==========================================
+enableAlwaysFetchUser      boolean     Run shibboleth extension on every page load, as opposed to only login events.                                TRUE
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+entityID                   string      (optional) Here you can specify an entityID of your IdP. Would overwrite the IdP setting within
+                                       ``shibboleth2.xml``
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 forceSSL                   boolean     Check this to force SSL for the session initiating.                                                          TRUE
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-sessionInitiator_Location  string      We need to create the link for Login, i.e. ...  <a                                                           /Login
-                                       href="`http://www.example.org/Shibboleth.sso
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `**/Login**
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `?target
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `**=**
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       `http://www.example.org
-                                       <http://testshibb.abezetdom.local/Shibboleth.sso/TestShib?target=http%3A%2F%2Ftestshibb.abezetdom.local>`__
-                                       ">Shibboleth-Login</a>  <SessionInitiator type="SAML2"
-                                       Location="**/Login** " isDefault="true"
-                                       defaultACSIndex="1" id="TestShib"
-                                       entityID="https://idp.testshib.org/idp/shibboleth"
-                                       template="bindingTemplate.html" />
+                                       This option is of importance only, if the application is run on a non-secure connection.
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 FE_applicationID           string      (optional) If you don't run your SP under the
                                        “default” application, you will need to enter your
                                        application ID here.
 
-                                       See your shibboleth2.xml file:
-
-                                       <ApplicationDefaults **id="default"** ... >
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-FE_autoImport              boolean     Check this to allow automatic import of new Shibboleth                                                       TRUE
-                                       users, based on Shibboleth attributes. (**Default is
-                                       TRUE!** )
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-FE_autoImport_pid          int         New users will be put into page with this pid.                                                               29
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_linkInLoginForm         boolean     Check this to activate JavaScript insertion of a link                                                        TRUE
-                                       to the Shibboleth authentication in the BE login form.
+                                       See your shibboleth2.xml file.
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 BE_applicationID           string      (optional) If you don't run your SP under the
                                        “default” application, you will need to enter your
                                        application ID here.
 
                                        See your shibboleth2.xml file:
-
-                                       <ApplicationDefaults **id="default"** ... >
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_autoImport              boolean     Check this to allow automatic import of new Shibboleth                                                       FALSE
-                                       users, based on Shibboleth attributes. Inactive by
-                                       default.
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_autoImportDisableUser   boolean     If this is set and BE_autoImport is active, new BE                                                           TRUE
-                                       users will be created in disabled state, yet to be
-                                       activated by an admin.
 =========================  ==========  ===========================================================================================================  ==========================================
+
+Debugging
+---------
+
+=========================  ==========  ===========================================================================================================  ==========================================
+Property:                  Data type:  Description:                                                                                                 Default:
+=========================  ==========  ===========================================================================================================  ==========================================
+FE_devLog                  boolean     Write internal information on frontend logins to 'devlog'                                                    FALSE
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_devLog                  boolean     Write internal information on backend logins to 'devlog'                                                     FALSE
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+database_devLog            boolean     When writing devlog info, also include details on database operations.                                       FALSE
+=========================  ==========  ===========================================================================================================  ==========================================
+
+
 
 .. toctree::
     :maxdepth: 2
