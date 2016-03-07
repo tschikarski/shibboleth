@@ -5,11 +5,11 @@ sessions_handlerURL = Shibboleth.sso
   # cat=General/enable/030; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"; with leading slash!
 sessionInitiator_Location = /Login
   # cat=FE authentication/enable/035; type=boolean; label=Enable Shibboleth for FE: ATTENTION! Take care to disable all imported Shibboleth users, when deactivating this or uninstalling the extension!
-FE_enable = 1
+FE_enable = 0
   # cat=FE authentication/enable/040; type=boolean; label=FE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as FE users
-FE_autoImport = 1
+FE_autoImport = 0
   # cat=FE authentication/enable/050; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
-FE_autoImport_pid = 29
+FE_autoImport_pid =
   # cat=BE authentication/enable/055; type=boolean; label=Enable Shibboleth for BE: ATTENTION! Take care to disable all imported Shibboleth users, when deactivating this or uninstalling the extension!
 BE_enable = 0
   # cat=BE authentication/enable/060; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
