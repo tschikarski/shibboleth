@@ -11,9 +11,21 @@
 Installation
 ------------
 
+Install the extension like any other TYPO3 extension. If you want to use Shibboleth for FE
+authentication, you will have to insert the plug-in “Shibboleth Login” somewhere on your web
+site.
+
+After installing the extension you **must**  edit some of the extension configuration parameters, as
+described in the “Configuration” section below. Additionally, you **must** add directives to your Apache configuration
+or to your ``.htaccess`` file.
+
+See next sub-section ("Special Files") and next section ("Configuration").
+
+
+
+
 .. toctree::
     :maxdepth: 2
     :titlesonly:
 
-    PrerequisitesOnTheWeb/Index
     InstallationOfTheExtension/Index

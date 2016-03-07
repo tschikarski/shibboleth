@@ -55,4 +55,5 @@ file”.
     :titlesonly:
 
     ConfigurationOptions/Index
+    MappingConfigurationFile/Index
     Faq2/Index

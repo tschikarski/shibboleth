@@ -11,9 +11,22 @@
 Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^
 
+General
+-------
+
 =========================  ==========  ===========================================================================================================  ==========================================
 Property:                  Data type:  Description:                                                                                                 Default:
 =========================  ==========  ===========================================================================================================  ==========================================
+mappingConfigPath          path        Point this to your mapping configuration file (for                                                           /typo3conf/ ext/shibboleth/ res/config.txt
+                                       usage of this file, see below). **In most cases you
+                                       will have to change this.**  (Never apply your changes
+                                       to the original config.txt, as these would be
+                                       overridden on extension updates.)
+
+                                       Instead, put your configuration file somewhere outside
+                                       the extension directory and point to this file by this
+                                       configuration option!
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 entityID                   string      (optional) Here you can specify an entityID (= unique
                                        identifier for your SP). Influences how the link to
                                        your session initiator is generated. If set, the value
@@ -53,16 +66,6 @@ sessionInitiator_Location  string      We need to create the link for Login, i.e
                                        defaultACSIndex="1" id="TestShib"
                                        entityID="https://idp.testshib.org/idp/shibboleth"
                                        template="bindingTemplate.html" />
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-mappingConfigPath          path        Point this to your mapping configuration file (for                                                           /typo3conf/ ext/shibboleth/ res/config.txt
-                                       usage of this file, see below). **In most cases you
-                                       will have to change this.**  (Never apply your changes
-                                       to the original config.txt, as these would be
-                                       overridden on extension updates.)
-
-                                       Instead, put your configuration file somewhere outside
-                                       the extension directory and point to this file by this
-                                       configuration option!
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 FE_applicationID           string      (optional) If you don't run your SP under the
                                        “default” application, you will need to enter your

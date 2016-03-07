@@ -3,7 +3,7 @@
 .. --------------------------------------------------
 .. -*- coding: utf-8 -*- with BOM.
 
-.. include:: ../../../Includes.txt
+.. include:: ../../Includes.txt
 
 
 .. _configuration-configuration-options-mapping-configuration-file:
