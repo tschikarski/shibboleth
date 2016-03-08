@@ -84,6 +84,14 @@ That is, where this extension comes into play. It will take this information and
 create or update a user record, authenticate the user to the frontend or backend, set or update metadata of the TYPO3
 user record, add the user to one or more groups, enable admin mode for a backend user etc.
 
+A word on logout buttons
+------------------------
+
+* Don't think a logout is a simple thing in a federated SSO environment.
+* Don't place a logout button for frontend users.
+* Use the modified logout for backend users.
+
+
 .. toctree::
     :maxdepth: 2
     :titlesonly:

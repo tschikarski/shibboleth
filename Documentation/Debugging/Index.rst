@@ -87,7 +87,7 @@ Successful logins show up in the devlog by entries from "TYPO3\CMS\Core\Authenti
 
 Look up the user in the database and check for inconsistencies in the field values. You might want to create a local user and compare the Shibboleth user record.
 
-For frontend users, again make sure there is at least one usergroup assigned.
+For frontend users, again make sure there is at least one user group assigned.
 
 .. toctree::
     :maxdepth: 2
