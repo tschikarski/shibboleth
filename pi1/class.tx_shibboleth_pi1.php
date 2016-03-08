@@ -83,7 +83,7 @@ class tx_shibboleth_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 		}
 		
 			// TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
-		$linkText = 'Login &uuml;ber Shibboleth';
+		$linkText = 'Shibboleth Login';
 		
 		$sessionHandlerUrl = $extConf['sessions_handlerURL'];
 		
