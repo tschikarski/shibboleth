@@ -23,7 +23,7 @@ web server. It offers versatile options to handle users being authenticated by S
 “The Shibboleth® System is a standards based, open source software package for web single sign-on
 across or within organizational boundaries. It allows sites to make informed authorization decisions
 for individual access of protected online resources in a privacy-preserving manner.” (Cited from
-http://shibboleth.internet2.edu/about.html).
+https://www.internet2.edu/products-services/trust-identity-middleware/shibboleth/).
 
 
 .. _screenshots:

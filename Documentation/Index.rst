@@ -58,7 +58,7 @@ EXT: Shibboleth
     UsersManual/Index
     Administration/Index
     Configuration/Index
-    Tutorial/Index
+    Debugging/Index
     KnownProblems/Index
     TodoList/Index
     Changelog/Index

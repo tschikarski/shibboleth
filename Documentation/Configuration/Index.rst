@@ -38,7 +38,12 @@ index.php
 If you now direct your browser to https://yourdomain/securetest/ you should be redirected to your Shibboleth login page.
 After logging in, you should be redirected to your web instance and see the output of the phpinfo() function.
 Now, scroll down to the section "Apache Environment" and check, if you can identify additional server environment variables, provided by Shibboleth.
-At least a few of them should have a name starting with "Shib-".
+At least a few of them should have a name starting with "Shib-". Additionally some other variables might be set by the Shibboleth SP.
+Very often, the standard variable ``REMOTE_USER`` is set with the Shibboleth user's ID.
+When using https://testshib.org/ you will see this user ID again in a variable named ``eppn``. For details refer to your ``shibboleth2.xml`` file.
+Other variables might be useful for retrieving metadata like the clear name of the user.
+
+**Take a copy** of this variable list. You will need it in one of the next steps.
 
 If this doesn't work, you very likely have to work on the Shibboleth SP integration and the "shibboleth" extension will not work.
 
@@ -56,4 +61,4 @@ file”.
 
     ConfigurationOptions/Index
     MappingConfigurationFile/Index
-    Faq2/Index
+    Checklists/Index
