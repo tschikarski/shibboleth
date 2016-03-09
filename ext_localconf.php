@@ -53,16 +53,18 @@ if (is_array($subtypesArray)) {
 	)
 );
 
+if ($EXT_CONFIG['BE_enable']) {
 // Hook for the BE login page
-if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'])) {
-	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array();
+	if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'])) {
+		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array();
+	}
+	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array_merge(
+		array(
+			'shibboleth' => 'EXT:shibboleth/hooks/class.tx_shibboleth_beform.php:tx_shibboleth_beform->process'
+		),
+		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook']
+	);
 }
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array_merge(
-	array(
-		'shibboleth' => 'EXT:shibboleth/hooks/class.tx_shibboleth_beform.php:tx_shibboleth_beform->process'
-	),
-	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook']
-);
 
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLog'] = FALSE;
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogFE'] = FALSE;
