@@ -18,14 +18,15 @@ General
 Property:                  Data type:  Description:                                                                                                 Default:
 =========================  ==========  ===========================================================================================================  ==========================================
 mappingConfigPath          path        Point this to your mapping configuration file (for                                                           ``/typo3conf/ext/shibboleth/res/config.txt``
-                                       usage of this file, see below). **In most cases you
+                                       usage of this file, see :ref:`configuration-configuration-options-mapping-configuration-file`).
+                                       **In most cases you
                                        will have to change this.**  (Never apply your changes
-                                       to directly to the sample config files, as these would be
+                                       directly to the sample config files, as these would be
                                        overridden on extension updates.)
 
                                        Instead, put your configuration file somewhere outside
-                                       the extension directory and point to this file by this
-                                       configuration option!
+                                       the extension directory and point this
+                                       configuration option to your new file!
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 sessions_handlerURL        string      Shibboleth session handler URL. If you didn't change the handlerURL attribute within                         ``/Shibboleth.sso``
                                        ``shibboleth2.xml``, the default value would do.

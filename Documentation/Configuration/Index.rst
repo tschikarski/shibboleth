@@ -45,7 +45,7 @@ Other variables might be useful for retrieving metadata like the clear name of t
 
 **Take a copy** of this variable list. You will need it in one of the next steps.
 
-If this doesn't work, you very likely have to work on the Shibboleth SP integration and the "shibboleth" extension will not work.
+If this doesn't work, you very likely have to work on the Shibboleth SP integration. Don't start configuring the shibboleth extension, before this works.
 
 Configuration of the extension
 ------------------------------

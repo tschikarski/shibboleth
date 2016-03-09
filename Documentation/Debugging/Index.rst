@@ -16,8 +16,8 @@ Checking your Apache Environment
 
 **First make sure, your Shibboleth environment is operational.** See section :ref:`configuration`.
 
-Note that at this point, you still need to check, if the Apache Shibboleth module is active for your TYPO3 directory.
-For this, you need to activate 'devlog' debugging.
+Note that at this point, you still don't know exactly, if the Apache Shibboleth module is also active for your TYPO3 directory.
+You will have to go through the next steps, if you can't log in via Shibboleth at this point.
 
 Make sure to recognize a successful login
 -----------------------------------------
@@ -39,7 +39,8 @@ With this installed, go to the extension configuration and select the "debugging
 
 Don't start with additional debugging info, as it fills up your debug log with even more information.
 
-*Hint:* Debugging BE authentication is a bit tricky, when you have the TYPO3 backend open, as you will might be confused by AJAX requests showing up in the log. That's a good reason to switch to file based logging.
+*Hint:* Debugging BE authentication is a bit tricky, when you have the TYPO3 backend open, as you might be confused by AJAX requests showing up in the log.
+That's a good reason to switch to file based logging. It will allow you to keep the BE closed while testing.
 
 Checking if the extension is active
 -----------------------------------
@@ -56,7 +57,7 @@ Checking if the Shibboleth module is active
 -------------------------------------------
 
 From now on concentrate on debug log entries from 'shibboleth'. Check latest entry "getUser ($_SERVER)".
-Check the list of server environment variables. Are the Shibboleth variables set, like in the basic test from above?
+Check the list of server environment variables. Are the Shibboleth variables set, like in the basic test from :ref:`configuration`?
 
 If not, make sure to activate the Apache configuration directives (e.g. within ``.htaccess``).
 
@@ -68,7 +69,9 @@ If not, make sure to activate the Apache configuration directives (e.g. within `
 Checking if the user is created within the TYPO3 database
 ---------------------------------------------------------
 
-Check the database table for an entry of the new user.
+Check the database table for an entry of the new user. You might need something like this to identify a Shibboleth user:
+
+``SELECT * FROM fe_users WHERE password LIKE 'shibb:%';``
 
 If the user is not created, check the extension configuration for the "auto import" flag.
 
@@ -81,13 +84,18 @@ Checking why a user is created, but not authenticated to TYPO3
 
 Double check that the user is not authenticated. Reload the browser.
 
-Check, if the user is newer logged in or if it is logged out immediately after login.
+Note that you might actually have a successful login followed by an immediate logout.
+Skimming through the log will tell you the difference.
 
-Successful logins show up in the devlog by entries from "TYPO3\CMS\Core\Authentication\AbstractUserAuthentication" containing the word "authenticated".
+Successful logins show up in the devlog by entries from ``TYPO3\CMS\Core\Authentication\AbstractUserAuthentication`` containing the word "authenticated".
 
-Look up the user in the database and check for inconsistencies in the field values. You might want to create a local user and compare the Shibboleth user record.
+Look up the user in the database and check for inconsistencies in the field values. You might want to create a functional local user and compare it to the Shibboleth user record.
 
 For frontend users, again make sure there is at least one user group assigned.
+
+If all this fails, sleep one night and try again.
+
+
 
 .. toctree::
     :maxdepth: 2

@@ -11,7 +11,8 @@
 Known problems
 ==============
 
-Server clusters and load balancers:
+Server clusters and load balancers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The extension is already successfully in use on a server cluster behind a load balancer. However, in the early implementation phase
 peculiar behavior has been observed. After a number of changes on the configuration of the shibboleth extension, the
@@ -25,7 +26,8 @@ settings "alwaysFetchUser" as well as timeout settings of login sessions.
 
 For further understanding the issue, please read this: https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPClustering
 
-Logout:
+Logout
+^^^^^^
 
 Logout's can only be done locally and will not end the global Shibboleth session. It is necessary to redirect the user
 away from the TYPO3 frontend / backend immediately after the logout. Otherwise, the still active Shibboleth session

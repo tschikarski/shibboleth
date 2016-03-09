@@ -32,7 +32,7 @@ configure this file.
 
 Additionally, you will have to activate Shibboleth authentication **in “lazy mode”**  for your
 TYPO3 instance. For FE authentication you will need to protect at least the base path of your
-installation, for BE authentication you will have to protect at least the “typo3” sub-folder. To
+installation\ [#]_, for BE authentication you will have to protect at least the “typo3” sub-folder. To
 do so, you need to add the following two Apache directives into your site config or into an
 “.htaccess” file in web root.
 
@@ -58,7 +58,7 @@ This must be inserted into .htaccess **in front of** any other rewrite or redire
 		...
 
 Explanation: Force SSL. Do this unless you exactly know why you don't want it to do. Be aware that you need a special
-Shibboleth configuration to allow insecure connections. Take care of all security implications!
+Shibboleth configuration to allow insecure connections. Take care of all security implications! See https://wiki.cam.ac.uk/raven/SSL,_certificates_and_security_with_Shibboleth
 
 ::
 
@@ -71,4 +71,4 @@ Explanation: The first line defines the authentication type to be shibboleth, e.
 “basic”. The second line is needed to activate ´lazy mode´.
 
 .. [#] With the flexibility of this TYPO3 extension, in most cases you don't need to change any mappings within ``shibboleth2.xml``.
-
+.. [#] If you need Shibboleth only for FE, don't be afraid to protect just the complete TYPO3 instance. Just don't activate BE authentication within the extension.

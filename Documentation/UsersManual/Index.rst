@@ -28,7 +28,7 @@ Your specific TYPO3 implementation might offer you a logout or not. In all cases
 Be aware that your global Shibboleth session will remain active. This will enable you and every other person who gets access
 to your browser to re-login to TYPO3 and any other application in your network that is protected by Shibboleth.
 
-Therefore, be sure to close all windows of the browser, before you leave your work place!
+**Therefore, be sure to close all windows of the browser, before you leave your work place!**
 
 
 .. toctree::

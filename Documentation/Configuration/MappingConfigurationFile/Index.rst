@@ -11,7 +11,8 @@
 Mapping Configuration File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Under /typo3conf/ext/shibboleth/res/sample-config.txt you find a sample config file.
+Under ``/typo3conf/ext/shibboleth/res/sample-config.txt`` you find a sample config file.
+It makes use of the Typoscript parser to achieve maximum flexibility.
 To better understand, what it does, let's examine it's structure.
 
 ::
@@ -28,7 +29,7 @@ To better understand, what it does, let's examine it's structure.
 Explanations:
 
 As you can see, there are two different sections for frontend and backend authentication and authorization.
-Both work with few exceptions identically. However, you might need to set different fields in the respective TYPO3 user table.
+Both work identically. However, you might need to set different fields in the respective TYPO3 user table.
 
 Let's start with a backend example.
 
@@ -48,9 +49,12 @@ Let's start with a backend example.
                 allowUser = TEXT
                 allowUser.value = 1
                 createUserFieldsMapping {
-                	// Set additional fields, when the user is imported for the FIRST TIME
+                    // Set additional fields, when the user is imported for the FIRST TIME
                     email = TEXT
                     email.field = REMOTE_USER
+
+                    admin = TEXT
+                    admin.value = 0
                 }
                 updateUserFieldsMapping {
                     // Update the user with these field values at EVERY LOGIN
@@ -81,14 +85,12 @@ In our example, we accept all Shibboleth users. ( ``allowUser.value = 1`` )
 In both ``*UserFieldsMapping`` sections you can use basically any TYPO3 field that exists in the user table. Take care of the few differences between fe_users and be_users (e.g. ``admin`` only exists in be_users).
 
 On auto-import, we set the email address field of the new TYPO3 user to the value transferred in ``REMOTE_USER``.
-However, we do not update this field later on. In case, the user entry in the user database behind Shibboleth is updated to reflect a new email address, this change will **not** appear in TYPO3.
-We could change this behaviour by *copying* these two lines to ``updateUserFieldsMapping``.
+However, we do not update this field later on. This makes sense here, as the source field is also the user ID.
 
 On each subsequent authentication the user record is updated. In our example, only the ``admin`` flag is affected by the update.
 The idea here is to make sure a user is not given the "admin" privilege manually. (Again, this is a decision to be made in accordance to your requirements.)
 
 **Important hint:** If you want a field to be set in all cases, you have to put the configuration in *both* sections, ``createUserFieldsMapping`` **and** ``updateUserFieldsMapping``.
-(For the ``admin`` flag, we can omit this in ``createUserFieldsMapping``, as not setting the value is equivalent to setting it to 0.)
 
 Now to a frontend example:
 
@@ -106,17 +108,20 @@ Now to a frontend example:
 				allowUser.value = 1
 				createUserFieldsMapping {
 					email = TEXT
-					email.field = eppn
+					email.field = mail
 
 					usergroup = TEXT
 					usergroup.value = 1
 
 					name = TEXT
-					name.field = eppn
+					name.field = Shib-realname
 				}
 				updateUserFieldsMapping {
 					email = TEXT
 					email.field = mail
+
+					name = TEXT
+					name.field = Shib-realname
 				}
 			}
 		}

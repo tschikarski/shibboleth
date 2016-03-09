@@ -31,6 +31,10 @@ https://www.internet2.edu/products-services/trust-identity-middleware/shibboleth
 Screenshots
 -----------
 
-TODO: This image is outdated
-
-.. image:: ../Images/image-2.png
+.. image:: ../Images/be_form_collapsed.png
+.. image:: ../Images/be_form_expanded.png
+.. image:: ../Images/extconf_general.png
+.. image:: ../Images/extconf_feauth.png
+.. image:: ../Images/extconf_beauth.png
+.. image:: ../Images/extconf_advanced.png
+.. image:: ../Images/extconf_debugging.png
