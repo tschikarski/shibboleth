@@ -20,5 +20,14 @@ RewriteEngine On
 	#RewriteCond %{HTTPS} !=on
 	#RewriteRule ^(typo3/.*)$ https://%{SERVER_NAME}/$1 [L,R=301]
 
+	#	# Optional: Automatically redirect to IdP for backend
+	#	RewriteCond %{REQUEST_URI} ^/typo3/(index\.php)?$
+	#	RewriteCond %{QUERY_STRING} !redirecttoshibboleth
+	#	# Avoid redirect during and after login or logout
+	#	RewriteCond %{HTTP_COOKIE} !shibsession
+	#	RewriteCond %{HTTP_REFERER} !backend
+	#	RewriteCond %{REQUEST_METHOD} GET
+	#	RewriteRule	^(typo3/.*)$ https://%{SERVER_NAME}/$1?redirecttoshibboleth=yes [L,R=302]
+
 	# Other TYPO3 related redirect rules may follow here
 </IfModule>
