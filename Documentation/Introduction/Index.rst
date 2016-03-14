@@ -31,10 +31,10 @@ https://www.internet2.edu/products-services/trust-identity-middleware/shibboleth
 Screenshots
 -----------
 
-.. image:: ../Images/be_form_collapsed.png
-.. image:: ../Images/be_form_expanded.png
-.. image:: ../Images/extconf_general.png
-.. image:: ../Images/extconf_feauth.png
-.. image:: ../Images/extconf_beauth.png
-.. image:: ../Images/extconf_advanced.png
-.. image:: ../Images/extconf_debugging.png
+.. image:: ../Imagedir/be_form_collapsed.png
+.. image:: ../Imagedir/be_form_expanded.png
+.. image:: ../Imagedir/extconf_general.png
+.. image:: ../Imagedir/extconf_feauth.png
+.. image:: ../Imagedir/extconf_beauth.png
+.. image:: ../Imagedir/extconf_advanced.png
+.. image:: ../Imagedir/extconf_debugging.png
