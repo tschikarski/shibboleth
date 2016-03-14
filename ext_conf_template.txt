@@ -5,18 +5,24 @@ sessions_handlerURL = Shibboleth.sso
   # cat=General/enable/030; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"; with leading slash!
 sessionInitiator_Location = /Login
   # cat=FE authentication/enable/035; type=boolean; label=Enable Shibboleth for FE: ATTENTION! Take care to disable all imported Shibboleth users, when deactivating this or uninstalling the extension!
-FE_enable = 1
+FE_enable = 0
   # cat=FE authentication/enable/040; type=boolean; label=FE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as FE users
-FE_autoImport = 1
+FE_autoImport = 0
   # cat=FE authentication/enable/050; type=int; label=FE User Autoimport to pid: Page ID of the (sys)folder automatic imported FE users shall go into
-FE_autoImport_pid = 29
+FE_autoImport_pid =
   # cat=BE authentication/enable/055; type=boolean; label=Enable Shibboleth for BE: ATTENTION! Take care to disable all imported Shibboleth users, when deactivating this or uninstalling the extension!
 BE_enable = 0
   # cat=BE authentication/enable/060; type=boolean; label=BE User Autoimport: Check this to enable automatic import of authenticated Shibboleth users as BE users
 BE_autoImport = 0
   # cat=BE authentication/enable/070; type=boolean; label=BE User Autoimport in Disabled State: If this is checked and BE Autoimport is enabled, new BE users start in disabled state
 BE_autoImportDisableUser = 1
-  # cat=Advanced/enable/110; type=boolean; label=Enable alwaysFetchUser: Detects a local Shibboleth session at any circumstances. You might have to set to FALSE, if living behind a load balancer.
+  # cat=BE authentication/enable/190; type=string; label=Custom BE login page, template path:Specify a path relative to the site root (e.g. fileadmin/my_templates/login.html) with a custom HTML template. The default template is typo3/sysext/t3skin/Resources/Private/Templates/login.html.
+BE_loginTemplatePath =typo3conf/ext/shibboleth/res/be_form/login.html
+  # cat=BE authentication/enable/200; type=string; label=Custom BE login page, CSS file:Specify a path relative to the backend directory (e.g. ../fileadmin/my_templates/login.css) with a CSS file to include in the login page.
+BE_loginTemplateCss =../typo3conf/ext/shibboleth/res/be_form/login.css
+  # cat=BE authentication/enable/210; type=string; label=Redirect after logout: User will be redirected to this URL after backend logout. This avoids re-login to the backend. No redirect, if empty.
+BE_logoutRedirectUrl = /typo3conf/ext/shibboleth/res/be_form/logout.html
+  # cat=Advanced/enable/110; type=boolean; label=Enable alwaysFetchUser: Detects a local Shibboleth session at any circumstances. If not a performance issue, leave this on in normal circumstances.
 enableAlwaysFetchUser = 1
   # cat=Advanced/enable/120; type=string; label=entityID of your IdP: Can be used to overwrite any discovery method defined in your shibboleth config file (shibboleth2.xml)
 entityID=
@@ -26,8 +32,6 @@ forceSSL = 1
 FE_applicationID =
   # cat=Advanced/enable/170; type=string; label=BE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
 BE_applicationID =
-  # cat=Advanced/enable/180; type=boolean; label=BE Link in Log In Form (EXPERIMENTAL!): If checked, the BE log in form is modified and contains a link to the Shibboleth login
-BE_linkInLoginForm = 0
   # cat=Debugging/enable/190; type=boolean; label=FE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
 FE_devLog = 0
   # cat=Debugging/enable/200; type=boolean; label=BE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs

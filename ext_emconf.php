@@ -12,9 +12,9 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Shibboleth Authentication and SSO',
-	'description' => '',
+	'description' => 'Shibboleth login for TYPO3',
 	'category' => 'services',
-	'author' => 'Thomas Schikarski, Irene Höppner',
+	'author' => 'Thomas Schikarski (Trusting Connections UG), Andreas Groth (TYPO3-Team der TU München), Irene Höppner',
 	'author_email' => 'thomas.schikarski@trusting-connections.net',
 	'shy' => '',
 	'dependencies' => 'cms',
@@ -29,7 +29,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 1,
 	'lockType' => '',
 	'author_company' => '',
-	'version' => '2.0.2',
+	'version' => '2.0.4',
 	'constraints' => array(
 		'depends' => array(
 			'typo3' => '6.2.0-6.2.99',

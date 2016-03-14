@@ -1,0 +1,57 @@
+tx_shibboleth {
+	FE {
+		IDMapping {
+			shibID = TEXT
+			shibID.field = eppn
+			typo3Field = username
+		}
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				email = TEXT
+				email.field = eppn
+
+				usergroup = TEXT
+				usergroup.value = 1
+
+				name = TEXT
+				name.field = eppn
+			}
+			updateUserFieldsMapping {
+				email = TEXT
+				email.field = mail
+			}
+		}
+	}
+	BE {
+		IDMapping {
+			shibID = TEXT
+			shibID.field = eppn
+			typo3Field = username
+		}
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				email = TEXT
+				email.field = eppn
+
+				# Never create an admin!
+				admin = TEXT
+				admin.value = 1
+				realName = TEXT
+				realName.field = eppn
+				# Mount from groups: DB Mounts & File Mounts
+				options = TEXT
+				options.value = 3
+			}
+			updateUserFieldsMapping {
+				email = TEXT
+				email.field = eppn
+				realName = TEXT
+				realName.field = eppn
+			}
+		}
+	}
+}
