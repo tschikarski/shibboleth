@@ -67,7 +67,7 @@ class tx_shibboleth_userhandler {
 		if (is_object($GLOBALS['TSFE'])) {
 			$this->tsfeDetected = TRUE;
 		}
-		$localcObj = GeneralUtility::makeInstance('tslib_cObj');
+		$localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
 		$localcObj->start($_SERVER);
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
