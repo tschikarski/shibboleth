@@ -8,6 +8,8 @@
  * @subpackage	tx_shibboleth
  */
 
+namespace TrustCnct\Shibboleth;
+
 class tx_shibboleth_toolbar implements \TYPO3\CMS\Backend\Toolbar\ToolbarItemHookInterface {
 
 	/**
