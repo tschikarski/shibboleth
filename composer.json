@@ -1,0 +1,32 @@
+{
+	"name": "trustcnct/shibboleth",
+	"type": "typo3-cms-framework",
+	"description": "TYPO3 Shibboleth authentication",
+	"homepage": "https://github.com/tschikarski/shibboleth",
+	"authors": [
+		{
+			"name": "Thomas Schikarski",
+			"email": "dummy@trustcnct.net",
+			"role": "IT-Zipfel",
+			"homepage": "http://example.com"
+		}
+	],
+	"license": ["GPL-2.0+"],
+	"require": {
+		"typo3/cms": ">=6.2.0,<8.0.0"
+	},
+	"require-dev":
+	{
+		"phpunit/phpunit": "~4.8.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"TrustCnct\\Shibboleth\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+		}
+	}
+}

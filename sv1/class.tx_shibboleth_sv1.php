@@ -29,6 +29,7 @@
 
 namespace TrustCnct\Shibboleth;
 
+use TrustCnct\Shibboleth\User\UserHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -105,7 +106,7 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 			return FALSE;
 		}
 		
-		$userhandler = GeneralUtility::makeInstance('TrustCnct\\Shibboleth\\tx_shibboleth_userhandler',$this->authInfo['loginType'],
+		$userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
 			$this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 
 		$user = $userhandler->getUserFromDB();
@@ -183,7 +184,7 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 		if (is_array($user) && $user['_allowUser']) {
 			unset ($user['_allowUser']);
 				// Before we return our positiv result, we have to update/insert the user in DB
-			$userhandler = GeneralUtility::makeInstance('TrustCnct\\Shibboleth\\tx_shibboleth_userhandler',$this->authInfo['loginType'],
+			$userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
 				$this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 				// We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
 			$user['uid'] = $userhandler->synchronizeUserData($user);
