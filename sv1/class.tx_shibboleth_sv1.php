@@ -31,8 +31,6 @@ namespace TrustCnct\Shibboleth;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibboleth').'lib/class.tx_shibboleth_userhandler.php');
-
 /**
  * Service "Shibboleth Authentication" for the "shibboleth" extension.
  *
