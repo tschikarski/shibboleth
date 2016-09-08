@@ -237,7 +237,7 @@ class tx_shibboleth_userhandler {
 		
 		if ($this->writeDevLog) GeneralUtility::devlog('configString','shibboleth_userhandler',0,array($configString));
 		
-		$parser = GeneralUtility::makeInstance('t3lib_TSparser');
+		$parser = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Configuration\TsConfigParser::class);
 		$parser->parse($configString);
 
 		$completeSetup = $parser->setup;
