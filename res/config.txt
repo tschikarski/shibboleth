@@ -27,7 +27,7 @@ tx_shibboleth {
 	BE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = eppn
+			shibID.field = uid
 			typo3Field = username
 		}
 		userControls {
@@ -35,22 +35,30 @@ tx_shibboleth {
 			allowUser.value = 1
 			createUserFieldsMapping {
 				email = TEXT
-				email.field = eppn
+				email.field = mail
 
 				# Never create an admin!
 				admin = TEXT
-				admin.value = 1
-				realName = TEXT
-				realName.field = eppn
+				admin.value = 0
+				realName = COA
+				realName.1 = TEXT
+				realName.1.field = sn
+				realName.3 = TEXT
+				realName.3.field = givenName
+				realName.3.noTrimWrap  = |, ||
 				# Mount from groups: DB Mounts & File Mounts
 				options = TEXT
 				options.value = 3
 			}
 			updateUserFieldsMapping {
 				email = TEXT
-				email.field = eppn
-				realName = TEXT
-				realName.field = eppn
+				email.field = mail
+				realName = COA
+				realName.1 = TEXT
+				realName.1.field = sn
+				realName.3 = TEXT
+				realName.3.field = givenName
+				realName.3.noTrimWrap  = |, ||
 			}
 		}
 	}
