@@ -1,0 +1,62 @@
+<f:layout name="Login7Layout" />
+
+<f:section name="shibbMessage">
+	<!-- Shibboleth: Message block -->
+	<div id="shib_message">
+		<div class="t3-headline">
+			<h2>Backend login via "Shibboleth"</h2>
+		</div>
+
+		<div class="t3-login-box-body">
+			<!-- Copied from local login box -->
+			<!--[if lte IE 6]>
+			###WARNING_BROWSER_INCOMPATIBLE###
+			<![endif]-->
+
+			<!-- Our message -->
+			<p>
+				This TYPO3 installation is Shibboleth-enabled. To access the backend, you need an account with appropriate access rights.
+			</p>
+			<p>
+				To activate your account and authorization to access this website, please contact the administrator of the site in your unit.
+			</p>
+			<p>
+				Once your account is activated, follow this link:
+			</p>
+			<div class="btn btn-block btn-login t3js-login-submit">
+				<a href="/typo3/?redirecttoshibboleth=yes">Login to backend »</a>
+			</div>
+			<div style="clear:both"></div>
+		</div>
+	</div>
+	<!-- /Shibboleth: Message block -->
+</f:section>
+
+<f:section name="shibbToggle">
+	<!-- Shibboleth: Toggle button -->
+	<div class="shib_togglediv backgroundsize"><span id="shib_toggle_localform" class=""> </span>Local login</div>
+	<!-- /Shibboleth: Toggle button -->
+</f:section>
+
+<f:section name="loginFormFields">
+	<div class="form-group t3js-login-username-section" id="t3-login-username-section">
+		<div class="form-control-wrap">
+			<div class="form-control-holder">
+				<input type="text" id="t3-username" name="username" value="{presetUsername}" placeholder="{f:translate(key: 'login.username')}" class="form-control input-login t3js-clearable t3js-login-username-field" autofocus="autofocus" required="required" />
+				<div class="form-notice-capslock hidden t3js-login-alert-capslock">
+					<img src="{images.capslock}" width="14" height="14" alt="{f:translate(key: 'login.error.capslock')}" title="{f:translate(key: 'login.error.capslock')}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-group t3js-login-password-section" id="t3-login-password-section">
+		<div class="form-control-wrap">
+			<div class="form-control-holder">
+				<input type="password" id="t3-password" name="p_field" value="{presetPassword}" placeholder="{f:translate(key: 'login.password')}" class="form-control input-login t3js-clearable t3js-login-password-field" required="required" data-rsa-encryption="t3-field-userident" />
+				<div class="form-notice-capslock hidden t3js-login-alert-capslock">
+					<img src="{images.capslock}" width="14" height="14" alt="{f:translate(key: 'login.error.capslock')}" title="{f:translate(key: 'login.error.capslock')}" />
+				</div>
+			</div>
+		</div>
+	</div>
+</f:section>

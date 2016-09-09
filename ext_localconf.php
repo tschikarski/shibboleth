@@ -64,6 +64,13 @@ if ($EXT_CONFIG['BE_enable']) {
 		),
 		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook']
 	);
+	//$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][1473415709]['provider'] = \TrustCnct\Shibboleth\LoginProvider\ShibbolethLoginProvider::class;
+	$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][1473415709] = array(
+		'provider' => \TrustCnct\Shibboleth\LoginProvider\ShibbolethLoginProvider::class,
+		'sorting' => 25,
+		'icon-class' => 'fa-key',
+		'label' => 'LLL:EXT:shibboleth/res/Private/Language/locallang.xlf:login.link'
+	);
 }
 
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLog'] = FALSE;

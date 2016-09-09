@@ -43,7 +43,10 @@ $EM_CONF[$_EXTKEY] = array(
 	),
 	'autoload' => array(
 		'psr-4' => array('TrustCnct\\Shibboleth\\' => 'Classes/'),
-		'classmap' => array('sv1/class.tx_shibboleth_sv1.php')
+		'classmap' => array(
+			'sv1/class.tx_shibboleth_sv1.php',
+			'hooks/',
+		)
 	)
 );
 
