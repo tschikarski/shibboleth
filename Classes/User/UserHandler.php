@@ -233,6 +233,9 @@ class UserHandler
 		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth_userhandler',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
+				if (!is_object($GLOBALS['TSFE'])) {
+					$GLOBALS['TSFE'] = new \stdClass();
+				}
 				$GLOBALS['TSFE']->cObjectDepthCounter = 100;
 			}
 			$result = $this->cObj->cObjGetSingle($conf, $subconf);
