@@ -44,10 +44,10 @@ class tx_shibboleth_beform {
 	 * @return void
 	 */
 	public function process() {
-		$extConf =  unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth']);
+        $extConf =  unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth']);
 
-		if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
-				// Redirect to Shibboleth login
+        if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
+            // Redirect to Shibboleth login
 			$entityIDparam = $extConf['entityID'];
 			if ($entityIDparam != '') {
 				$entityIDparam = '?entityID='. rawurldecode($entityIDparam);
