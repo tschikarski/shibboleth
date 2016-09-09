@@ -1,4 +1,5 @@
 <?php
+die('RUN INTO ext_autoload.php, which is not up to date!');
 $extpath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibboleth');
 return array(
 	'TrustCnct\\Shibboleth\\tx_shibboleth_sv1' => $extpath . 'sv1/class.tx_shibboleth_sv1.php',

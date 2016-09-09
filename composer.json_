@@ -21,8 +21,9 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"TrustCnct\\Shibboleth\\": "Classes/"
-		}
+			"TrustCnct\\Shibboleth\\": "Classes"
+		},
+		"classmap": ["sv1/class.tx_shibboleth_sv1.php"]
 	},
 	"autoload-dev": {
 		"psr-4": {
