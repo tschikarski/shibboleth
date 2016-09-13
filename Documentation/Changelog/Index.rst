@@ -14,6 +14,11 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+3.0.0    Compatibility with 7.6 LTS:
+         internal release without
+         updated documentation and
+         without cleanup
+-------  ------------------------------
 2.0.4    Neutral CI for
          logout
          button,
