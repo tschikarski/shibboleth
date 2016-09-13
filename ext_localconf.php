@@ -71,6 +71,8 @@ if ($EXT_CONFIG['BE_enable']) {
 		'icon-class' => 'fa-key',
 		'label' => 'LLL:EXT:shibboleth/res/Private/Language/locallang.xlf:login.link'
 	);
+	// Modify logout button; replacing TYPO3 original
+	$GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][1435433111] = \TrustCnct\Shibboleth\Toolbar\UserToolbarItem::class;
 }
 
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLog'] = FALSE;
