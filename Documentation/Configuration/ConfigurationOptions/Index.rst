@@ -85,7 +85,7 @@ BE_autoImportDisableUser   boolean     If this is set and BE_autoImport is activ
                                        users will be created in disabled state, yet to be
                                        activated manually by an admin.
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_loginTemplatePath       string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login.html``
+BE_loginTemplatePath       string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login7.html``
 
                                        Backend login page is not modified, if this option is empty.
 
