@@ -58,7 +58,6 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
             $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibboleth');
             $newLayoutRootPaths[] = $extPath . 'res/Private/Layouts';
             $view->setLayoutRootPaths($newLayoutRootPaths);
-            //$pageRenderer->addCssFile($extConf['BE_loginTemplateCss']);
         }
     }
 

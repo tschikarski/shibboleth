@@ -92,11 +92,6 @@ BE_loginTemplatePath       string      Customized backend login page. Hide login
                                        **Change filename or path, if you want to modify these files. Original files will be overwritten
                                        by extension updates!**
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_loginTemplateCss        string      CSS file for ``BE_loginTemplatePath`` (relative to ``/typo3``)                                               ``../typo3conf/ext/shibboleth/res/be_form/login.css``
-
-                                       **Change filename or path, if you want to modify these files. Original files will be overwritten
-                                       by extension updates!**
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 BE_logoutRedirectUrl       string      Redirect to this URL after backend logout. (**Without redirect, backend logout is followed by                ``/typo3conf/ext/shibboleth/res/be_form/logout.html``
                                        immediate re-login.**)
 

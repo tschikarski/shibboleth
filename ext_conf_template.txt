@@ -18,8 +18,6 @@ BE_autoImport = 0
 BE_autoImportDisableUser = 1
   # cat=BE authentication/enable/190; type=string; label=Custom BE login page, template path:Specify a path relative to the site root (e.g. fileadmin/my_templates/login.html) with a custom HTML template. The default template is typo3/sysext/t3skin/Resources/Private/Templates/login.html.
 BE_loginTemplatePath =typo3conf/ext/shibboleth/res/be_form/login7.html
-  # cat=BE authentication/enable/200; type=string; label=Custom BE login page, CSS file:Specify a path relative to the backend directory (e.g. ../fileadmin/my_templates/login.css) with a CSS file to include in the login page.
-BE_loginTemplateCss =../typo3conf/ext/shibboleth/res/be_form/login.css
   # cat=BE authentication/enable/210; type=string; label=Redirect after logout: User will be redirected to this URL after backend logout. This avoids re-login to the backend. No redirect, if empty.
 BE_logoutRedirectUrl = /typo3conf/ext/shibboleth/res/be_form/logout.html
   # cat=Advanced/enable/110; type=boolean; label=Enable alwaysFetchUser: Detects a local Shibboleth session at any circumstances. If not a performance issue, leave this on in normal circumstances.
