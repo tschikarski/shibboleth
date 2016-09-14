@@ -54,17 +54,6 @@ if (is_array($subtypesArray)) {
 );
 
 if ($EXT_CONFIG['BE_enable']) {
-// Hook for the BE login page
-	if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'])) {
-		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array();
-	}
-	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook'] = array_merge(
-		array(
-			'shibboleth' => 'EXT:shibboleth/hooks/class.tx_shibboleth_beform.php:tx_shibboleth_beform->process'
-		),
-		$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/index.php']['loginFormHook']
-	);
-	//$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][1473415709]['provider'] = \TrustCnct\Shibboleth\LoginProvider\ShibbolethLoginProvider::class;
 	$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][1473415709] = array(
 		'provider' => \TrustCnct\Shibboleth\LoginProvider\ShibbolethLoginProvider::class,
 		'sorting' => 25,
