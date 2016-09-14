@@ -52,12 +52,15 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
         }
 
         parent::render($view,$pageRenderer,$loginController);
-        if ($extConf['BE_loginTemplatePath']) {
-            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName(PATH_site.$extConf['BE_loginTemplatePath']));
+        $templatePathAndFilename = GeneralUtility::getFileAbsFileName(PATH_site . $extConf['BE_loginTemplatePath']);
+        if (is_file($templatePathAndFilename)) {
+            $view->setTemplatePathAndFilename($templatePathAndFilename);
             $newLayoutRootPaths = $view->getLayoutRootPaths();
             $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibboleth');
             $newLayoutRootPaths[] = $extPath . 'res/Private/Layouts';
             $view->setLayoutRootPaths($newLayoutRootPaths);
+        } else {
+            throw new \TYPO3\CMS\Extbase\Configuration\Exception\NoSuchFileException('BE_loginTemplatePath: File not found', 1473848139);
         }
     }
 
