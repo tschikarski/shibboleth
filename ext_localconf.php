@@ -56,7 +56,7 @@ if (is_array($subtypesArray)) {
 if ($EXT_CONFIG['BE_enable']) {
 	$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][1473415709] = array(
 		'provider' => \TrustCnct\Shibboleth\LoginProvider\ShibbolethLoginProvider::class,
-		'sorting' => 25,
+		'sorting' => 75,
 		'icon-class' => 'fa-key',
 		'label' => 'LLL:EXT:shibboleth/res/Private/Language/locallang.xlf:login.link'
 	);
