@@ -85,17 +85,11 @@ BE_autoImportDisableUser   boolean     If this is set and BE_autoImport is activ
                                        users will be created in disabled state, yet to be
                                        activated manually by an admin.
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_loginTemplatePath       string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login.html``
+BE_loginTemplatePath       string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login7.html``
 
                                        Backend login page is not modified, if this option is empty.
 
-                                       **Change filename or path, if you want to modify these files. Original files will be overwritten
-                                       by extension updates!**
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_loginTemplateCss        string      CSS file for ``BE_loginTemplatePath`` (relative to ``/typo3``)                                               ``../typo3conf/ext/shibboleth/res/be_form/login.css``
-
-                                       **Change filename or path, if you want to modify these files. Original files will be overwritten
-                                       by extension updates!**
+                                       **Do not modify original template file. It will be overridden by extension updates.**
 -------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
 BE_logoutRedirectUrl       string      Redirect to this URL after backend logout. (**Without redirect, backend logout is followed by                ``/typo3conf/ext/shibboleth/res/be_form/logout.html``
                                        immediate re-login.**)

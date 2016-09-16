@@ -29,7 +29,7 @@ BE authentication
 * Did you activate Shibboleth on your server? See first paragraph in :ref:`configuration`.
 * Is ``BE_enable`` enabled?
 * Is the timeout for BE users (practically) disabled by setting [BE][sessionTimeout] to 86400 or higher (recommended)?
-* Is there an entry for ``BE_loginTemplatePath`` and ``BE_loginTemplateCss``?
+* Is there an entry for ``BE_loginTemplatePath``?
 * If you changed such templates, did you change all file names to protect the files from overwriting by extension updates?
 * Is there an entry for ``BE_logoutRedirectUrl`` (recommended)?
 * If you changed the sample files for logout redirection, did you change all file names to protect the files from overwriting by extension updates?

@@ -14,6 +14,14 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+3.0.1    Removal of obsolete code and
+         settings:
+         Config BE_loginTemplateCss
+
+         Change sorting of
+         LoginProviders - Shibboleth
+         now first
+-------  ------------------------------
 3.0.0    Compatibility with 7.6 LTS:
          internal release without
          updated documentation and
