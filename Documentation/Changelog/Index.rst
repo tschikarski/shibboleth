@@ -14,6 +14,9 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+3.0.2    Fix error message referencing
+         removed directory "hooks"
+-------  ------------------------------
 3.0.1    Removal of obsolete code and
          settings:
          Config BE_loginTemplateCss
