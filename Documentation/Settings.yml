@@ -7,5 +7,5 @@ conf.py:
   copyright: 2010-2016, Thomas Schikarski, Irene Höppner, Andreas Groth
   project: EXT: Shibboleth
   version: 3.0
-  release: 3.0.1
+  release: 3.0.2
 ...
