@@ -60,3 +60,20 @@
 		</div>
 	</div>
 </f:section>
+
+<f:section name="otherLoginProviders">
+	<f:for each="{loginProviders}" as="provider" key="providerKey">
+		<f:if condition="{provider.label}">
+			<f:if condition="{loginProviderIdentifier} != {providerKey}">
+				<f:if condition="1433416747 == {providerKey}">
+					<f:then>
+						<li class="t3js-loginprovider-switch" data-providerkey="{providerKey}"><a href="?loginProvider={providerKey}"><i class="fa fa-fw {provider.icon-class}"></i> <span>Login for local admins (special!)</span></a></li>
+					</f:then>
+					<f:else>
+						<li class="t3js-loginprovider-switch" data-providerkey="{providerKey}"><a href="?loginProvider={providerKey}"><i class="fa fa-fw {provider.icon-class}"></i> <span><f:translate key="{provider.label}" /></span></a></li>
+					</f:else>
+				</f:if>
+			</f:if>
+		</f:if>
+	</f:for>
+</f:section>
