@@ -14,6 +14,10 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+3.0.3    Fix PHP Warning due to
+         dangling reference to
+         registerToolbarItem.php
+-------  ------------------------------
 3.0.2    Fix error message referencing
          removed directory "hooks"
 -------  ------------------------------
