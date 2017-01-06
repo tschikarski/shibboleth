@@ -23,6 +23,9 @@
     }
   ],
   "autoload": {
+    "files": [
+      "sv1/class.tx_shibboleth_sv1.php"
+    ],
     "psr-4": {
       "TrustCnct\\Shibboleth\\": "Classes"
     }

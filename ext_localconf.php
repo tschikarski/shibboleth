@@ -49,7 +49,7 @@ if (is_array($subtypesArray)) {
 		'quality' => 80,
 		'os' => '',
 		'exec' => '',
-		'className' => 'TrustCnct\\Shibboleth\\tx_shibboleth_sv1',
+		'className' => 'tx_shibboleth_sv1',
 	)
 );
 
