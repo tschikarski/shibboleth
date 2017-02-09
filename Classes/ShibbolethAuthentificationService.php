@@ -40,9 +40,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @subpackage	tx_shibboleth
  */
 
-class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
-	var $prefixId = 'tx_shibboleth_sv1';		// Same as class name
-	var $scriptRelPath = 'sv1/class.tx_shibboleth_sv1.php';	// Path to this script relative to the extension dir.
+class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
+	var $prefixId = 'ShibbolethAuthentificationService';		// Same as class name
+	var $scriptRelPath = 'Classes/ShibbolethAuthentificationService.php';	// Path to this script relative to the extension dir.
 	var $extKey = 'shibboleth';	// The extension key.
 	var $shibboleth_extConf = ''; // Extension configuration.
 	var $ShibSessionID = 'Shib-Session-ID';
@@ -201,8 +201,8 @@ class tx_shibboleth_sv1 extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
 
 
 
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/shibboleth/sv1/class.tx_shibboleth_sv1.php'])	{
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/shibboleth/sv1/class.tx_shibboleth_sv1.php']);
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/shibboleth/Classes/ShibbolethAuthentificationService.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/shibboleth/Classes/ShibbolethAuthentificationService.php']);
 }
 
 ?>
