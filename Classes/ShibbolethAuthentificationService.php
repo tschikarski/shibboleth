@@ -45,8 +45,23 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     var $scriptRelPath = 'Classes/ShibbolethAuthentificationService.php';    // Path to this script relative to the extension dir.
     var $extKey = 'shibboleth';    // The extension key.
     var $shibboleth_extConf = ''; // Extension configuration.
-    var $ShibSessionID = 'Shib-Session-ID';
-    var $ShibApplicationID = 'Shib-Application-ID';
+    var $envShibPrefix = '';      // If environment variables are prefixed, store prefix here (e.g. REDIRECT_...)
+    var $hasShibbolethSession = FALSE;
+    var $ShibSessionID = '';
+    var $ShibApplicationID = '';
+
+    private function logoffAnyShibbolethUser() {
+        if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
+            if($this->writeDevLog)
+                GeneralUtility::devlog(
+                    $this->mode . ': have a non-matching Shibboleth user logged in - logout! - for session id see extra data',
+                    'shibboleth',
+                    0,
+                    $this->authInfo['userSession']
+                );
+            $this->pObj->logoff();
+        }
+    }
 
     /**
      * [Put your description here]
@@ -65,9 +80,26 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
 
         global $TYPO3_CONF_VARS;
         $this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
-        
-        if (isset($_SERVER['AUTH_TYPE']) && $_SERVER['AUTH_TYPE'] == 'shibboleth') {
+
+
+        $firstFoundShibKey = '';
+        foreach ($_SERVER as $serverEnvKey => $serverEnvValue) {
+            $posOfShibInKey = strpos($serverEnvKey,'Shib');
+            if ($posOfShibInKey !== FALSE) {
+                $firstFoundShibKey = $serverEnvKey;
+                $this->envShibPrefix = substr($serverEnvKey, 0, $posOfShibInKey);
+                $this->hasShibbolethSession = TRUE;
+                $this->ShibSessionID = $this->envShibPrefix . 'Shib_Session_ID';
+                $this->ShibApplicationID = $this->envShibPrefix . 'Shib_Application_ID';
+                break;
+            }
+        }
+
+        // Another chance to detect Shibboleth session present; just for safety, as code before not well tested at the moment
+        if (!$this->hasShibbolethSession && isset($_SERVER['AUTH_TYPE']) && $_SERVER['AUTH_TYPE'] == 'shibboleth') {
             if (isset($_SERVER['Shib_Session_ID']) && $_SERVER['Shib_Session_ID'] != '') {
+                $this->hasShibbolethSession = TRUE;
+                $this->envShibPrefix = '';
                 $this->ShibSessionID = 'Shib_Session_ID';
                 $this->ShibApplicationID = 'Shib_Application_ID';
             }
@@ -82,15 +114,45 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             $isAlreadyThere = TRUE;
         }
 
-        if($this->writeDevLog) GeneralUtility::devlog('getUser ($_SERVER)','shibboleth',0,$_SERVER);
-        if($this->writeDevLog) GeneralUtility::devlog('getUser: mode: ' . $this->mode,'shibboleth'); // subtype
-        if($this->writeDevLog) GeneralUtility::devlog('getUser: loginType: ' . $this->authInfo['loginType'],'shibboleth'); // BE or FE
-        if($this->writeDevLog) GeneralUtility::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
-        if($this->writeDevLog) GeneralUtility::devlog('getUser: (loginData)','shibboleth',0,$this->login);
-        
+        if($this->writeDevLog) GeneralUtility::devlog($this->mode.' ($_SERVER)','shibboleth',0,$_SERVER);
+        // if($this->writeDevLog) GeneralUtility::devlog('getUser: mode: ' . $this->mode,'shibboleth'); // subtype
+        // if($this->writeDevLog) GeneralUtility::devlog('getUser: loginType: ' . $this->authInfo['loginType'],'shibboleth'); // BE or FE
+        // if($this->writeDevLog) GeneralUtility::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
+        // if($this->writeDevLog) GeneralUtility::devlog('getUser: (loginData)','shibboleth',0,$this->login);
+
+            // Without a valid Shibboleth session, bail out here returning FALSE
+        if (!$this->hasShibbolethSession) {
+            if($this->writeDevLog)
+                GeneralUtility::devlog(
+                    $this->mode . ': no applicable Shibboleth session recognized - see extra data for environment variables',
+                    'shibboleth',
+                    2,
+                    $_SERVER
+                );
+            $this->logoffAnyShibbolethUser();
+            return FALSE;
+        }
+
+            // Also bail out, if the application ID is required to coincide and does not
+        if ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
+                $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->ShibApplicationID]) {
+            if($this->writeDevLog)
+                GeneralUtility::devlog(
+                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->ShibApplicationID] .
+                    ' does not match required '. $this->authInfo['loginType'].'_applicationID (' .
+                    $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'].
+                    ') - see extra data for environment variables',
+                    'shibboleth',
+                    3,
+                    $_SERVER);
+            $this->logoffAnyShibbolethUser();
+            return FALSE;
+        }
+
             // check, if there is a user that is Shibboleth authenticated (with a correct application ID, if required by configuration)
             // Remark: Best recognition of Shibboleth session by $_SERVER['AUTH_TYPE'] == 'shibboleth', as other Shibboleth-specific 
             // server vars may have differing syntax/names on different systems
+        /*
         if(!isset($_SERVER['AUTH_TYPE']) || $_SERVER['AUTH_TYPE'] != 'shibboleth' ||
             ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
             $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->ShibApplicationID])
@@ -105,38 +167,61 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             
             return FALSE;
         }
+        */
         
         $userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
             $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
 
         $user = $userhandler->getUserFromDB();
-        if($this->writeDevLog) GeneralUtility::devlog('getUser: after getUserFromDB ($user)','shibboleth',0,$user);
-        
+
         if (!is_array($user)) {
                 // Got no matching user from DB
-            if($this->writeDevLog) GeneralUtility::devlog('getUser: no matching user in DB','shibboleth');
             if (!$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']){
                     // No auto-import for this login type, no user found -> no login possible, don't return a user record.
-                if($this->writeDevLog) GeneralUtility::devlog('getUser: no auto-import configured; will exit','shibboleth',0,$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']);
-                // if($this->writeDevLog) GeneralUtility::devlog('getUser: extConf','shibboleth',0,$this->shibboleth_extConf);
-                
+                if($this->writeDevLog)
+                    GeneralUtility::devlog(
+                        $this->mode.': User not found in DB and no auto-import configured; will exit',
+                        'shibboleth',
+                        2,
+                        $this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']
+                    );
                 return false;
-            } else {
-                if($this->writeDevLog) GeneralUtility::devlog('getUser: preparing ($user) for auto-import','shibboleth',0,$user);
             }
         }
             // Fetched matching user successfully from DB or auto-import is allowed
             // get some basic user data from shibboleth server-variables
         $user = $userhandler->transferShibbolethAttributesToUserArray($user);
+        if (!is_array($user)) {
+            if($this->writeDevLog)
+                GeneralUtility::devlog(
+                    $this->mode.': Error while calculating user attributes. Check config file!',
+                    'shibboleth',
+                    3
+                );
+            return false;
+        }
+
         if($this->writeDevLog) GeneralUtility::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
 
         if (!$isAlreadyThere) {
             unset($GLOBALS['TSFE']);
         }
+
+        if ($user[$this->db_user['username_column']] == '') {
+            if($this->writeDevLog)
+                GeneralUtility::devlog(
+                    $this->mode.': Username is empty string. Never do this!',
+                    'shibboleth',
+                    3,
+                    $this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']
+                );
+            $this->logoffAnyShibbolethUser();
+            return FALSE;
+        }
         
         return $user;
     }
-    
+
     function authUser(&$user) {
         if($this->writeDevLog) GeneralUtility::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->ShibSessionID],'shibboleth',0,$user);
         
@@ -157,7 +242,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             }
             
                 // For safety: Check for existing Shibboleth-Session and return FALSE, otherwise!
-            if (!$_SERVER[$this->ShibSessionID]) {
+            if (!$this->hasShibbolethSession) {
                     // With no Shibboleth session we won't authenticate anyone!
                 if($this->writeDevLog) GeneralUtility::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
                 return FALSE;

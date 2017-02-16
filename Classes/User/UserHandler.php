@@ -28,9 +28,10 @@ class UserHandler
 	var $shibboleth_extConf;
 	var $config; // typoscript like configuration for the current loginType
 	var $cObj; // local cObj, needed to parse the typoscript configuration
+    var $envShibPrefix = '';
 	var $ShibSessionID;
 
-	function __construct($loginType, $db_user, $db_group, $shibSessionIDname, $writeDevLog = FALSE) {
+	function __construct($loginType, $db_user, $db_group, $shibSessionIDname, $writeDevLog = FALSE, $envShibPrefix = '') {
 		global $TYPO3_CONF_VARS;
 		$this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
 		//if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
@@ -41,6 +42,7 @@ class UserHandler
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
 		$this->ShibSessionID = $shibSessionIDname;
+        $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
 		if (is_object($GLOBALS['TSFE'])) {
@@ -53,16 +55,26 @@ class UserHandler
 		}
 
 		$this->cObj = $localcObj;
-		#if ($this->writeDevLog) GeneralUtility::devlog('cObj data','shibboleth_userhandler',0,$this->cObj->data);
 	}
 
 	function getUserFromDB() {
-		if ($this->writeDevLog) {
-			GeneralUtility::devlog('getUserFromDB: start','shibboleth_userhandler');
-		}
 
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
+
+        if ($idValue == '') {
+            if ($this->writeDevLog)
+                GeneralUtility::devLog(
+                    'getUserFromDB: Shibboleth data evaluates username to empty string! Extra data may help',
+                    'shibboleth',
+                    3,
+                    array(
+                        'idField' => $idField,
+                        'idValue' => $idValue
+                    )
+                );
+            return false;
+        }
 
 		$where = $idField . '=\'' . $idValue . '\' ';
 		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
@@ -90,9 +102,8 @@ class UserHandler
 		}
 	}
 
-	function transferShibbolethAttributesToUserArray($user) {
-		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray','shibboleth_userhandler',0,array('user' => $user, 'this_config' => $this->config));
-		// We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
+    function transferShibbolethAttributesToUserArray($user) {
+            // We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
 		$user['tx_shibboleth_config'] = $this->config['userControls.'];
 		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
 
@@ -105,7 +116,22 @@ class UserHandler
 		// any possible mis-configuration from the other fields mapping entries
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
-		$user[$idField] = $idValue;
+
+        if ($idValue == '') {
+            if ($this->writeDevLog)
+                GeneralUtility::devLog(
+                    'transferShibbolethAttributesToUserArray: Shibboleth data evaluates username to empty string! Extra data may help',
+                    'shibboleth',
+                    3,
+                    array(
+                        'idField' => $idField,
+                        'idValue' => $idValue
+                    )
+                );
+            return false;
+        }
+
+        $user[$idField] = $idValue;
 
 		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray: newUserArray','shibboleth_userhandler',0,$user);
 		return $user;
@@ -214,17 +240,12 @@ class UserHandler
 			return array();
 		}
 
-		if ($this->writeDevLog) GeneralUtility::devlog('configString','shibboleth_userhandler',0,array($configString));
-
 		$parser = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Configuration\TsConfigParser');
 		$parser->parse($configString);
 
 		$completeSetup = $parser->setup;
 
-		if ($this->writeDevLog) GeneralUtility::devlog('loginType','shibboleth_userhandler',0,array($this->loginType));
-
 		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
-		if ($this->writeDevLog) GeneralUtility::devlog('parsed TypoScript','shibboleth_userhandler',0,$localSetup);
 
 		return $localSetup;
 	}
