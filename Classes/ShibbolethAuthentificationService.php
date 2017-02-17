@@ -47,8 +47,8 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     var $shibboleth_extConf = ''; // Extension configuration.
     var $envShibPrefix = '';      // If environment variables are prefixed, store prefix here (e.g. REDIRECT_...)
     var $hasShibbolethSession = FALSE;
-    var $ShibSessionID = '';
-    var $ShibApplicationID = '';
+    var $shibSessionIdKey = '';
+    var $shibApplicationIdKey = '';
 
     private function logoffAnyShibbolethUser() {
         if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
@@ -89,8 +89,8 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 $firstFoundShibKey = $serverEnvKey;
                 $this->envShibPrefix = substr($serverEnvKey, 0, $posOfShibInKey);
                 $this->hasShibbolethSession = TRUE;
-                $this->ShibSessionID = $this->envShibPrefix . 'Shib_Session_ID';
-                $this->ShibApplicationID = $this->envShibPrefix . 'Shib_Application_ID';
+                $this->shibSessionIdKey = $this->envShibPrefix . 'Shib_Session_ID';
+                $this->shibApplicationIdKey = $this->envShibPrefix . 'Shib_Application_ID';
                 break;
             }
         }
@@ -100,8 +100,8 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             if (isset($_SERVER['Shib_Session_ID']) && $_SERVER['Shib_Session_ID'] != '') {
                 $this->hasShibbolethSession = TRUE;
                 $this->envShibPrefix = '';
-                $this->ShibSessionID = 'Shib_Session_ID';
-                $this->ShibApplicationID = 'Shib_Application_ID';
+                $this->shibSessionIdKey = 'Shib_Session_ID';
+                $this->shibApplicationIdKey = 'Shib_Application_ID';
             }
         }
         
@@ -135,10 +135,10 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
 
             // Also bail out, if the application ID is required to coincide and does not
         if ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
-                $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->ShibApplicationID]) {
+                $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->shibApplicationIdKey]) {
             if($this->writeDevLog)
                 GeneralUtility::devlog(
-                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->ShibApplicationID] .
+                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->shibApplicationIdKey] .
                     ' does not match required '. $this->authInfo['loginType'].'_applicationID (' .
                     $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'].
                     ') - see extra data for environment variables',
@@ -170,7 +170,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         */
         
         $userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
-            $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
+            $this->db_user, $this->db_groups, $this->shibSessionIdKey, $this->writeDevLog);
 
         $user = $userhandler->getUserFromDB();
 
@@ -241,7 +241,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     }
 
     function authUser(&$user) {
-        if($this->writeDevLog) GeneralUtility::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->ShibSessionID],'shibboleth',0,$user);
+        if($this->writeDevLog) GeneralUtility::devlog('authUser: ($user); Shib-Session-ID: ' . $_SERVER[$this->shibSessionIdKey],'shibboleth',0,$user);
         
         if($this->writeDevLog) GeneralUtility::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
         
@@ -255,21 +255,21 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 // Some user is already logged in to TYPO3, check if it is a Shibboleth user 
             if (!$this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
                     // The presently logged in user is not a shibboleth user, we do nothing
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));    
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
                 return 100;
             }
             
                 // For safety: Check for existing Shibboleth-Session and return FALSE, otherwise!
             if (!$this->hasShibbolethSession) {
                     // With no Shibboleth session we won't authenticate anyone!
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
                 return FALSE;
             }
             
                 // The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, Session-ID might have changed on some miraculous way
-            if ($_SERVER[$this->ShibSessionID] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
+            if ($_SERVER[$this->shibSessionIdKey] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
                     // Shibboleth session still the same, authenticate!
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER[$this->ShibSessionID]));
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
                 return 200;
             }
             
@@ -288,7 +288,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             unset ($user['_allowUser']);
                 // Before we return our positiv result, we have to update/insert the user in DB
             $userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
-                $this->db_user, $this->db_groups, $this->ShibSessionID, $this->writeDevLog);
+                $this->db_user, $this->db_groups, $this->shibSessionIdKey, $this->writeDevLog);
                 // We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
             $user['uid'] = $userhandler->synchronizeUserData($user);
             if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; ($user attached).','shibboleth',0,$user);

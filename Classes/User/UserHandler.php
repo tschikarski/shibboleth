@@ -29,9 +29,9 @@ class UserHandler
 	var $config; // typoscript like configuration for the current loginType
 	var $cObj; // local cObj, needed to parse the typoscript configuration
     var $envShibPrefix = '';
-	var $ShibSessionID;
+	var $shibSessionIdKey;
 
-	function __construct($loginType, $db_user, $db_group, $shibSessionIDname, $writeDevLog = FALSE, $envShibPrefix = '') {
+	function __construct($loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = '') {
 		global $TYPO3_CONF_VARS;
 		$this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
 		//if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
@@ -41,7 +41,7 @@ class UserHandler
 		$this->loginType = $loginType;
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
-		$this->ShibSessionID = $shibSessionIDname;
+		$this->shibSessionIdKey = $shibSessionIdKey;
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
@@ -105,7 +105,7 @@ class UserHandler
     function transferShibbolethAttributesToUserArray($user) {
             // We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
 		$user['tx_shibboleth_config'] = $this->config['userControls.'];
-		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
+		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->shibSessionIdKey];
 
 		$user['_allowUser'] = $this->getSingle($user['tx_shibboleth_config']['allowUser'],$user['tx_shibboleth_config']['allowUser.']);
 
