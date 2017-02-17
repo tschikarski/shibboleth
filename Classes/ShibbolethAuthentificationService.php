@@ -176,6 +176,16 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
 
         if (!is_array($user)) {
                 // Got no matching user from DB
+            if($user !== false) {
+                if($this->writeDevLog)
+                    GeneralUtility::devLog(
+                        $this->mode.': '.$user.' - see $_SERVER in extra data for original data',
+                        'shibboleth',
+                        3,
+                        $_SERVER
+                    );
+                return false;
+            }
             if (!$this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']){
                     // No auto-import for this login type, no user found -> no login possible, don't return a user record.
                 if($this->writeDevLog)
@@ -192,12 +202,20 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             // get some basic user data from shibboleth server-variables
         $user = $userhandler->transferShibbolethAttributesToUserArray($user);
         if (!is_array($user)) {
-            if($this->writeDevLog)
+            if($this->writeDevLog) {
+                if($user === false) {
+                    $msg = $this->mode . ': Error while calculating user attributes.';
+                } else {
+                    $msg = $this->mode . ': '. $user;
+                }
+                $msg = $msg . ' Check $_SERVER (extra data) and config file!';
                 GeneralUtility::devlog(
-                    $this->mode.': Error while calculating user attributes. Check config file!',
-                    'shibboleth',
-                    3
-                );
+                        $msg,
+                        'shibboleth',
+                        3,
+                        $_SERVER
+                    );
+            }
             return false;
         }
 

@@ -73,7 +73,7 @@ class UserHandler
                         'idValue' => $idValue
                     )
                 );
-            return false;
+            return 'Shibboleth data evaluates username to empty string!';
         }
 
 		$where = $idField . '=\'' . $idValue . '\' ';
@@ -128,7 +128,7 @@ class UserHandler
                         'idValue' => $idValue
                     )
                 );
-            return false;
+            return 'Shibboleth data evaluates username to empty string!';
         }
 
         $user[$idField] = $idValue;
