@@ -14,6 +14,11 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+tbd        Add handling of prefixed
+         server variables
+           Allow installation in
+         composer mode
+-------  ------------------------------
 3.0.3    Fix PHP Warning due to
          dangling reference to
          registerToolbarItem.php

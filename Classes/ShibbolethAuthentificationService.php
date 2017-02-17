@@ -119,7 +119,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
 
         if (($this->envShibPrefix) && ($this->writeDevLog))
             GeneralUtility::devLog(
-                'Found only prefixed "Shib" environment variables. Prefix is "'.$this->envShibPrefix.'"',
+                'Found only prefixed "Shib" environment variables. Will remove prefix "'.$this->envShibPrefix.'"',
                 'shibboleth',
                 1
             );
@@ -174,7 +174,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         */
         
         $userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
-            $this->db_user, $this->db_groups, $this->shibSessionIdKey, $this->writeDevLog);
+            $this->db_user, $this->db_groups, $this->shibSessionIdKey, $this->writeDevLog, $this->envShibPrefix);
 
         $user = $userhandler->getUserFromDB();
 

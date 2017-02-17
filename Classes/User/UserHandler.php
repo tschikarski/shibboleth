@@ -45,11 +45,18 @@ class UserHandler
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
-		if (is_object($GLOBALS['TSFE'])) {
-			$this->tsfeDetected = TRUE;
-		}
-		$localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
-		$localcObj->start($_SERVER);
+        $pattern = '/^' . $this->envShibPrefix . '/';
+        echo($pattern);
+        foreach ($_SERVER as $aKey => $aValue) {
+            $replacedKey = preg_replace($pattern, '',$aKey);
+            $serverEnvReplaced[$replacedKey] = $aValue;
+        }
+
+        if (is_object($GLOBALS['TSFE'])) {
+            $this->tsfeDetected = TRUE;
+        }
+        $localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
+        $localcObj->start($serverEnvReplaced);
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
