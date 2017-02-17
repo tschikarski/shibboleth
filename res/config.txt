@@ -1,3 +1,7 @@
+# NEVER change this file
+# Make a copy instead, change path and/or name and change the reference
+# in the extension configuration accordingly!
+
 tx_shibboleth {
 	FE {
 		IDMapping {
