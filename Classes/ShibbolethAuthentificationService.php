@@ -49,6 +49,11 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     var $hasShibbolethSession = FALSE;
     var $shibSessionIdKey = '';
     var $shibApplicationIdKey = '';
+    var $forbiddenUser = array(
+        'uid' => 999999,
+        'username' => 'nevernameauserlikethis',
+        '_allowUser' => 0
+    );
 
     private function logoffAnyShibbolethUser() {
         if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
