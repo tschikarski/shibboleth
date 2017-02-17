@@ -81,20 +81,17 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         global $TYPO3_CONF_VARS;
         $this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 
-
-        $firstFoundShibKey = '';
+        $shortestPrefixLength = 65535;
         foreach ($_SERVER as $serverEnvKey => $serverEnvValue) {
             $posOfShibInKey = strpos($serverEnvKey,'Shib');
-            if ($posOfShibInKey !== FALSE) {
-                $firstFoundShibKey = $serverEnvKey;
+            if ($posOfShibInKey !== FALSE && $posOfShibInKey < $shortestPrefixLength) {
+                $shortestPrefixLength = $posOfShibInKey;
                 $this->envShibPrefix = substr($serverEnvKey, 0, $posOfShibInKey);
                 $this->hasShibbolethSession = TRUE;
                 $this->shibSessionIdKey = $this->envShibPrefix . 'Shib_Session_ID';
                 $this->shibApplicationIdKey = $this->envShibPrefix . 'Shib_Application_ID';
-                break;
             }
         }
-
         // Another chance to detect Shibboleth session present; just for safety, as code before not well tested at the moment
         if (!$this->hasShibbolethSession && isset($_SERVER['AUTH_TYPE']) && $_SERVER['AUTH_TYPE'] == 'shibboleth') {
             if (isset($_SERVER['Shib_Session_ID']) && $_SERVER['Shib_Session_ID'] != '') {
@@ -120,7 +117,14 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         // if($this->writeDevLog) GeneralUtility::devlog('getUser: (authInfo)','shibboleth',0,$this->authInfo);
         // if($this->writeDevLog) GeneralUtility::devlog('getUser: (loginData)','shibboleth',0,$this->login);
 
-            // Without a valid Shibboleth session, bail out here returning FALSE
+        if (($this->envShibPrefix) && ($this->writeDevLog))
+            GeneralUtility::devLog(
+                'Found only prefixed "Shib" environment variables. Prefix is "'.$this->envShibPrefix.'"',
+                'shibboleth',
+                1
+            );
+
+        // Without a valid Shibboleth session, bail out here returning FALSE
         if (!$this->hasShibbolethSession) {
             if($this->writeDevLog)
                 GeneralUtility::devlog(
