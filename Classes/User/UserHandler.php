@@ -45,10 +45,14 @@ class UserHandler
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
+        $serverEnvReplaced = $_SERVER;
         $pattern = '/^' . $this->envShibPrefix . '/';
-        foreach ($_SERVER as $aKey => $aValue) {
+        foreach ($serverEnvReplaced as $aKey => $aValue) {
             $replacedKey = preg_replace($pattern, '',$aKey);
-            $serverEnvReplaced[$replacedKey] = $aValue;
+            if (!isset($serverEnvReplaced[$replacedKey])) {
+                $serverEnvReplaced[$replacedKey] = $aValue;
+                unset($serverEnvReplaced[$aKey]);
+            }
         }
 
         if (is_object($GLOBALS['TSFE'])) {
@@ -153,14 +157,9 @@ class UserHandler
 			// We have to update the tstamp field, in any case.
 			$user['tstamp'] = time();
 
-			// Don't automatically change groups after first creation
-			foreach($user['tx_shibboleth_config']['updateUserFieldsMapping.'] as $field => $fieldConfig) {
-				$newFieldValue = $this->getSingle($user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field],$user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field . '.']);
-				if(substr(trim($field), -1) != '.') {
-					$user[$field] = $newFieldValue;
-				}
-			}
-			// Remove that data from $user - otherwise we get an error updating the user record in DB
+            $user = $this->mapAdditionalFields($user);
+
+            // Remove that data from $user - otherwise we get an error updating the user record in DB
 			unset($user['tx_shibboleth_config']);
 			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth_userhandler',0,$user);
 			// Update
@@ -257,7 +256,6 @@ class UserHandler
 	}
 
 	function getSingle($conf,$subconf='') {
-		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth_userhandler',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
 				if (!is_object($GLOBALS['TSFE'])) {
@@ -272,7 +270,6 @@ class UserHandler
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
-		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($result)','shibboleth_userhandler',0,array('result' => $result));
 		return $result;
 	}
 
@@ -291,5 +288,21 @@ class UserHandler
 
 		return $tsfe;
 	}
+
+    /**
+     * @param $user
+     * @return mixed
+     */
+    private function mapAdditionalFields($user)
+    {
+        foreach ($user['tx_shibboleth_config']['updateUserFieldsMapping.'] as $field => $fieldConfig) {
+            $newFieldValue = $this->getSingle($user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field],
+                $user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field . '.']);
+            if (substr(trim($field), -1) != '.') {
+                $user[$field] = $newFieldValue;
+            }
+        }
+        return $user;
+    }
 
 }

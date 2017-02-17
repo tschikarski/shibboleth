@@ -23,5 +23,11 @@ namespace TrustCnct\Shibboleth\User;
 
 class UserHandlerTest extends \PHPUnit_Framework_TestCase
 {
-
+    /*
+     * @test
+     */
+    public function testeIrgendwas()
+    {
+        $userhandler = new UserHandler('FE','','','');
+    }
 }
