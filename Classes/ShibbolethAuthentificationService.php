@@ -41,6 +41,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 
 class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthenticationService {
+
     var $prefixId = 'ShibbolethAuthentificationService';        // Same as class name
     var $scriptRelPath = 'Classes/ShibbolethAuthentificationService.php';    // Path to this script relative to the extension dir.
     var $extKey = 'shibboleth';    // The extension key.
@@ -55,17 +56,47 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         '_allowUser' => 0
     );
 
-    private function logoffAnyShibbolethUser() {
-        if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
+    /**
+     * @return bool
+     */
+    private function isLoggedInByShibboleth()
+    {
+        return is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid'];
+    }
+
+    /**
+     * @return bool
+     */
+    private function applicationHasMatchingShibbolethSession()
+    {
+        if (!$this->hasShibbolethSession) {
+            return false;
+        }
+        if (($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '') &&
+            ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->shibApplicationIdKey])) {
             if($this->writeDevLog)
                 GeneralUtility::devlog(
-                    $this->mode . ': have a non-matching Shibboleth user logged in - logout! - for session id see extra data',
+                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->shibApplicationIdKey] .
+                    ' does not match required '. $this->authInfo['loginType'].'_applicationID (' .
+                    $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'].
+                    ') - see extra data for environment variables',
                     'shibboleth',
-                    0,
-                    $this->authInfo['userSession']
-                );
-            $this->pObj->logoff();
+                    2,
+                    $_SERVER);
+            return false;
         }
+        return true;
+    }
+
+    private function logoffPresentUser() {
+        if($this->writeDevLog)
+            GeneralUtility::devlog(
+                $this->mode . ': have a non-matching Shibboleth user logged in - logout! - for session id see extra data',
+                'shibboleth',
+                0,
+                $this->authInfo['userSession']
+            );
+        $this->pObj->logoff();
     }
 
     /**
@@ -130,7 +161,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             );
 
         // Without a valid Shibboleth session, bail out here returning FALSE
-        if (!$this->hasShibbolethSession) {
+        if (!$this->applicationHasMatchingShibbolethSession()) {
             if($this->writeDevLog)
                 GeneralUtility::devlog(
                     $this->mode . ': no applicable Shibboleth session recognized - see extra data for environment variables',
@@ -138,46 +169,21 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                     2,
                     $_SERVER
                 );
-            $this->logoffAnyShibbolethUser();
-            return FALSE;
-        }
-
-            // Also bail out, if the application ID is required to coincide and does not
-        if ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
-                $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->shibApplicationIdKey]) {
-            if($this->writeDevLog)
-                GeneralUtility::devlog(
-                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->shibApplicationIdKey] .
-                    ' does not match required '. $this->authInfo['loginType'].'_applicationID (' .
-                    $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'].
-                    ') - see extra data for environment variables',
-                    'shibboleth',
-                    3,
-                    $_SERVER);
-            $this->logoffAnyShibbolethUser();
-            return FALSE;
-        }
-
-            // check, if there is a user that is Shibboleth authenticated (with a correct application ID, if required by configuration)
-            // Remark: Best recognition of Shibboleth session by $_SERVER['AUTH_TYPE'] == 'shibboleth', as other Shibboleth-specific 
-            // server vars may have differing syntax/names on different systems
-        /*
-        if(!isset($_SERVER['AUTH_TYPE']) || $_SERVER['AUTH_TYPE'] != 'shibboleth' ||
-            ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '' &&
-            $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->ShibApplicationID])
-        ) {
-            if($this->writeDevLog) GeneralUtility::devlog('getUser: no applicable Shibboleth session present','shibboleth',0,$_SERVER);
-                // Unfortunately, returning FALSE is not sufficient to log off from an active session (tested on FE)
-                // But: Log off only, if the logged in user came from Shibboleth, i.e. has a non-empty special field!
-            if (is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
-                if($this->writeDevLog) GeneralUtility::devlog('getUser: ... so logging off actively ($this->authInfo[\'userSession\'])','shibboleth',0,$this->authInfo['userSession']);
+            if ($this->isLoggedInByShibboleth()) {
+                if($this->writeDevLog)
+                    GeneralUtility::devlog(
+                        $this->mode . ': have a non-matching Shibboleth user logged in - logout! - for session id see extra data',
+                        'shibboleth',
+                        3,
+                        $this->authInfo['userSession']
+                    );
                 $this->pObj->logoff();
+                return $this->forbiddenUser;
+            } else {
+                return FALSE;
             }
-            
-            return FALSE;
         }
-        */
-        
+
         $userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
             $this->db_user, $this->db_groups, $this->shibSessionIdKey, $this->writeDevLog, $this->envShibPrefix);
 
@@ -228,12 +234,6 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             return false;
         }
 
-        if($this->writeDevLog) GeneralUtility::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
-
-        if (!$isAlreadyThere) {
-            unset($GLOBALS['TSFE']);
-        }
-
         if ($user[$this->db_user['username_column']] == '') {
             if($this->writeDevLog)
                 GeneralUtility::devlog(
@@ -242,10 +242,16 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                     3,
                     $this->shibboleth_extConf[$this->authInfo['loginType'].'_autoImport']
                 );
-            $this->logoffAnyShibbolethUser();
+            $this->logoffPresentUser();
             return FALSE;
         }
-        
+
+        if($this->writeDevLog) GeneralUtility::devlog('getUser: offering $user for authentication','shibboleth',0,$user);
+
+        if (!$isAlreadyThere) {
+            unset($GLOBALS['TSFE']);
+        }
+
         return $user;
     }
 
@@ -254,43 +260,40 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         
         if($this->writeDevLog) GeneralUtility::devlog('authUser: ($this->authInfo)','shibboleth',0,$this->authInfo);
         
-            // If the user come not from shibboleth getUser, we will ignore it.
+            // If the user comes not from shibboleth getUser, we will ignore it.
         if (!$user['tx_shibboleth_shibbolethsessionid']) {
-            if($this->writeDevLog) GeneralUtility::devlog('authUser: This is not our user. Exiting.','shibboleth');
+            if($this->writeDevLog) GeneralUtility::devlog($this->mode.': This user is not for us (not Shibboleth). Exiting.','shibboleth',0);
             return 100;
         }
-            // Check, if we have an already logged in TYPO3 user.
+
+            // For safety: Check for existing Shibboleth-Session and return FALSE, otherwise!
+        if (!$this->applicationHasMatchingShibbolethSession()) {
+            // With no Shibboleth session we won't authenticate anyone!
+            if($this->writeDevLog) GeneralUtility::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',4,array($_SERVER[$this->shibSessionIdKey]));
+            return FALSE;
+        }
+
+        // Check, if we have an already logged in TYPO3 user.
         if (is_array($this->authInfo['userSession'])) {
                 // Some user is already logged in to TYPO3, check if it is a Shibboleth user 
             if (!$this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
-                    // The presently logged in user is not a shibboleth user, we do nothing
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a logged in non-Shibboleth user - exiting','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
+                    // The presently logged in user is not a shibboleth user - neutral answer
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a logged in non-Shibboleth user - no decision','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
                 return 100;
-            }
-            
-                // For safety: Check for existing Shibboleth-Session and return FALSE, otherwise!
-            if (!$this->hasShibbolethSession) {
-                    // With no Shibboleth session we won't authenticate anyone!
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found no Shib-Session-ID: rejecting','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
-                return FALSE;
             }
             
                 // The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, Session-ID might have changed on some miraculous way
             if ($_SERVER[$this->shibSessionIdKey] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
                     // Shibboleth session still the same, authenticate!
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',-1,array($_SERVER[$this->shibSessionIdKey]));
                 return 200;
+            } else {
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a changed Shibboleth Session-ID: reject','shibboleth',3,array($_SERVER[$this->shibSessionIdKey]));
+                $this->logoffPresentUser();
+                return false;
             }
             
-//                // Shibboleth session gone or changed, refuse authentication, even log off a logged in user!
-//            if($this->writeDevLog) GeneralUtility::devlog('authUser: Shib-Session changed. Log off present user!','shibboleth',0,$_SERVER);
-//                // Just returning FALSE will not log off an already active user!
-//            $this->pObj->logoff();
-
-                // Shibboleth session gone or changed, this is just a re-authentication via Shibboleth, nothing to do
         }
-        
-        // if($this->writeDevLog) GeneralUtility::devlog('authUser: $this->db_user','shibboleth',0,$this->db_user);
         
             // This user is not yet logged in
         if (is_array($user) && $user['_allowUser']) {
