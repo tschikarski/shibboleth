@@ -46,7 +46,6 @@ class UserHandler
 		$this->config = $this->getTyposcriptConfiguration();
 
         $pattern = '/^' . $this->envShibPrefix . '/';
-        echo($pattern);
         foreach ($_SERVER as $aKey => $aValue) {
             $replacedKey = preg_replace($pattern, '',$aKey);
             $serverEnvReplaced[$replacedKey] = $aValue;
