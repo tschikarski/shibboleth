@@ -21,6 +21,10 @@ tbd        Add handling of prefixed
            If BE_logoutRedirectUrl
          invalid, prefix correct
          Shibboleth handler URL
+           Allow special redirect
+         in case of a Shibboleth
+         user is not yet enabled for
+         BE access
 -------  ------------------------------
 3.0.3    Fix PHP Warning due to
          dangling reference to
