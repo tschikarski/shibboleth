@@ -18,6 +18,9 @@ tbd        Add handling of prefixed
          server variables
            Allow installation in
          composer mode
+           If BE_logoutRedirectUrl
+         invalid, prefix correct
+         Shibboleth handler URL
 -------  ------------------------------
 3.0.3    Fix PHP Warning due to
          dangling reference to
