@@ -1,6 +1,7 @@
 # NEVER change this file
 # Make a copy instead, change path and/or name and change the reference
 # in the extension configuration accordingly!
+# This example config would work for example with testshib.org as IdP
 
 tx_shibboleth {
 	FE {
