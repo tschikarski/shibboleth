@@ -305,7 +305,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             $user['uid'] = $userhandler->synchronizeUserData($user);
             if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; ($user attached).','shibboleth',0,$user);
             if ((! $user['disable']) AND ($user['uid']>0)) return 200;
-            if ($user['disable']) {
+            if (($this->authInfo['loginType']) == 'BE' AND ($user['disable'])) {
                 if ($this->writeDevLog) GeneralUtility::devLog('authUser: user created/exists, but is in state "disable"','shibboleth',2,$user);
                 if ($this->shibboleth_extConf['BE_disabledUserRedirectUrl']) {
                     if ($this->writeDevLog) {
