@@ -104,6 +104,9 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
 	 */
 	private function getSecureLogoutRedirectUrl()
 	{
+        if (!$GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid']) {
+            return '';
+        }
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->EXTKEY]);
 		$redirect_url = trim($extConf['BE_logoutRedirectUrl']);
 		if (strpos($redirect_url,'Logout?return=') === FALSE) {
