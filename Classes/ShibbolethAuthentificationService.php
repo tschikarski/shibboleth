@@ -281,7 +281,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a logged in non-Shibboleth user - no decision','shibboleth',0,array($_SERVER[$this->shibSessionIdKey]));
                 return 100;
             }
-            
+
                 // The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, Session-ID might have changed on some miraculous way
             if ($_SERVER[$this->shibSessionIdKey] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
                     // Shibboleth session still the same, authenticate!
@@ -305,7 +305,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             $user['uid'] = $userhandler->synchronizeUserData($user);
             if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; ($user attached).','shibboleth',0,$user);
             if ((! $user['disable']) AND ($user['uid']>0)) return 200;
-            if (($this->authInfo['loginType']) == 'BE' AND ($user['disable'])) {
+            if (defined('TYPO3_MODE') AND (TYPO3_MODE == 'BE') AND ($user['disable'])) {
                 if ($this->writeDevLog) GeneralUtility::devLog('authUser: user created/exists, but is in state "disable"','shibboleth',2,$user);
                 if ($this->shibboleth_extConf['BE_disabledUserRedirectUrl']) {
                     if ($this->writeDevLog) {
