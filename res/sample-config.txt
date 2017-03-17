@@ -53,22 +53,14 @@ tx_shibboleth {
 
 				email = TEXT
 				email.field = eppn
-				realName = COA
-				realName.1 = TEXT
-				realName.1.value = Nachname
-				realName.3 = TEXT
-				realName.3.value = Vorname
-				realName.3.noTrimWrap  = |, ||
+				realName = TEXT
+				realName.field = eppn
 			}
 			updateUserFieldsMapping {
 				email = TEXT
 				email.field = eppn
-				realName = COA
-				realName.1 = TEXT
-				realName.1.value = Nachname
-				realName.3 = TEXT
-				realName.3.value = Vorname
-				realName.3.noTrimWrap  = |, ||
+				realName = TEXT
+				realName.field = eppn
 			}
 		}
 	}
