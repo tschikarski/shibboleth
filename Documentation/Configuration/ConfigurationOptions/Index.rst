@@ -96,6 +96,13 @@ BE_logoutRedirectUrl       string      Redirect to this URL after backend logout
 
                                        **Change filename or path, if you want to modify these files. Original files will be overwritten
                                        by extension updates!**
+-------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
+BE_disabledUserRedirectUrl  string     (Optional) Redirect to this URL if a successful Shibboleth authentication results to an user record in       ``/typo3conf/ext/shibboleth/res/be_form/nologinyet.html``
+                                       state "disabled". This would be typical, if Shibboleth users shall be mapped to TYPO3-BE, but are
+                                       required manual activation.
+
+                                       **Change filename or path, if you want to modify these files. Original files will be overwritten
+                                       by extension updates!**
 =========================  ==========  ===========================================================================================================  ==========================================
 
 

@@ -39,6 +39,10 @@ If you now direct your browser to https://yourdomain/securetest/ you should be r
 After logging in, you should be redirected to your web instance and see the output of the phpinfo() function.
 Now, scroll down to the section "Apache Environment" and check, if you can identify additional server environment variables, provided by Shibboleth.
 At least a few of them should have a name starting with "Shib-". Additionally some other variables might be set by the Shibboleth SP.
+
+Under certain circumstances all Shibboleth generated environment variables are prefixed by e.g. ``REDIRECT_``. The extension will automatically
+recognize this situation and work with these variables.
+
 Very often, the standard variable ``REMOTE_USER`` is set with the Shibboleth user's ID.
 When using https://testshib.org/ you will see this user ID again in a variable named ``eppn``. For details refer to your ``shibboleth2.xml`` file.
 Other variables might be useful for retrieving metadata like the clear name of the user.
