@@ -124,10 +124,12 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 $shortestPrefixLength = $posOfShibInKey;
                 $this->envShibPrefix = substr($serverEnvKey, 0, $posOfShibInKey);
                 $this->hasShibbolethSession = TRUE;
-                $this->shibSessionIdKey = $this->envShibPrefix . 'Shib_Session_ID';
-                $this->shibApplicationIdKey = $this->envShibPrefix . 'Shib_Application_ID';
+                $separationChar = substr($serverEnvKey, $posOfShibInKey+4,1);
+                $this->shibSessionIdKey = $this->envShibPrefix . 'Shib'.$separationChar.'Session'.$separationChar.'ID';
+                $this->shibApplicationIdKey = $this->envShibPrefix . 'Shib'.$separationChar.'Application'.$separationChar.'ID';
             }
         }
+        /*
         // Another chance to detect Shibboleth session present; just for safety, as code before not well tested at the moment
         if (!$this->hasShibbolethSession && isset($_SERVER['AUTH_TYPE']) && $_SERVER['AUTH_TYPE'] == 'shibboleth') {
             if (isset($_SERVER['Shib_Session_ID']) && $_SERVER['Shib_Session_ID'] != '') {
@@ -137,6 +139,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 $this->shibApplicationIdKey = 'Shib_Application_ID';
             }
         }
+        */
         
         return $available;
     }
