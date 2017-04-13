@@ -312,7 +312,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 if ($this->writeDevLog) GeneralUtility::devLog('authUser: user created/exists, but is in state "disable"','shibboleth',2,$user);
                 if ($this->shibboleth_extConf['BE_disabledUserRedirectUrl']) {
                     if ($this->writeDevLog) {
-                        $redirectUrl = '/'.trim($this->shibboleth_extConf['sessions_handlerURL']).'/Logout?return='.$this->shibboleth_extConf['BE_disabledUserRedirectUrl'];
+                        $redirectUrl = $this->shibboleth_extConf['BE_disabledUserRedirectUrl'];
                         GeneralUtility::devLog('authUser: redirecting to '. $redirectUrl,'shibboleth');
                         // initiate Redirect here
                         header("Location: $redirectUrl");
