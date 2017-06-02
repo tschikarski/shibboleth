@@ -10,7 +10,7 @@
     "issues": "https://github.com/tschikarski/shibboleth/issues"
   },
   "require": {
-    "typo3/cms": ">=7.6.10,<8.0"
+    "typo3/cms": ">=7.6.10"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.8.0"
