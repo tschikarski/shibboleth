@@ -12,21 +12,28 @@ namespace TrustCnct\Shibboleth\Controller;
  *
  ***/
 
+use TrustCnct\Shibboleth\Service\LoginLinkService;
+
 /**
  * LoginLinkController
  */
 class LoginLinkController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
     /**
+     * @var LoginLinkService
+     * @inject
+     */
+    protected $loginLinkService;
+
+    /**
      * action show
      *
-     * @param \TrustCnct\Shibboleth\Domain\Model\LoginLink $loginLink
      * @return void
      */
     //public function showAction(\TrustCnct\Shibboleth\Domain\Model\LoginLink $loginLink)
     public function showAction()
     {
-        $loginLink = 'Mein Dummylink in showAction.';
+        $loginLink = $this->loginLinkService->createLink();
         $this->view->assign('loginLink', $loginLink);
     }
 }
