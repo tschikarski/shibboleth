@@ -107,19 +107,19 @@ call_user_func(
             \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
             ['source' => 'EXT:'.$extkey.'/Resources/Public/Icons/user_plugin_loginlink.png']
         );
-        var_dump($iconRegistry);
 
         // wizards
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
             'mod {
-            wizards.newContentElement.wizardItems.plugins {
+             wizards.newContentElement.wizardItems.plugins {
                 elements {
                     loginlink {
                         iconIdentifier = tx-shibboleth-loginlink
                         title = LLL:EXT:shibboleth/Resources/Private/Language/locallang_db.xlf:tx_shibboleth_domain_model_loginlink
                         description = LLL:EXT:shibboleth/Resources/Private/Language/locallang_db.xlf:tx_shibboleth_domain_model_loginlink.description
                         tt_content_defValues {
-                            CType = text
+                            CType = list
+                            list_type = shibboleth_loginlink
                         }
                     }
                 }
