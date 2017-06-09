@@ -118,10 +118,9 @@ call_user_func(
                         iconIdentifier = tx-shibboleth-loginlink
                         title = LLL:EXT:shibboleth/Resources/Private/Language/locallang_db.xlf:tx_shibboleth_domain_model_loginlink
                         description = LLL:EXT:shibboleth/Resources/Private/Language/locallang_db.xlf:tx_shibboleth_domain_model_loginlink.description
-                        #tt_content_defValues {
-                        #    CType = list
-                        #    list_type = shibboleth_loginlink
-                        #}
+                        tt_content_defValues {
+                            CType = text
+                        }
                     }
                 }
                 show = *
