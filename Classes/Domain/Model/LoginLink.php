@@ -1,9 +1,9 @@
 <?php
-namespace Trustcnct\Shibboleth\Domain\Model;
+namespace TrustCnct\Shibboleth\Domain\Model;
 
 /***
  *
- * This file is part of the "Trustcnct.Shibboleth" Extension for TYPO3 CMS.
+ * This file is part of the "TrustCnct.Shibboleth" Extension for TYPO3 CMS.
  *
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.

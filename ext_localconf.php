@@ -90,7 +90,7 @@ call_user_func(
     {
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-            'Trustcnct.Shibboleth',
+            'TrustCnct.Shibboleth',
             'LoginLink',
             [
                 'LoginLink' => 'show'

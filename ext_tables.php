@@ -48,7 +48,7 @@ call_user_func(
     {
 
         \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-            'Trustcnct.Shibboleth',
+            'TrustCnct.Shibboleth',
             'LoginLink',
             'Shibboleth Login Link'
         );

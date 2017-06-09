@@ -1,5 +1,5 @@
 <?php
-namespace Trustcnct\Shibboleth\Tests\Unit\Domain\Model;
+namespace TrustCnct\Shibboleth\Tests\Unit\Domain\Model;
 
 /**
  * Test case.
@@ -7,14 +7,14 @@ namespace Trustcnct\Shibboleth\Tests\Unit\Domain\Model;
 class LoginLinkTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
 {
     /**
-     * @var \Trustcnct\Shibboleth\Domain\Model\LoginLink
+     * @var \TrustCnct\Shibboleth\Domain\Model\LoginLink
      */
     protected $subject = null;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->subject = new \Trustcnct\Shibboleth\Domain\Model\LoginLink();
+        $this->subject = new \TrustCnct\Shibboleth\Domain\Model\LoginLink();
     }
 
     protected function tearDown()
