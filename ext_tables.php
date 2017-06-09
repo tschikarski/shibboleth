@@ -39,4 +39,22 @@ $tempColumns = array (
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('be_users',$tempColumns);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
-?>
+
+
+
+
+call_user_func(
+    function()
+    {
+
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
+            'Trustcnct.Shibboleth',
+            'LoginLink',
+            'Shibboleth Login Link'
+        );
+
+        // Try moving this to Configuration/TCA/overrides/sys_template.php
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('shibboleth', 'Configuration/TypoScript', 'Shibboleth');
+
+    }
+);
