@@ -12,15 +12,13 @@ namespace TrustCnct\Shibboleth\Controller;
  *
  ***/
 
-use TrustCnct\Shibboleth\Service\LoginLinkService;
-
 /**
  * LoginLinkController
  */
 class LoginLinkController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
     /**
-     * @var LoginLinkService
+     * @var \TrustCnct\Shibboleth\Service\LoginLinkService
      * @inject
      */
     protected $loginLinkService;
