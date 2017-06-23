@@ -9,6 +9,12 @@
   "support": {
     "issues": "https://github.com/tschikarski/shibboleth/issues"
   },
+  "repositories": {
+    "nimut": {
+      "type": "vcs",
+      "url": "git@github.com:Nimut/testing-framework.git"
+    }
+  },
   "require": {
     "typo3/cms": ">=7.6.10"
   },
