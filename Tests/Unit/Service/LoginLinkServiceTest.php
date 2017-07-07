@@ -9,11 +9,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LoginLinkServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
 {
-    /**
-     * @var \TrustCnct\Shibboleth\Controller\LoginLinkService
-     */
-    protected $subject = null;
-
     protected $extConf;
 
     protected $testExtConf = array(
@@ -27,11 +22,6 @@ class LoginLinkServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     {
         parent::setUp();
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth'] = serialize($this->testExtConf);
-        $this->subject = $this->getMockBuilder(\TrustCnct\Shibboleth\Service\LoginLinkService::class)
-            ->setMethods(['dummy'])
-            ->enableOriginalConstructor()
-            ->getMock();
-//        $this->subject = new LoginLinkService();
     }
 
     protected function tearDown()
@@ -55,23 +45,38 @@ class LoginLinkServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
-    public function loginLinkProtocolIsHttpOrHttps() {
-        preg_match('|^(.+)\:.*|',$this->subject->createLink(),$matches);
-        $this->assertRegExp('|https?|', $matches[1]);
+    public function loginLinkProtocolIsHttp() {
+        $mockedLinkService = $this->getMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        preg_match('|^(.+)\:.*|',$mockedLinkService->createLink(),$matches);
+        $this->assertRegExp('|http|', $matches[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function loginLinkProtocolIsForcedHttps() {
+        $mockedLinkService = $this->getAccessibleMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $specialExtConf = $mockedLinkService->_get('extConf');
+        $specialExtConf['forceSSL'] = true;
+        $mockedLinkService->_set('extConf',$specialExtConf);
+        preg_match('|^(.+)\:.*|',$mockedLinkService->createLink(),$matches);
+        $this->assertRegExp('|https|', $matches[1]);
     }
 
     /**
      * @test
      */
     public function loginLinkContainsShibbolethHandlerUrl() {
-        $this->assertRegExp('|/'.$this->extConf['sessions_handlerURL'].'/|', $this->subject->createLink());
+        $mockedLinkService = $this->getMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $this->assertRegExp('|/'.$this->extConf['sessions_handlerURL'].'/|', $mockedLinkService->createLink());
     }
 
     /**
      * @test
      */
     public function loginLinkContainsSessionInitiatorLocation() {
-        $link = $this->subject->createLink();
+        $mockedLinkService = $this->getMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $link = $mockedLinkService->createLink();
         $this->assertRegExp('|/'.$this->extConf['sessionsInitiator_location'].'|', $link);
     }
 
@@ -79,7 +84,8 @@ class LoginLinkServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
      * @test
      */
     public function loginLinkContainsTargetParameter() {
-        $parameters = $this->getParameterArrayFromUrl($this->subject->createLink());
+        $mockedLinkService = $this->getMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $parameters = $this->getParameterArrayFromUrl($mockedLinkService->createLink());
         $this->assertArrayHasKey('target',$parameters);
     }
 
@@ -87,7 +93,8 @@ class LoginLinkServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
      * @test
      */
     public function loginLinkTargetParameterIsUrl() {
-        $parameters = $this->getParameterArrayFromUrl($this->subject->createLink());
+        $mockedLinkService = $this->getMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $parameters = $this->getParameterArrayFromUrl($mockedLinkService->createLink());
         $targetUrl = urldecode($parameters['target']);
         $this->assertRegExp('|^https?://.*$|', $targetUrl,'Link target must have URL format.');
     }
@@ -95,11 +102,22 @@ class LoginLinkServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
+    public function loginLinkContainsNoEntityIdParameter() {
+        $mockedLinkService = $this->getMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $parameters = $this->getParameterArrayFromUrl($mockedLinkService->createLink());
+        $this->assertArrayNotHasKey('entityID',$parameters);
+    }
+
+    /**
+     * @test
+     */
     public function loginLinkContainsOptionalEntityIdParameter() {
-        $specialExtConf = $this->testExtConf;
+        $mockedLinkService = $this->getAccessibleMock('TrustCnct\Shibboleth\Service\LoginLinkService',['dummy']);
+        $specialExtConf = $mockedLinkService->_get('extConf');
         $specialExtConf['entityID'] = 'EntityIdTest';
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth'] = serialize($specialExtConf);
-        $parameters = $this->getParameterArrayFromUrl($this->subject->createLink());
+        $mockedLinkService->_set('extConf',$specialExtConf);
+        $parameters = $this->getParameterArrayFromUrl($mockedLinkService->createLink());
         $this->assertArrayHasKey('entityID',$parameters,'We expect here the additional parameter "entityID".');
+        $this->assertSame('EntityIdTest',$parameters['entityID']);
     }
 }
