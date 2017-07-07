@@ -12,7 +12,7 @@ class LoginLinkControllerTest extends \Nimut\TestingFramework\TestCase\UnitTestC
     protected $subject = null;
 
     /**
-     * @var \TrustCnct\Shibboleth\Service\LoginLinkService
+     * @var \TrustCnct\Shibboleth\Service\LoginUrlService
      * @inject
      */
     protected $loginLinkService;
@@ -37,7 +37,7 @@ class LoginLinkControllerTest extends \Nimut\TestingFramework\TestCase\UnitTestC
         $loginLink = 'https://localhost/Shibboleth.sso/LoginTest';
         $view = $this->getMockBuilder(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface::class)->getMock();
         $this->inject($this->subject, 'view', $view);
-        $mockLinkService = $this->getMock(\TrustCnct\Shibboleth\Service\LoginLinkService::class,['createLink']);
+        $mockLinkService = $this->getMock(\TrustCnct\Shibboleth\Service\LoginUrlService::class,['createLink']);
         $mockLinkService->expects($this->once())->method('createLink')->willReturn($loginLink);
         $this->inject($this->subject, 'loginLinkService', $mockLinkService);
         $view->expects(self::once())->method('assign')->with('loginLinkUrl', $loginLink);

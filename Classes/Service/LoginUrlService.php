@@ -10,7 +10,7 @@ namespace TrustCnct\Shibboleth\Service;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LoginLinkService
+class LoginUrlService
 {
     protected $extConf;
 
