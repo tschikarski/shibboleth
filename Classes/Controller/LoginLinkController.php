@@ -31,7 +31,6 @@ class LoginLinkController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
     //public function showAction(\TrustCnct\Shibboleth\Domain\Model\LoginLink $loginLink)
     public function showAction()
     {
-        $loginLink = $this->loginLinkService->createLink();
-        $this->view->assign('loginLink', $loginLink);
+        $this->view->assign('loginLinkUrl', $this->loginLinkService->createLink());
     }
 }

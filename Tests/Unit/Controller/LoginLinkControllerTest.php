@@ -4,12 +4,18 @@ namespace TrustCnct\Shibboleth\Tests\Unit\Controller;
 /**
  * Test case.
  */
-class LoginLinkControllerTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
+class LoginLinkControllerTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
 {
     /**
      * @var \TrustCnct\Shibboleth\Controller\LoginLinkController
      */
     protected $subject = null;
+
+    /**
+     * @var \TrustCnct\Shibboleth\Service\LoginLinkService
+     * @inject
+     */
+    protected $loginLinkService;
 
     protected function setUp()
     {
@@ -18,6 +24,7 @@ class LoginLinkControllerTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
             ->setMethods(['redirect', 'forward', 'addFlashMessage'])
             ->disableOriginalConstructor()
             ->getMock();
+
     }
 
     protected function tearDown()
@@ -30,7 +37,7 @@ class LoginLinkControllerTest extends \TYPO3\CMS\Core\Tests\UnitTestCase
      */
     public function showActionAssignsTheGivenLoginLinkToView()
     {
-        $loginLink = new \TrustCnct\Shibboleth\Domain\Model\LoginLink();
+        $loginLink = new \TrustCnct\Shibboleth\Service\LoginLinkService();
 
         $view = $this->getMockBuilder(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface::class)->getMock();
         $this->inject($this->subject, 'view', $view);
