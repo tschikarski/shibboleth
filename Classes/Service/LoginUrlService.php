@@ -23,7 +23,7 @@ class LoginUrlService
     /**
      * @return string
      */
-    public function createLink()
+    public function createUrl()
     {
         $entityIDparam = $this->extConf['entityID'];
         if ($entityIDparam != '') {
