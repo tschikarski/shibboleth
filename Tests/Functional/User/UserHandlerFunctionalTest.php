@@ -35,13 +35,6 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      * @test
      */
     public function getMappingConfigPathTest() {
-//            array(
-//                'FE',
-//                'fe_users',
-//                'fe_groups',
-//                'Shib_Session_ID',
-//                false,
-//                ''),
         $userHandler = $this->getAccessibleMock('TrustCnct\Shibboleth\User\UserHandler',['getEnvironmentVariable'], ['FE','fe_users','fe_groups','Shib_Session_ID'],'',false);
         $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
         $loginType = 'FE';
