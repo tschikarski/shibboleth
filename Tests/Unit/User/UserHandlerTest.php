@@ -1,12 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tschikarski
- * Date: 08.09.16
- * Time: 15:29
- */
-
-namespace TrustCnct\Shibboleth\User;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -21,13 +13,77 @@ namespace TrustCnct\Shibboleth\User;
  * The TYPO3 project - inspiring people to share!
  */
 
+namespace TrustCnct\Shibboleth\User;
+
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 class UserHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /*
+    /**
      * @test
      */
-    public function testeIrgendwas()
+    public function tempTsfeIsFinallyUnsetTest()
     {
-        $userhandler = new UserHandler('FE','','','');
+        /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
+        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $this->assertFalse($userHandler->tsfeDetected);
+        $this->assertEmpty($GLOBALS['TSFE']);
     }
+
+    /**
+     * @test
+     */
+    public function existingTsfeIsFinallyPresentTest()
+    {
+        $GLOBALS['TSFE'] = new \stdClass();
+        $GLOBALS['TSFE']->cObjectDepthCounter = 100;
+        /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
+        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $this->assertTrue($userHandler->tsfeDetected);
+        $this->assertObjectHasAttribute('cObjectDepthCounter',$GLOBALS['TSFE']);
+    }
+
+    /**
+     * @test
+     */
+    public function validCObjCreatedTest() {
+        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $this->assertNotEmpty($userHandler->cObj->data);
+        $this->assertNotEmpty($userHandler->cObj->data['USER']);
+    }
+
+    /**
+     * @test
+     */
+    public function environmentGoesIntoCObjData() {
+        $_SERVER['UserHandlerTestEnvironment'] = 'UserHandlerTestValue';
+        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $this->assertNotEmpty($userHandler->cObj->data['UserHandlerTestEnvironment']);
+        $this->assertSame('UserHandlerTestValue',$userHandler->cObj->data['UserHandlerTestEnvironment']);
+    }
+
+    /**
+     * @test
+     */
+    public function environmentPrefixIsRecognized() {
+        $_SERVER['redirectShibbSomeEnvironment'] = 'ShibbSomeValue';
+        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'redirect');
+        $this->assertSame('ShibbSomeValue',$userHandler->cObj->data['ShibbSomeEnvironment']);
+    }
+
+    /**
+     * Helper to debug variable contents
+     *
+     * @param null $mixed
+     * @return string
+     */
+    private function var_dump_ret($mixed = null) {
+        ob_start();
+        var_dump($mixed);
+        $content = ob_get_contents();
+        ob_end_clean();
+        return $content;
+    }
+
+
 }
