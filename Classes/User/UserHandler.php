@@ -250,7 +250,8 @@ class UserHandler
 		#$incFile = $GLOBALS['TSFE']->tmpl->getFileName($fName);
 		#$GLOBALS['TSFE']->tmpl->fileContent($incFile);
 
-		$configString = GeneralUtility::getURL(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath']);
+        $this->mappingConfigAbsolutePath = $this->getEnvironmentVariable('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath'];
+        $configString = GeneralUtility::getURL($this->mappingConfigAbsolutePath);
 		if($configString === FALSE) {
 			if ($this->writeDevLog) GeneralUtility::devlog('Could not find config file, please check extension setting for correct path!','shibboleth_userhandler',3);
 			return array();
@@ -315,5 +316,16 @@ class UserHandler
         }
         return $user;
     }
+
+    /**
+     * Wrapper function for GeneralUtility::getIndpEnv()
+     *
+     * @see GeneralUtility::getIndpEnv
+     * @param string $key Name of the "environment variable"/"server variable" you wish to get.
+     * @return string
+     */
+    protected function getEnvironmentVariable($key) {
+		return GeneralUtility::getIndpEnv($key);
+	}
 
 }
