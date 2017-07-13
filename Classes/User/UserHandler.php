@@ -19,17 +19,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class UserHandler
 {
-	var $writeDevLog;
-	var $tsfeDetected = FALSE;
-	var $loginType=''; //FE or BE
-	var $user='';
-	var $db_user='';
-	var $db_group='';
-	var $shibboleth_extConf;
-	var $config; // typoscript like configuration for the current loginType
-	var $cObj; // local cObj, needed to parse the typoscript configuration
+    var $writeDevLog;
+    var $tsfeDetected = FALSE;
+    var $loginType=''; //FE or BE
+    var $user='';
+    var $db_user='';
+    var $db_group='';
+    protected $shibboleth_extConf;
+    var $mappingConfigAbsolutePath;
+    var $config; // typoscript like configuration for the current loginType
+    var $cObj; // local cObj, needed to parse the typoscript configuration
     var $envShibPrefix = '';
-	var $shibSessionIdKey;
+    var $shibSessionIdKey;
 
     /**
      * UserHandler constructor.
@@ -42,15 +43,15 @@ class UserHandler
      */
 	function __construct($loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = '') {
 		global $TYPO3_CONF_VARS;
-		$this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
-		//if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
+        $this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
+        //if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
 
-		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+        $this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 
-		$this->loginType = $loginType;
-		$this->db_user = $db_user;
-		$this->db_group = $db_group;
-		$this->shibSessionIdKey = $shibSessionIdKey;
+        $this->loginType = $loginType;
+        $this->db_user = $db_user;
+        $this->db_group = $db_group;
+        $this->shibSessionIdKey = $shibSessionIdKey;
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
@@ -67,14 +68,15 @@ class UserHandler
         if (is_object($GLOBALS['TSFE'])) {
             $this->tsfeDetected = TRUE;
         }
+        /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $localcObj */
         $localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
         $localcObj->start($serverEnvReplaced);
-		if (!$this->tsfeDetected) {
-			unset($GLOBALS['TSFE']);
-		}
+        if (!$this->tsfeDetected) {
+            unset($GLOBALS['TSFE']);
+        }
 
-		$this->cObj = $localcObj;
-	}
+        $this->cObj = $localcObj;
+    }
 
 	function getUserFromDB() {
 
@@ -255,11 +257,11 @@ class UserHandler
 		}
 
 		$parser = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Configuration\TsConfigParser');
-		$parser->parse($configString);
+        $parser->parse($configString);
 
-		$completeSetup = $parser->setup;
+        $completeSetup = $parser->setup;
 
-		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
+        $localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
 
 		return $localSetup;
 	}
