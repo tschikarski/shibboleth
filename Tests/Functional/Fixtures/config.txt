@@ -1,0 +1,67 @@
+# NEVER change this file
+# Make a copy instead, change path and/or name and change the reference
+# in the extension configuration accordingly!
+# This example config would work for example with testshib.org as IdP
+
+tx_shibboleth {
+	FE {
+		IDMapping {
+			shibID = TEXT
+			shibID.field = eppn
+			typo3Field = username
+		}
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				usergroup = TEXT
+				usergroup.value = 1
+
+				email = TEXT
+				email.field = eppn
+				first_name = TEXT
+				first_name.value = Vorname
+				middle_name = TEXT
+				middle_name.value = M.
+				last_name = TEXT
+				last_name.value = Nachname
+			}
+			updateUserFieldsMapping {
+				email = TEXT
+				email.field = eppn
+				first_name = TEXT
+				first_name.value = Vorname
+				middle_name = TEXT
+				middle_name.value = M.
+				last_name = TEXT
+				last_name.value = Nachname
+			}
+		}
+	}
+	BE {
+		IDMapping {
+			shibID = TEXT
+			shibID.field = eppn
+			typo3Field = username
+		}
+		userControls {
+			allowUser = TEXT
+			allowUser.value = 1
+			createUserFieldsMapping {
+				admin = TEXT
+				admin.value = 0
+
+				email = TEXT
+				email.field = eppn
+				realName = TEXT
+				realName.field = eppn
+			}
+			updateUserFieldsMapping {
+				email = TEXT
+				email.field = eppn
+				realName = TEXT
+				realName.field = eppn
+			}
+		}
+	}
+}
