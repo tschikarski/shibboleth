@@ -97,6 +97,31 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function addPidClauseUsingPidStringWithAndTest() {
+        $db_user = $this->db_user;
+        $db_user['check_pid_clause'] = ' AND '.$db_user['check_pid_clause'];
+        $userHandler = new UserHandler('FE', $db_user, $this->db_group,'Shib_Session_ID',false,'redirect');
+        $oldWhere = 'WHERE username=\'myself@testshib.org\' AND deleted = 0';
+        $newWhere = $userHandler->addPidClause($oldWhere);
+        $pattern = $oldWhere . ' AND ' . $this->db_user['check_pid_clause'];
+        $this->assertNotEmpty(strstr($newWhere,$pattern));
+    }
+
+    /**
+     * @test
+     */
+    public function addPidClauseUsingPidStringWithoutAndTest() {
+        $db_user = $this->db_user;
+        $userHandler = new UserHandler('FE', $db_user, $this->db_group,'Shib_Session_ID',false,'redirect');
+        $oldWhere = 'WHERE username=\'myself@testshib.org\' AND deleted = 0';
+        $newWhere = $userHandler->addPidClause($oldWhere);
+        $pattern = $oldWhere . ' AND ' . $this->db_user['check_pid_clause'];
+        $this->assertNotEmpty(strstr($newWhere,$pattern),'Did not find correct SQL syntax.');
+    }
+
+    /**
      * Helper to debug variable contents
      *
      * @param null $mixed
