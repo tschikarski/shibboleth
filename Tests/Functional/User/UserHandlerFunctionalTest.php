@@ -30,7 +30,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
             'usergroup_column' => 'usergroup',
             'enable_clause' => $enable_clause,
             'checkPidList' => 0,
-            'check_pid_clause' => '`pid` IN (0)'
+            'check_pid_clause' => '`pid` IN (2)'
         );
         $this->db_group = array(
             'table' => 'fe_groups'
@@ -155,6 +155,36 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
         $userFromDB = $userHandler->getUserFromDB();
         $this->assertTrue(is_array($userFromDB),'Expected array');
+        $this->assertArrayHasKey('uid', $userFromDB);
+        $this->assertSame('2', $userFromDB['uid']);
+        $this->assertStringStartsWith('myself', $userFromDB['username']);
+
+    }
+
+    /**
+     * @test
+     */
+    public function getUserFromDbCheckingPidReturnsExistingUser() {
+
+        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
+            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
+            'FE',
+            'fe_users',
+            'fe_groups',
+            'Shib_Session_ID',
+            false,
+            ''),
+            '',false);
+        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
+        $_SERVER['eppn'] = 'myself@testshib.org';
+        $loginType = 'FE';
+        $db_user = 'fe_users';
+        $db_group = 'fe_groups';
+        $shibbSessionIdKey = 'Shib_Session_ID';
+        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
+        $userHandler->db_user['checkPidList'] = 1;
+        $userFromDB = $userHandler->getUserFromDB();
+        $this->assertTrue(is_array($userFromDB),'Expected array, but got '.$userFromDB);
         $this->assertArrayHasKey('uid', $userFromDB);
         $this->assertSame('2', $userFromDB['uid']);
         $this->assertStringStartsWith('myself', $userFromDB['username']);
