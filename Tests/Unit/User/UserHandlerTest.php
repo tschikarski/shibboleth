@@ -19,13 +19,38 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class UserHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    protected $db_user;
+    protected $db_group;
+
+    /**
+     * Test setup
+     */
+    protected function setUp() {
+        parent::setUp();
+        $enable_clause = GeneralUtility::makeInstance('TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression', 'AND');
+        $this->db_user = array(
+            'table' => 'fe_users',
+            'userid_column' => 'uid',
+            'username_column' => 'username',
+            'userident_column' => 'password',
+            'usergroup_column' => 'usergroup',
+            'enable_clause' => $enable_clause,
+            'checkPidList' => 0,
+            'check_pid_clause' => '`pid` IN (0)'
+        );
+        $this->db_group = array(
+            'table' => 'fe_groups'
+        );
+
+    }
+
     /**
      * @test
      */
     public function tempTsfeIsFinallyUnsetTest()
     {
         /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
-        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
         $this->assertFalse($userHandler->tsfeDetected);
         $this->assertEmpty($GLOBALS['TSFE']);
     }
@@ -38,7 +63,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
         $GLOBALS['TSFE'] = new \stdClass();
         $GLOBALS['TSFE']->cObjectDepthCounter = 100;
         /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
-        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
         $this->assertTrue($userHandler->tsfeDetected);
         $this->assertObjectHasAttribute('cObjectDepthCounter',$GLOBALS['TSFE']);
     }
@@ -47,7 +72,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
      * @test
      */
     public function validCObjCreatedTest() {
-        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
         $this->assertNotEmpty($userHandler->cObj->data);
         $this->assertNotEmpty($userHandler->cObj->data['USER']);
     }
@@ -57,7 +82,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function environmentGoesIntoCObjData() {
         $_SERVER['UserHandlerTestEnvironment'] = 'UserHandlerTestValue';
-        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'');
+        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
         $this->assertNotEmpty($userHandler->cObj->data['UserHandlerTestEnvironment']);
         $this->assertSame('UserHandlerTestValue',$userHandler->cObj->data['UserHandlerTestEnvironment']);
     }
@@ -67,7 +92,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function environmentPrefixIsRecognized() {
         $_SERVER['redirectShibbSomeEnvironment'] = 'ShibbSomeValue';
-        $userHandler = new UserHandler('FE','fe_users','fe_groups','Shib_Session_ID',false,'redirect');
+        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'redirect');
         $this->assertSame('ShibbSomeValue',$userHandler->cObj->data['ShibbSomeEnvironment']);
     }
 
