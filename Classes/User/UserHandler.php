@@ -104,8 +104,8 @@ class UserHandler
 		// will create new users on every log in attempt until user is unhidden by admin.
 		$where .= ' AND deleted = 0 ';
 		if($this->db_user['checkPidList']) {
-			$where .= $this->db_user['check_pid_clause'];
-		}
+            $where = $this->addPidClause($where);
+        }
 		#if ($this->writeDevLog) GeneralUtility::devlog('userFromDB: where-statement','shibboleth_userhandler',0,array($where));
 		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
 		$table = $this->db_user['table'];
@@ -329,5 +329,19 @@ class UserHandler
     protected function getEnvironmentVariable($key) {
 		return GeneralUtility::getIndpEnv($key);
 	}
+
+    /**
+     * @param $where
+     * @return string
+     */
+    function addPidClause($where): string
+    {
+        $posOfAndInString = stristr($this->db_user['check_pid_clause'], 'AND');
+        if (!$posOfAndInString OR $posOfAndInString>1) {
+            $where .= ' AND ';
+        }
+        $where .= $this->db_user['check_pid_clause'];
+        return $where;
+    }
 
 }
