@@ -36,7 +36,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
             'usergroup_column' => 'usergroup',
             'enable_clause' => $enable_clause,
             'checkPidList' => 0,
-            'check_pid_clause' => '`pid` IN (0)'
+            'check_pid_clause' => '`pid` IN (2)'
         );
         $this->db_group = array(
             'table' => 'fe_groups'
