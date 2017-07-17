@@ -15,8 +15,14 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Domain\Repository\Module\BackendModuleRepository;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 
 class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolbarItem {
+
+    /**
+     * @var \TYPO3\CMS\Backend\Domain\Repository\Module\BackendModuleRepository $backendModuleRepository
+     */
+    protected $backendModuleRepository;
 
     /**
      * reference to the backend object
@@ -25,7 +31,21 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
      */
     protected $backendReference;
 
+    /**
+     * @var \TYPO3\CMS\Core\Imaging\IconFactory $iconFactory
+     * @inject
+     */
+    protected $iconFactory;
+
+    /**
+     * @var string
+     */
     protected $EXTKEY = 'shibboleth';
+
+    public function _construct()
+    {
+        $this->backendModuleRepository = GeneralUtility::makeInstance(BackendModuleRepository::class);
+    }
 
     /**
      * Render drop down
@@ -49,10 +69,8 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
             );
         }
 
-        /** @var BackendModuleRepository $backendModuleRepository */
-        $backendModuleRepository = GeneralUtility::makeInstance(BackendModuleRepository::class);
         /** @var \TYPO3\CMS\Backend\Domain\Model\Module\BackendModule $userModuleMenu */
-        $userModuleMenu = $backendModuleRepository->findByModuleName('user');
+        $userModuleMenu = $this->backendModuleRepository->findByModuleName('user');
         if ($userModuleMenu != false && $userModuleMenu->getChildren()->count() > 0) {
             foreach ($userModuleMenu->getChildren() as $module) {
                 /** @var BackendModule $module */
@@ -77,6 +95,9 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
         $buttonLabel = 'LLL:EXT:lang/locallang_core.xlf:' . ($backendUser->user['ses_backuserid'] ? 'buttons.exit' : 'buttons.logout');
         $dropdown[] = '<li class="reset-dropdown">';
         $dropdown[] = '<a href="' . htmlspecialchars(BackendUtility::getModuleUrl('logout', $urlParameters)) . '" class="btn btn-danger pull-right" target="_top">';
+        if(!$this->iconFactory) {
+            $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+        }
         $dropdown[] = $this->iconFactory->getIcon('actions-logout', Icon::SIZE_SMALL)->render('inline') . ' ';
         $dropdown[] = $languageService->sL($buttonLabel, true);
         $dropdown[] = '</a>';
