@@ -4,8 +4,8 @@ namespace TrustCnct\Shibboleth\Tests\Unit\Service;
 
 use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TrustCnct\Shibboleth\Service\LoginUrlService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TrustCnct\Shibboleth\Service\LoginUrlService;
 
 class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
 {
