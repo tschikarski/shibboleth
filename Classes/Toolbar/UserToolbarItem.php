@@ -123,7 +123,7 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
 	/**
 	 * @return string
 	 */
-	private function getSecureLogoutRedirectUrl()
+	protected function getSecureLogoutRedirectUrl()
 	{
         if (!$GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid']) {
             return '';
