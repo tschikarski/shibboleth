@@ -49,7 +49,7 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
      */
     public function getDropDown()
     {
-        if(version_compare(TYPO3_version, '8.0.0') >= 0) {
+        if(version_compare(TYPO3_version, '8.5.0') >= 0) {
 
             $view = $this->getFluidTemplateObject('UserToolbarItemDropDown.html');
             $view->assignMultiple([
@@ -62,8 +62,8 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
         }
 
         $backendUser = $this->getBackendUser();
-        $languageService = $this->getLanguageService();
-        //$languageService = $GLOBALS['LANG'];
+        //$languageService = $this->getLanguageService();
+        $languageService = $GLOBALS['LANG'];
 
         $dropdown = array();
         $dropdown[] = '<ul class="dropdown-list">';
