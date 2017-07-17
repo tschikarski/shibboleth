@@ -54,8 +54,21 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
      */
     public function getDropDown()
     {
+        if(version_compare(TYPO3_version, '8.0.0') >= 0) {
+
+            $view = $this->getFluidTemplateObject('UserToolbarItemDropDown.html');
+            $view->assignMultiple([
+                'modules' => $this->backendModuleRepository->findByModuleName('user')->getChildren(),
+                'logoutUrl' => $this->getSecureLogoutRedirectUrl(),
+                'switchUserMode' => $this->getBackendUser()->user['ses_backuserid'],
+            ]);
+            return $view->render();
+
+        }
+
         $backendUser = $this->getBackendUser();
         $languageService = $this->getLanguageService();
+        //$languageService = $GLOBALS['LANG'];
 
         $dropdown = array();
         $dropdown[] = '<ul class="dropdown-list">';
