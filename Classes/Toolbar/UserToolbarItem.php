@@ -42,11 +42,6 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
      */
     protected $EXTKEY = 'shibboleth';
 
-    public function _construct()
-    {
-        $this->backendModuleRepository = GeneralUtility::makeInstance(BackendModuleRepository::class);
-    }
-
     /**
      * Render drop down
      *
@@ -82,6 +77,10 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
             );
         }
 
+        if (!$this->backendModuleRepository) {
+            $this->backendModuleRepository = GeneralUtility::makeInstance(BackendModuleRepository::class);
+
+        }
         /** @var \TYPO3\CMS\Backend\Domain\Model\Module\BackendModule $userModuleMenu */
         $userModuleMenu = $this->backendModuleRepository->findByModuleName('user');
         if ($userModuleMenu != false && $userModuleMenu->getChildren()->count() > 0) {
