@@ -61,10 +61,46 @@ class UserHandler
 			GeneralUtility::devlog('getUserFromDB: start','shibboleth_userhandler');
 		}
 
-		$idField = $this->config['IDMapping.']['typo3Field'];
-		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
+		$result = $this->checkForUserInDb('typo3Field','shibID');
+		if ($result === false) {
+			$result = $this->checkForUserInDb('typo3FieldFallback','shibIDFallback','typo3Field');
+		}
+
+		return $result;
+	}
+
+	function checkForUserInDb($mappingDbFieldName, $mappingShibIdName, $mappingEmptyDbFieldName = null) {
+
+		// Skip this check if field is not configured
+		if (empty($this->config['IDMapping.'][$mappingDbFieldName])) {
+			return false;
+		}
+
+		$idField = $this->config['IDMapping.'][$mappingDbFieldName];
+		$idValue = $this->getSingle($this->config['IDMapping.'][$mappingShibIdName],$this->config['IDMapping.'][$mappingShibIdName.'.']);
+
+		if ($idValue == '') {
+			if ($this->writeDevLog) {
+				GeneralUtility::devLog(
+					'getUserFromDB: Shibboleth data evaluates username to empty string! Extra data may help',
+					'shibboleth',
+					3,
+					array(
+						'idField' => $idField,
+						'idValue' => $idValue
+					)
+				);
+				return 'Shibboleth data evaluates username to empty string!';
+			}
+		}
 
 		$where = $idField . '=\'' . $idValue . '\' ';
+
+		// Applies only if field is empty in the database
+		if (!empty($mappingEmptyDbFieldName)) {
+			$where .= ' AND ('.$mappingEmptyDbFieldName.' IS NULL OR '.$mappingEmptyDbFieldName.'=\'\') ';
+		}
+
 		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
 		// will create new users on every log in attempt until user is unhidden by admin.
 		$where .= ' AND deleted = 0 ';
@@ -82,10 +118,10 @@ class UserHandler
 			$where
 		);
 		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth_userhandler',0,$row);
+			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB ('.$mappingDbFieldName.';'.$mappingShibIdName.') returning user record ($row)','shibboleth_userhandler',0,$row);
 			return $row;
 		} else {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
+			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB ('.$mappingDbFieldName.';'.$mappingShibIdName.') returning FALSE (no record found)','shibboleth_userhandler',0,$row);
 			return false;
 		}
 	}
