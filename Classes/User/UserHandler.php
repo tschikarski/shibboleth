@@ -98,7 +98,8 @@ class UserHandler
 
 		// Applies only if field is empty in the database
 		if (!empty($mappingEmptyDbFieldName)) {
-			$where .= ' AND ('.$mappingEmptyDbFieldName.' IS NULL OR '.$mappingEmptyDbFieldName.'=\'\') ';
+			$lookupField = $this->config['IDMapping.'][$mappingEmptyDbFieldName];
+			$where .= ' AND ('.$lookupField.' IS NULL OR '.$lookupField.'=\'\') ';
 		}
 
 		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
