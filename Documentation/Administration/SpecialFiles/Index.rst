@@ -32,6 +32,10 @@ Resources within the file system
 +======================+====================+============+================================+============================================================+
 | res/be_form          | login7.html        | No         | Template for BE login form     | used by ShibbolethLoginProvider, needs Layout file         |
 +----------------------+--------------------+------------+--------------------------------+------------------------------------------------------------+
+| res/be_form          | logout.html        | No         | Sample message after BE logout | Needed as redirect target after logout to avoid re-login   |
++----------------------+--------------------+------------+--------------------------------+------------------------------------------------------------+
+| res/be_form          | nologinyet.html    | Yes        | Sample message after login attempt | Needed as redirect target for not-yet-enabled users    |
++----------------------+--------------------+------------+--------------------------------+------------------------------------------------------------+
 | res/Private/Layouts  | Login7Layout.html  | No         | Layout for BE login form       | used by ShibbolethLoginProvider                            |
 +----------------------+--------------------+------------+--------------------------------+------------------------------------------------------------+
 

@@ -1,3 +1,9 @@
+<!--
+ NEVER change this file
+ Make a copy instead, change path and/or name and change the reference
+ in the extension configuration accordingly!
+-->
+
 <f:layout name="Login7Layout" />
 
 <f:section name="shibbMessage">
@@ -24,18 +30,12 @@
 				Once your account is activated, follow this link:
 			</p>
 			<div class="btn btn-block btn-login t3js-login-submit">
-				<a href="/typo3/?redirecttoshibboleth=yes">Login to backend »</a>
+				<a href="/typo3/?redirecttoshibboleth=yes">Login with Shibboleth »</a>
 			</div>
 			<div style="clear:both"></div>
 		</div>
 	</div>
 	<!-- /Shibboleth: Message block -->
-</f:section>
-
-<f:section name="shibbToggle">
-	<!-- Shibboleth: Toggle button -->
-	<div class="shib_togglediv backgroundsize"><span id="shib_toggle_localform" class=""> </span>Local login</div>
-	<!-- /Shibboleth: Toggle button -->
 </f:section>
 
 <f:section name="loginFormFields">
@@ -59,4 +59,21 @@
 			</div>
 		</div>
 	</div>
+</f:section>
+
+<f:section name="otherLoginProviders">
+	<f:for each="{loginProviders}" as="provider" key="providerKey">
+		<f:if condition="{provider.label}">
+			<f:if condition="{loginProviderIdentifier} != {providerKey}">
+				<f:if condition="1433416747 == {providerKey}">
+					<f:then>
+						<li class="t3js-loginprovider-switch" data-providerkey="{providerKey}"><a href="?loginProvider={providerKey}"><i class="fa fa-fw {provider.icon-class}"></i> <span>Login for local admins (special!)</span></a></li>
+					</f:then>
+					<f:else>
+						<li class="t3js-loginprovider-switch" data-providerkey="{providerKey}"><a href="?loginProvider={providerKey}"><i class="fa fa-fw {provider.icon-class}"></i> <span><f:translate key="{provider.label}" /></span></a></li>
+					</f:else>
+				</f:if>
+			</f:if>
+		</f:if>
+	</f:for>
 </f:section>

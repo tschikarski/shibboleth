@@ -14,6 +14,21 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+3.0.4      Add handling of prefixed
+         server variables
+           Allow installation in
+         composer mode
+           If BE_logoutRedirectUrl
+         invalid, prefix correct
+         Shibboleth handler URL
+           Allow special redirect
+         in case of a Shibboleth
+         user is not yet enabled for
+         BE access
+           Fix composer mode
+           Reject logins, if user ID
+         is empty string
+-------  ------------------------------
 3.0.3    Fix PHP Warning due to
          dangling reference to
          registerToolbarItem.php

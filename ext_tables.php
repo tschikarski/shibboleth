@@ -37,11 +37,6 @@ $tempColumns = array (
 	),
 );
 
-// Register BE toolbar item
-if (TYPO3_MODE === 'BE') {
-	$GLOBALS['TYPO3_CONF_VARS']['typo3/backend.php']['additionalBackendItems'][] = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('shibboleth'). 'registerToolbarItem.php';
-}
-
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('be_users',$tempColumns);
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('be_users','tx_shibboleth_shibbolethsessionid;;;;1-1-1');
 ?>

@@ -28,9 +28,10 @@ class UserHandler
 	var $shibboleth_extConf;
 	var $config; // typoscript like configuration for the current loginType
 	var $cObj; // local cObj, needed to parse the typoscript configuration
-	var $ShibSessionID;
+    var $envShibPrefix = '';
+	var $shibSessionIdKey;
 
-	function __construct($loginType, $db_user, $db_group, $shibSessionIDname, $writeDevLog = FALSE) {
+	function __construct($loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = '') {
 		global $TYPO3_CONF_VARS;
 		$this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
 		//if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
@@ -40,29 +41,50 @@ class UserHandler
 		$this->loginType = $loginType;
 		$this->db_user = $db_user;
 		$this->db_group = $db_group;
-		$this->ShibSessionID = $shibSessionIDname;
+		$this->shibSessionIdKey = $shibSessionIdKey;
+        $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
-		if (is_object($GLOBALS['TSFE'])) {
-			$this->tsfeDetected = TRUE;
-		}
-		$localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
-		$localcObj->start($_SERVER);
+        $serverEnvReplaced = $_SERVER;
+        $pattern = '/^' . $this->envShibPrefix . '/';
+        foreach ($serverEnvReplaced as $aKey => $aValue) {
+            $replacedKey = preg_replace($pattern, '',$aKey);
+            if (!isset($serverEnvReplaced[$replacedKey])) {
+                $serverEnvReplaced[$replacedKey] = $aValue;
+                unset($serverEnvReplaced[$aKey]);
+            }
+        }
+
+        if (is_object($GLOBALS['TSFE'])) {
+            $this->tsfeDetected = TRUE;
+        }
+        $localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
+        $localcObj->start($serverEnvReplaced);
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
 
 		$this->cObj = $localcObj;
-		#if ($this->writeDevLog) GeneralUtility::devlog('cObj data','shibboleth_userhandler',0,$this->cObj->data);
 	}
 
 	function getUserFromDB() {
-		if ($this->writeDevLog) {
-			GeneralUtility::devlog('getUserFromDB: start','shibboleth_userhandler');
-		}
 
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
+
+        if ($idValue == '') {
+            if ($this->writeDevLog)
+                GeneralUtility::devLog(
+                    'getUserFromDB: Shibboleth data evaluates username to empty string! Extra data may help',
+                    'shibboleth',
+                    3,
+                    array(
+                        'idField' => $idField,
+                        'idValue' => $idValue
+                    )
+                );
+            return 'Shibboleth data evaluates username to empty string!';
+        }
 
 		$where = $idField . '=\'' . $idValue . '\' ';
 		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
@@ -90,11 +112,10 @@ class UserHandler
 		}
 	}
 
-	function transferShibbolethAttributesToUserArray($user) {
-		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray','shibboleth_userhandler',0,array('user' => $user, 'this_config' => $this->config));
-		// We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
+    function transferShibbolethAttributesToUserArray($user) {
+            // We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
 		$user['tx_shibboleth_config'] = $this->config['userControls.'];
-		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->ShibSessionID];
+		$user['tx_shibboleth_shibbolethsessionid'] = $_SERVER[$this->shibSessionIdKey];
 
 		$user['_allowUser'] = $this->getSingle($user['tx_shibboleth_config']['allowUser'],$user['tx_shibboleth_config']['allowUser.']);
 
@@ -105,7 +126,22 @@ class UserHandler
 		// any possible mis-configuration from the other fields mapping entries
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
-		$user[$idField] = $idValue;
+
+        if ($idValue == '') {
+            if ($this->writeDevLog)
+                GeneralUtility::devLog(
+                    'transferShibbolethAttributesToUserArray: Shibboleth data evaluates username to empty string! Extra data may help',
+                    'shibboleth',
+                    3,
+                    array(
+                        'idField' => $idField,
+                        'idValue' => $idValue
+                    )
+                );
+            return 'Shibboleth data evaluates username to empty string!';
+        }
+
+        $user[$idField] = $idValue;
 
 		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray: newUserArray','shibboleth_userhandler',0,$user);
 		return $user;
@@ -121,14 +157,9 @@ class UserHandler
 			// We have to update the tstamp field, in any case.
 			$user['tstamp'] = time();
 
-			// Don't automatically change groups after first creation
-			foreach($user['tx_shibboleth_config']['updateUserFieldsMapping.'] as $field => $fieldConfig) {
-				$newFieldValue = $this->getSingle($user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field],$user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field . '.']);
-				if(substr(trim($field), -1) != '.') {
-					$user[$field] = $newFieldValue;
-				}
-			}
-			// Remove that data from $user - otherwise we get an error updating the user record in DB
+            $user = $this->mapAdditionalFields($user);
+
+            // Remove that data from $user - otherwise we get an error updating the user record in DB
 			unset($user['tx_shibboleth_config']);
 			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth_userhandler',0,$user);
 			// Update
@@ -214,23 +245,17 @@ class UserHandler
 			return array();
 		}
 
-		if ($this->writeDevLog) GeneralUtility::devlog('configString','shibboleth_userhandler',0,array($configString));
-
 		$parser = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Configuration\TsConfigParser');
 		$parser->parse($configString);
 
 		$completeSetup = $parser->setup;
 
-		if ($this->writeDevLog) GeneralUtility::devlog('loginType','shibboleth_userhandler',0,array($this->loginType));
-
 		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
-		if ($this->writeDevLog) GeneralUtility::devlog('parsed TypoScript','shibboleth_userhandler',0,$localSetup);
 
 		return $localSetup;
 	}
 
 	function getSingle($conf,$subconf='') {
-		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($conf,$subconf)','shibboleth_userhandler',0,array('conf' => $conf, 'subconf' => $subconf));
 		if(is_array($subconf)) {
 			if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
 				if (!is_object($GLOBALS['TSFE'])) {
@@ -245,7 +270,6 @@ class UserHandler
 		if (!$this->tsfeDetected) {
 			unset($GLOBALS['TSFE']);
 		}
-		//if ($this->writeDevLog) GeneralUtility::devlog('getSingle ($result)','shibboleth_userhandler',0,array('result' => $result));
 		return $result;
 	}
 
@@ -264,5 +288,21 @@ class UserHandler
 
 		return $tsfe;
 	}
+
+    /**
+     * @param $user
+     * @return mixed
+     */
+    private function mapAdditionalFields($user)
+    {
+        foreach ($user['tx_shibboleth_config']['updateUserFieldsMapping.'] as $field => $fieldConfig) {
+            $newFieldValue = $this->getSingle($user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field],
+                $user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field . '.']);
+            if (substr(trim($field), -1) != '.') {
+                $user[$field] = $newFieldValue;
+            }
+        }
+        return $user;
+    }
 
 }

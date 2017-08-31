@@ -1,8 +1,13 @@
+# NEVER change this file
+# Make a copy instead, change path and/or name and change the reference
+# in the extension configuration accordingly!
+# This example config would work for example with testshib.org as IdP
+
 tx_shibboleth {
 	FE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = REMOTE_USER
+			shibID.field = eppn
 			typo3Field = username
 		}
 		userControls {
@@ -13,7 +18,7 @@ tx_shibboleth {
 				usergroup.value = 1
 
 				email = TEXT
-				email.field = REMOTE_USER
+				email.field = eppn
 				first_name = TEXT
 				first_name.value = Vorname
 				middle_name = TEXT
@@ -23,9 +28,7 @@ tx_shibboleth {
 			}
 			updateUserFieldsMapping {
 				email = TEXT
-				email.field = REMOTE_USER
-				name = TEXT
-				name.value = Testname
+				email.field = eppn
 				first_name = TEXT
 				first_name.value = Vorname
 				middle_name = TEXT
@@ -38,7 +41,7 @@ tx_shibboleth {
 	BE {
 		IDMapping {
 			shibID = TEXT
-			shibID.field = REMOTE_USER
+			shibID.field = eppn
 			typo3Field = username
 		}
 		userControls {
@@ -49,23 +52,15 @@ tx_shibboleth {
 				admin.value = 0
 
 				email = TEXT
-				email.field = REMOTE_USER
-				realName = COA
-				realName.1 = TEXT
-				realName.1.value = Nachname
-				realName.3 = TEXT
-				realName.3.value = Vorname
-				realName.3.noTrimWrap  = |, ||
+				email.field = eppn
+				realName = TEXT
+				realName.field = eppn
 			}
 			updateUserFieldsMapping {
 				email = TEXT
-				email.field = REMOTE_USER
-				realName = COA
-				realName.1 = TEXT
-				realName.1.value = Nachname
-				realName.3 = TEXT
-				realName.3.value = Vorname
-				realName.3.noTrimWrap  = |, ||
+				email.field = eppn
+				realName = TEXT
+				realName.field = eppn
 			}
 		}
 	}

@@ -35,13 +35,7 @@
 									<f:render section="shibbMessage" />
 
 									<ul class="list-unstyled typo3-login-links">
-										<f:for each="{loginProviders}" as="provider" key="providerKey">
-											<f:if condition="{provider.label}">
-												<f:if condition="{loginProviderIdentifier} != {providerKey}">
-													<li class="t3js-loginprovider-switch" data-providerkey="{providerKey}"><a href="?loginProvider={providerKey}"><i class="fa fa-fw {provider.icon-class}"></i> <span><f:translate key="{provider.label}" /></span></a></li>
-												</f:if>
-											</f:if>
-										</f:for>
+										<f:render section="otherLoginProviders" />
 									</ul>
 								</form>
 							</div>

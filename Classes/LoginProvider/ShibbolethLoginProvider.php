@@ -35,9 +35,11 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
 
         if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
             // Redirect to Shibboleth login
+            $typo3SiteUrlParams = array();
+            $typo3SiteUrlParams[] = 'login_status=login';
             $entityIDparam = $extConf['entityID'];
             if ($entityIDparam != '') {
-                $entityIDparam = '?entityID='. rawurldecode($entityIDparam);
+                $typo3SiteUrlParams[] = 'entityID='. rawurldecode($entityIDparam);
             }
             $typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
             if ($extConf['forceSSL']) {
@@ -47,7 +49,12 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
             if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
                 $sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
             }
-            $shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) . 'typo3/' . $entityIDparam;
+            $typo3SiteUrlParamString = implode('&', $typo3SiteUrlParams);
+            if ($typo3SiteUrlParamString != '') {
+                $typo3SiteUrlParamString = '?' . $typo3SiteUrlParamString;
+            }
+            $shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) .
+                    'typo3/' . $typo3SiteUrlParamString;
             \TYPO3\CMS\Core\Utility\HttpUtility::redirect($shiblinkUrl, \TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_302);
         }
 

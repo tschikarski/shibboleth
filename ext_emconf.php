@@ -29,7 +29,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 1,
 	'lockType' => '',
 	'author_company' => '',
-	'version' => '3.0.3',
+	'version' => '3.0.4',
 	'constraints' => array(
 		'depends' => array(
 			'typo3' => '7.6.0-7.99.99',
@@ -42,10 +42,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'suggests' => array(
 	),
 	'autoload' => array(
-		'psr-4' => array('TrustCnct\\Shibboleth\\' => 'Classes/'),
-		'classmap' => array(
-			'sv1/class.tx_shibboleth_sv1.php',
-		)
+		'psr-4' => array('TrustCnct\\Shibboleth\\' => 'Classes/')
 	)
 );
 
