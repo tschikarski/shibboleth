@@ -14,7 +14,7 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
-tbd        Add handling of prefixed
+3.0.4      Add handling of prefixed
          server variables
            Allow installation in
          composer mode
@@ -25,6 +25,9 @@ tbd        Add handling of prefixed
          in case of a Shibboleth
          user is not yet enabled for
          BE access
+           Fix composer mode
+           Reject logins, if user ID
+         is empty string
 -------  ------------------------------
 3.0.3    Fix PHP Warning due to
          dangling reference to
