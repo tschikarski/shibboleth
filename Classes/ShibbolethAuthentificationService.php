@@ -122,23 +122,30 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             $posOfShibInKey = strpos($serverEnvKey,'Shib');
             if ($posOfShibInKey !== FALSE && $posOfShibInKey < $shortestPrefixLength) {
                 $shortestPrefixLength = $posOfShibInKey;
-                $this->envShibPrefix = substr($serverEnvKey, 0, $posOfShibInKey);
                 $shibKey = substr($serverEnvKey, $posOfShibInKey);
                 switch($shibKey) {
                     case 'Shib_Application_ID':
                     case 'Shib_Session_ID':
-                        $this->hasShibbolethSession = TRUE;
-                        $this->shibApplicationIdKey = $this->envShibPrefix . 'Shib_Application_ID';
-                        $this->shibSessionIdKey = $this->envShibPrefix . 'Shib_Session_ID';
+                        $shibApplicationIdKey = 'Shib_Application_ID';
+                        $shibSessionIdKey = 'Shib_Session_ID';
                         break;
                     case 'Shib-Application-ID':
                     case 'Shib-Session-ID':
-                        $this->hasShibbolethSession = TRUE;
-                        $this->shibApplicationIdKey = $this->envShibPrefix . 'Shib-Application-ID';
-                        $this->shibSessionIdKey = $this->envShibPrefix . 'Shib-Session-ID';
+                        $shibApplicationIdKey = 'Shib-Application-ID';
+                        $shibSessionIdKey = 'Shib-Session-ID';
                         break;
                     default:
                         // Ignore any other keys, e.g. Shib-Identity-Provider
+                }
+
+                if ($shibSessionIdKey) {
+                    $this->envShibPrefix = substr($serverEnvKey, 0, $posOfShibInKey);
+                    $this->shibApplicationIdKey = $this->envShibPrefix . $shibApplicationIdKey;
+                    $this->shibSessionIdKey = $this->envShibPrefix . $shibSessionIdKey;
+                    $this->hasShibbolethSession = TRUE;
+
+                    // Stop the search when a key was found
+                    break;
                 }
             }
         }
