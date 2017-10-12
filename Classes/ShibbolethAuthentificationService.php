@@ -149,17 +149,6 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 }
             }
         }
-        /*
-        // Another chance to detect Shibboleth session present; just for safety, as code before not well tested at the moment
-        if (!$this->hasShibbolethSession && isset($_SERVER['AUTH_TYPE']) && $_SERVER['AUTH_TYPE'] == 'shibboleth') {
-            if (isset($_SERVER['Shib_Session_ID']) && $_SERVER['Shib_Session_ID'] != '') {
-                $this->hasShibbolethSession = TRUE;
-                $this->envShibPrefix = '';
-                $this->shibSessionIdKey = 'Shib_Session_ID';
-                $this->shibApplicationIdKey = 'Shib_Application_ID';
-            }
-        }
-        */
         
         return $available;
     }
