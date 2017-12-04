@@ -114,7 +114,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     /**
      * @test
      */
-    public function getUserFromDbReportsErrorOnEmptyIdValue() {
+    public function lookUpShibbolethUserInDatabaseReportsErrorOnEmptyIdValue() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
@@ -132,15 +132,14 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $db_group = 'fe_groups';
         $shibbSessionIdKey = 'Shib_Session_ID';
         $userHandler->_callRef('__construct', $loginType, $db_user, $db_group, $shibbSessionIdKey);
-        $this->assertSame('Shibboleth data evaluates username to empty string!', $userHandler->getUserFromDB());
+        $this->assertSame('Shibboleth data evaluates username to empty string!', $userHandler->lookUpShibbolethUserInDatabase());
 
     }
 
     /**
      * @test
      */
-    public function getUserFromDbReturnsExistingUser() {
-
+    public function lookUpShibbolethUserInDatabaseReturnsExistingFeUser() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
@@ -158,7 +157,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $db_group = 'fe_groups';
         $shibbSessionIdKey = 'Shib_Session_ID';
         $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
-        $userFromDB = $userHandler->getUserFromDB();
+        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertTrue(is_array($userFromDB),'Expected array');
         $this->assertArrayHasKey('uid', $userFromDB);
         $this->assertSame('2', $userFromDB['uid']);
@@ -169,8 +168,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     /**
      * @test
      */
-    public function getUserFromDbCheckingPidReturnsExistingUser() {
-
+    public function lookUpShibbolethUserInDatabaseCheckingPidReturnsExistingFeUser() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
@@ -189,7 +187,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $shibbSessionIdKey = 'Shib_Session_ID';
         $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
         $userHandler->db_user['checkPidList'] = 1;
-        $userFromDB = $userHandler->getUserFromDB();
+        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertTrue(is_array($userFromDB),'Expected array, but got '.$userFromDB);
         $this->assertArrayHasKey('uid', $userFromDB);
         $this->assertSame('2', $userFromDB['uid']);
@@ -200,8 +198,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     /**
      * @test
      */
-    public function getUserFromDbReturnsNullIfNotExists() {
-
+    public function lookUpShibbolethUserInDatabaseReturnsNullIfFeUserDoesNotExist() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
@@ -220,7 +217,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $shibbSessionIdKey = 'Shib_Session_ID';
         /** @var UserHandler $userHandler */
         $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
-        $userFromDB = $userHandler->getUserFromDB();
+        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertFalse(is_array($userFromDB),'Did not expect array');
         $this->assertEmpty($userFromDB);
 

@@ -79,7 +79,7 @@ class UserHandler
         $this->cObj = $localcObj;
     }
 
-	function getUserFromDB() {
+	function lookUpShibbolethUserInDatabase() {
 
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
@@ -100,7 +100,7 @@ class UserHandler
 
 		$where = $idField . '=\'' . $idValue . '\' ';
 		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
-		// will create new users on every log in attempt until user is unhidden by admin.
+		// will create new users on every login attempt until user is unhidden by admin.
 		$where .= ' AND deleted = 0 ';
 		if($this->db_user['checkPidList']) {
             $where = $this->addPidClause($where);
