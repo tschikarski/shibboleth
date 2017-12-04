@@ -15,9 +15,10 @@
 
 namespace TrustCnct\Shibboleth\User;
 
+use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class UserHandlerTest extends \PHPUnit_Framework_TestCase
+class UserHandlerTest extends UnitTestCase
 {
     protected $db_user;
     protected $db_group;
@@ -27,6 +28,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp() {
         parent::setUp();
+        $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'] = array(); // Avoid exception in web/typo3conf/ext/shibboleth/Classes/User/UserHandler.php:76
         $enable_clause = GeneralUtility::makeInstance('TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression', 'AND');
         $this->db_user = array(
             'table' => 'fe_users',
@@ -41,6 +43,8 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
         $this->db_group = array(
             'table' => 'fe_groups'
         );
+        $this->expectException('RuntimeException');
+        $this->expectExceptionMessage('The requested database connection named "Default" has not been configured.');
 
     }
 

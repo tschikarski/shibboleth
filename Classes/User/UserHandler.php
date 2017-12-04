@@ -15,8 +15,9 @@ namespace TrustCnct\Shibboleth\User;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 
 class UserHandler
@@ -33,6 +34,20 @@ class UserHandler
     var $cObj; // local cObj, needed to parse the typoscript configuration
     var $envShibPrefix = '';
     var $shibSessionIdKey;
+
+    /**
+     * @var
+     */
+
+    /**
+     * @var QueryBuilder
+     */
+    protected $queryBuilder;
+
+    /**
+     * @var boolean
+     */
+    protected $hasQueryBuilder = false;
 
     /**
      * UserHandler constructor.
@@ -55,6 +70,15 @@ class UserHandler
         $this->shibSessionIdKey = $shibSessionIdKey;
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
+
+		try {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            $this->queryBuilder = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $this->hasQueryBuilder = true;
+        } catch (Exception $e) {
+		    $this->hasQueryBuilder = false;
+        }
+
 
         $serverEnvReplaced = $_SERVER;
         $pattern = '/^' . $this->envShibPrefix . '/';
@@ -115,13 +139,15 @@ class UserHandler
 			$table,
 			$where
 		);
-		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
+        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		if ($row)  {
 			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth_userhandler',0,$row);
 			return $row;
 		} else {
 			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
 			return false;
 		}
+
 	}
 
     function transferShibbolethAttributesToUserArray($user) {
