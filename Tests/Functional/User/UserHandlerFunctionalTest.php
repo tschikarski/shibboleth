@@ -43,7 +43,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      */
     public function constructorForFrontendCaseTest()
     {
-        /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
+        /** @var UserHandler $userHandler */
         $userHandler = GeneralUtility::makeInstance(UserHandler::class,'FE','fe_users','fe_groups','Shib_Session_ID',false,'');
         $this->assertFalse($userHandler->tsfeDetected);
     }
@@ -52,6 +52,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      * @test
      */
     public function getMappingConfigPathTest() {
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock('TrustCnct\Shibboleth\User\UserHandler',['getEnvironmentVariable'], ['FE','fe_users','fe_groups','Shib_Session_ID'],'',false);
         $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
         $loginType = 'FE';
@@ -67,6 +68,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      * @test
      */
     public function mockGetTyposcriptConfigurationTest() {
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
                 'FE',
@@ -89,6 +91,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      * @test
      */
     public function typo3IdFieldFromConfigFileTest() {
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
             'FE',
@@ -112,6 +115,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      * @test
      */
     public function getUserFromDbReportsErrorOnEmptyIdValue() {
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
             'FE',
@@ -137,6 +141,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      */
     public function getUserFromDbReturnsExistingUser() {
 
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
             'FE',
@@ -166,6 +171,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      */
     public function getUserFromDbCheckingPidReturnsExistingUser() {
 
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
             'FE',
@@ -196,6 +202,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
      */
     public function getUserFromDbReturnsNullIfNotExists() {
 
+        /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
             // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
             'FE',
@@ -211,6 +218,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $db_user = 'fe_users';
         $db_group = 'fe_groups';
         $shibbSessionIdKey = 'Shib_Session_ID';
+        /** @var UserHandler $userHandler */
         $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
         $userFromDB = $userHandler->getUserFromDB();
         $this->assertFalse(is_array($userFromDB),'Did not expect array');

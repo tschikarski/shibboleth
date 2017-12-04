@@ -187,6 +187,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             }
         }
 
+        /** @var UserHandler $userhandler */
         $userhandler = GeneralUtility::makeInstance(UserHandler::class,$this->authInfo['loginType'],
             $this->db_user, $this->db_groups, $this->shibSessionIdKey, $this->writeDevLog, $this->envShibPrefix);
 
