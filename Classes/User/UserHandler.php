@@ -71,14 +71,14 @@ class UserHandler
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
 
-		try {
+        if (class_exists(ConnectionPool::class)) {
             $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
             $this->queryBuilder = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
             $this->hasQueryBuilder = true;
-        } catch (Exception $e) {
+        } else {
+            $this->queryBuilder = NULL;
 		    $this->hasQueryBuilder = false;
         }
-
 
         $serverEnvReplaced = $_SERVER;
         $pattern = '/^' . $this->envShibPrefix . '/';
