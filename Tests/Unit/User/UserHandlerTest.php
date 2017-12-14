@@ -30,7 +30,7 @@ class UserHandlerTest extends UnitTestCase
     protected function setUp() {
         parent::setUp();
         $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'] = array(); // Avoid exception in web/typo3conf/ext/shibboleth/Classes/User/UserHandler.php:76
-        $enable_clause = GeneralUtility::makeInstance('TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression', 'AND');
+        $enable_clause = '';
         $this->db_user = array(
             'table' => 'fe_users',
             'userid_column' => 'uid',
