@@ -16,6 +16,7 @@
 namespace TrustCnct\Shibboleth\User;
 
 use Nimut\TestingFramework\TestCase\UnitTestCase;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class UserHandlerTest extends UnitTestCase
@@ -43,8 +44,11 @@ class UserHandlerTest extends UnitTestCase
         $this->db_group = array(
             'table' => 'fe_groups'
         );
-        $this->expectException('RuntimeException');
-        $this->expectExceptionMessage('The requested database connection named "Default" has not been configured.');
+        if (class_exists(ConnectionPool::class)) {
+            $this->expectException('RuntimeException');
+            $this->expectExceptionMessage('The requested database connection named "Default" has not been configured.');
+
+        }
 
     }
 
