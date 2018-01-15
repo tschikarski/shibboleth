@@ -25,9 +25,9 @@ class UserHandler
     var $writeDevLog;
     var $tsfeDetected = FALSE;
     var $loginType=''; //FE or BE
-    var $user='';
-    var $db_user='';
-    var $db_group='';
+    var $user=array();
+    var $db_user=array();
+    var $db_group=array();
     protected $shibboleth_extConf;
     var $mappingConfigAbsolutePath;
     var $config; // typoscript like configuration for the current loginType
