@@ -129,12 +129,9 @@ class UserHandler
 		if($this->db_user['checkPidList']) {
             $where = $this->addPidClause($where);
         }
-		#if ($this->writeDevLog) GeneralUtility::devlog('userFromDB: where-statement','shibboleth_userhandler',0,array($where));
 		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
 		$table = $this->db_user['table'];
-		$groupBy = '';
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
-		#$sql = $GLOBALS['TYPO3_DB']->SELECTquery (
 			'*',
 			$table,
 			$where
