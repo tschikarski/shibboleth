@@ -122,30 +122,46 @@ class UserHandler
             return 'Shibboleth data evaluates username to empty string!';
         }
 
-		$where = $idField . '=\'' . $idValue . '\' ';
-		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
-		// will create new users on every login attempt until user is unhidden by admin.
-		$where .= ' AND deleted = 0 ';
-		if($this->db_user['checkPidList']) {
-            $where = $this->addPidClause($where);
+        if ($this->queryBuilder != NULL) {
+            $this->queryBuilder->getRestrictions()->removeAll();
+            $statement = $this->queryBuilder
+                ->select('*')
+                ->from($this->db_user['table'])
+                ->where(
+                    $this->queryBuilder->expr()->eq($idField, $this->queryBuilder->createNamedParameter($idValue))
+                )
+                ->andWhere(
+                    $this->queryBuilder->expr()->eq('deleted', 0)
+                )
+                ->execute();
+            $row = $statement->fetch();
+        } else {
+            $where = $idField . '=\'' . $idValue . '\' ';
+            // Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
+            // will create new users on every login attempt until user is unhidden by admin.
+            $where .= ' AND deleted = 0 ';
+            if($this->db_user['checkPidList']) {
+                $where = $this->addPidClause($where);
+            }
+            //$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
+            $table = $this->db_user['table'];
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
+                '*',
+                $table,
+                $where
+            );
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+
         }
-		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
-		$table = $this->db_user['table'];
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
-			'*',
-			$table,
-			$where
-		);
-        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-		if ($row)  {
+
+        if ($row)  {
 			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth_userhandler',0,$row);
 			return $row;
-		} else {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
-			return false;
 		}
+        if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
+        return false;
 
-	}
+    }
 
     function transferShibbolethAttributesToUserArray($user) {
             // We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user

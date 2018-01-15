@@ -160,7 +160,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertTrue(is_array($userFromDB),'Expected array');
         $this->assertArrayHasKey('uid', $userFromDB);
-        $this->assertSame('2', $userFromDB['uid']);
+        $this->assertSame(2, (int) $userFromDB['uid']);
         $this->assertStringStartsWith('myself', $userFromDB['username']);
 
     }
@@ -189,7 +189,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertTrue(is_array($userFromDB),'Expected array');
         $this->assertArrayHasKey('uid', $userFromDB);
-        $this->assertSame('4', $userFromDB['uid']);
+        $this->assertSame(4, (int) $userFromDB['uid']);
         $this->assertStringStartsWith('disabled', $userFromDB['username']);
 
     }
@@ -219,7 +219,7 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertTrue(is_array($userFromDB),'Expected array, but got '.$userFromDB);
         $this->assertArrayHasKey('uid', $userFromDB);
-        $this->assertSame('2', $userFromDB['uid']);
+        $this->assertSame(2, (int) $userFromDB['uid']);
         $this->assertStringStartsWith('myself', $userFromDB['username']);
 
     }
