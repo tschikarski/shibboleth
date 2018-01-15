@@ -168,6 +168,35 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     /**
      * @test
      */
+    public function lookUpShibbolethUserInDatabaseReturnsDisabledFeUser() {
+        /** @var UserHandler $userHandler */
+        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
+            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
+            'FE',
+            'fe_users',
+            'fe_groups',
+            'Shib_Session_ID',
+            false,
+            ''),
+            '',false);
+        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
+        $_SERVER['eppn'] = 'disabled@testshib.org';
+        $loginType = 'FE';
+        $db_user = 'fe_users';
+        $db_group = 'fe_groups';
+        $shibbSessionIdKey = 'Shib_Session_ID';
+        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
+        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
+        $this->assertTrue(is_array($userFromDB),'Expected array');
+        $this->assertArrayHasKey('uid', $userFromDB);
+        $this->assertSame('4', $userFromDB['uid']);
+        $this->assertStringStartsWith('disabled', $userFromDB['username']);
+
+    }
+
+    /**
+     * @test
+     */
     public function lookUpShibbolethUserInDatabaseCheckingPidReturnsExistingFeUser() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
@@ -211,6 +240,34 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
             '',false);
         $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
         $_SERVER['eppn'] = 'false@testshib.org';
+        $loginType = 'FE';
+        $db_user = 'fe_users';
+        $db_group = 'fe_groups';
+        $shibbSessionIdKey = 'Shib_Session_ID';
+        /** @var UserHandler $userHandler */
+        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
+        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
+        $this->assertFalse(is_array($userFromDB),'Did not expect array');
+        $this->assertEmpty($userFromDB);
+
+    }
+
+    /**
+     * @test
+     */
+    public function lookUpShibbolethUserInDatabaseReturnsNullIfFeUserIsDeleted() {
+        /** @var UserHandler $userHandler */
+        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
+            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
+            'FE',
+            'fe_users',
+            'fe_groups',
+            'Shib_Session_ID',
+            false,
+            ''),
+            '',false);
+        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
+        $_SERVER['eppn'] = 'deleted@testshib.org';
         $loginType = 'FE';
         $db_user = 'fe_users';
         $db_group = 'fe_groups';

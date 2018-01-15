@@ -32,4 +32,36 @@
         <TSconfig>NULL</TSconfig>
         <lastlogin>1371033743</lastlogin>
     </fe_users>
+    <fe_users>
+        <uid>3</uid>
+        <pid>2</pid>
+        <tstamp>1366642542</tstamp>
+        <username>deleted@testshib.org</username>
+        <password>shibb:50dfb56f5ab71a8cb9086234cae665b3bdf2ebaf</password>
+        <usergroup>1</usergroup>
+        <disable>0</disable>
+        <starttime>0</starttime>
+        <endtime>0</endtime>
+        <crdate>1366642541</crdate>
+        <cruser_id>0</cruser_id>
+        <deleted>1</deleted>
+        <TSconfig>NULL</TSconfig>
+        <lastlogin>1371033743</lastlogin>
+    </fe_users>
+    <fe_users>
+        <uid>4</uid>
+        <pid>2</pid>
+        <tstamp>1366642542</tstamp>
+        <username>disabled@testshib.org</username>
+        <password>shibb:50dfb56f5ab71a8cb9086234cae665b3bdf2ebaf</password>
+        <usergroup>1</usergroup>
+        <disable>1</disable>
+        <starttime>0</starttime>
+        <endtime>0</endtime>
+        <crdate>1366642541</crdate>
+        <cruser_id>0</cruser_id>
+        <deleted>0</deleted>
+        <TSconfig>NULL</TSconfig>
+        <lastlogin>1371033743</lastlogin>
+    </fe_users>
 </dataset>
