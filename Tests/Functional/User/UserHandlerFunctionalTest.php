@@ -215,7 +215,9 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $db_group = 'fe_groups';
         $shibbSessionIdKey = 'Shib_Session_ID';
         $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
-        $userHandler->db_user['checkPidList'] = 1;
+        $this->assertSame($this->db_user['check_pid_clause'],'`pid` IN (2)');
+        $this->assertSame($this->db_user['checkPidList'], '2');
+        $userHandler->db_user['checkPidList'] = array('2');
         $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertTrue(is_array($userFromDB),'Expected array, but got '.$userFromDB);
         $this->assertArrayHasKey('uid', $userFromDB);
