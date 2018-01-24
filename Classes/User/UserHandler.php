@@ -72,11 +72,8 @@ class UserHandler
 		$this->config = $this->getTyposcriptConfiguration();
 
         if (class_exists(ConnectionPool::class)) {
-            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-            $this->queryBuilder = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
             $this->hasQueryBuilder = true;
         } else {
-            $this->queryBuilder = NULL;
 		    $this->hasQueryBuilder = false;
         }
 
@@ -122,18 +119,20 @@ class UserHandler
             return 'Shibboleth data evaluates username to empty string!';
         }
 
-        if ($this->queryBuilder != NULL) {
-            $this->queryBuilder->getRestrictions()->removeAll();
-            $this->queryBuilder
+        if ($this->hasQueryBuilder) {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $query->getRestrictions()->removeAll();
+            $query
                 ->select('*')
                 ->from($this->db_user['table'])
                 ->where(
-                    $this->queryBuilder->expr()->eq($idField, $this->queryBuilder->createNamedParameter($idValue))
+                    $query->expr()->eq($idField, $query->createNamedParameter($idValue))
                 )
                 ->andWhere(
-                    $this->queryBuilder->expr()->eq('deleted', 0)
+                    $query->expr()->eq('deleted', 0)
                 );
-            $statement = $this->queryBuilder->execute();
+            $statement = $query->execute();
             $row = $statement->fetch();
         } else {
             $where = $idField . '=\'' . $idValue . '\' ';
