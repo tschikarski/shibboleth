@@ -133,15 +133,6 @@ class UserHandler
                 ->andWhere(
                     $this->queryBuilder->expr()->eq('deleted', 0)
                 );
-            if ($this->db_user['checkPidList']) {
-                $this->queryBuilder->andWhere(
-                    $this->queryBuilder->expr()->in('pid', GeneralUtility::intExplode(',',$this->db_user['checkPidList']))
-                );
-                // Prototype, to be replaced by something that uses $this->db_user['check_pid_clause']
-//                $this->queryBuilder->andWhere(
-//                    $this->queryBuilder->expr()->eq('pid', 6) // set to 6 instead of 2 - force func test red
-//                );
-            }
             $statement = $this->queryBuilder->execute();
             $row = $statement->fetch();
         } else {
@@ -149,9 +140,6 @@ class UserHandler
             // Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
             // will create new users on every login attempt until user is unhidden by admin.
             $where .= ' AND deleted = 0 ';
-            if($this->db_user['checkPidList']) {
-                $where = $this->addPidClause($where);
-            }
             //$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
             $table = $this->db_user['table'];
             $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
@@ -376,19 +364,5 @@ class UserHandler
     protected function getEnvironmentVariable($key) {
 		return GeneralUtility::getIndpEnv($key);
 	}
-
-    /**
-     * @param $where
-     * @return string
-     */
-    function addPidClause($where): string
-    {
-        $posOfAndInString = stristr($this->db_user['check_pid_clause'], 'AND');
-        if (!$posOfAndInString OR $posOfAndInString>1) {
-            $where .= ' AND ';
-        }
-        $where .= $this->db_user['check_pid_clause'];
-        return $where;
-    }
 
 }

@@ -197,66 +197,6 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     /**
      * @test
      */
-    public function lookUpShibbolethUserInDatabaseCheckingPidReturnsExistingFeUser() {
-        /** @var UserHandler $userHandler */
-        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
-            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
-            'FE',
-            'fe_users',
-            'fe_groups',
-            'Shib_Session_ID',
-            false,
-            ''),
-            '',false);
-        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
-        $_SERVER['eppn'] = 'myself@testshib.org';
-        $loginType = 'FE';
-        $db_user = 'fe_users';
-        $db_group = 'fe_groups';
-        $shibbSessionIdKey = 'Shib_Session_ID';
-        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
-        $this->assertSame($this->db_user['check_pid_clause'],'`pid` IN (2)');
-        $this->assertSame($this->db_user['checkPidList'], '2');
-        $userHandler->db_user['checkPidList'] = array('2');
-        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
-        $this->assertTrue(is_array($userFromDB),'Expected array, but got '.$userFromDB);
-        $this->assertArrayHasKey('uid', $userFromDB);
-        $this->assertSame(2, (int) $userFromDB['uid']);
-        $this->assertStringStartsWith('myself', $userFromDB['username']);
-
-    }
-
-    /**
-     * @test
-     */
-    public function lookUpShibbolethUserInDatabaseCheckingMismatchedPidReturnsNull() {
-        /** @var UserHandler $userHandler */
-        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
-            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
-            'FE',
-            'fe_users',
-            'fe_groups',
-            'Shib_Session_ID',
-            false,
-            ''),
-            '',false);
-        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
-        $_SERVER['eppn'] = 'wrongpid@testshib.org';
-        $loginType = 'FE';
-        $db_user = 'fe_users';
-        $db_group = 'fe_groups';
-        $shibbSessionIdKey = 'Shib_Session_ID';
-        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
-        $userHandler->db_user['checkPidList'] = 1;
-        $userFromDB = $userHandler->lookUpShibbolethUserInDatabase();
-        $this->assertFalse(is_array($userFromDB),'Did not expect array');
-        $this->assertEmpty($userFromDB);
-
-    }
-
-    /**
-     * @test
-     */
     public function lookUpShibbolethUserInDatabaseReturnsNullIfFeUserDoesNotExist() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
