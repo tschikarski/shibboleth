@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 
 class UserHandler
 {
@@ -122,16 +123,16 @@ class UserHandler
         if ($this->hasQueryBuilder) {
             $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
             $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
-            $query->getRestrictions()->removeAll();
+            $query->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
             $query
                 ->select('*')
                 ->from($this->db_user['table'])
                 ->where(
                     $query->expr()->eq($idField, $query->createNamedParameter($idValue))
-                )
-                ->andWhere(
-                    $query->expr()->eq('deleted', 0)
                 );
+//                ->andWhere(
+//                    $query->expr()->eq('deleted', 0)
+//                );
             $statement = $query->execute();
             $row = $statement->fetch();
         } else {
