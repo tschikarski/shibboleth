@@ -250,4 +250,35 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
 
     }
 
+    /**
+     * @test
+     */
+    public function existingUserIsUpdated() {
+        /** @var UserHandler $userHandler */
+        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
+            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
+            'FE',
+            'fe_users',
+            'fe_groups',
+            'Shib_Session_ID',
+            false,
+            ''),
+            '',false);
+        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
+        $_SERVER['eppn'] = 'myself@testshib.org';
+        $loginType = 'FE';
+        $db_user = 'fe_users';
+        $db_group = 'fe_groups';
+        $shibbSessionIdKey = 'Shib_Session_ID';
+        /** @var UserHandler $userHandler */
+        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
+        $userBefore = $userHandler->lookUpShibbolethUserInDatabase();
+        $uidBefore = $userBefore['uid'];
+        $_SERVER['affiliation'] = 'goes to description';
+        $userHandler->synchronizeUserData($userBefore);
+        $userAfter = $userHandler->lookUpShibbolethUserInDatabase();
+        $this->assertSame('goes to description', $userAfter['description']);
+
+    }
+
 }

@@ -25,6 +25,8 @@ tx_shibboleth {
 				middle_name.value = M.
 				last_name = TEXT
 				last_name.value = Nachname
+				description = TEXT
+				description.field = affiliation
 			}
 			updateUserFieldsMapping {
 				email = TEXT
@@ -35,6 +37,8 @@ tx_shibboleth {
 				middle_name.value = M.
 				last_name = TEXT
 				last_name.value = Nachname
+				description = TEXT
+				description.field = affiliation
 			}
 		}
 	}
