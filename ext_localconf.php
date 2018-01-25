@@ -39,7 +39,7 @@ if (is_array($subtypesArray)) {
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
 	$_EXTKEY,
 	'auth' /* sv type */,
-	'ShibbolethAuthentificationService' /* sv key */,
+	\TrustCnct\Shibboleth\ShibbolethAuthentificationService::class /* sv key */,
 	array(
 		'title' => 'Shibboleth Authentication',
 		'description' => '',
