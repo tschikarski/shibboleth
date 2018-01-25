@@ -196,13 +196,18 @@ class UserHandler
 		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','shibboleth_userhandler',0,$user);
 
 		if($user['uid']) {
-            list($uid, $user) = $this->updateUser($user);
+            $user = $this->updateUser($user);
 
         } else {
-            list($user, $uid) = $this->insertUser($user);
+            $user = $this->insertUser($user);
 
         }
 
+        if ($user === NULL) {
+		    $uid = 0;
+        } else {
+		    $uid = $user['uid'];
+        }
 		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth_userhandler');
 		return $uid;
 	}
@@ -296,7 +301,7 @@ class UserHandler
      * @param $user
      * @return array
      */
-    private function updateUser(&$user): array
+    private function updateUser($user)
     {
 // User is in DB, so we have to update, therefore remove uid from DB record and save it for later
         $uid = $user['uid'];
@@ -331,19 +336,19 @@ class UserHandler
                         'shibboleth_userhandler');
                 }
             }
-            unset($user);
-            $uid = 0;
+            return NULL;
         }
-        return array($uid, $user);
+        $user['uid'] = $uid;
+        return $user;
     }
 
     /**
      * @param $user
      * @return array
      */
-    private function insertUser(&$user): array
+    private function insertUser($user)
     {
-// We will insert a new user
+        // We will insert a new user
         // We have to set crdate and tstamp correctly
         $user['crdate'] = time();
         $user['tstamp'] = time();
@@ -380,15 +385,14 @@ class UserHandler
                         'shibboleth_userhandler');
                 }
             }
-            unset($user);
-            $uid = 0;
-        } else {
-            $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-            if ($this->writeDevLog) {
-                GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $uid, 'shibboleth_userhandler');
-            }
+            return NULL;
         }
-        return array($user, $uid);
+        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        $user['uid'] = $uid;
+        if ($this->writeDevLog) {
+            GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $uid, 'shibboleth_userhandler');
+        }
+        return $user;
     }
 
 }
