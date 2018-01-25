@@ -317,7 +317,7 @@ class UserHandler
         $where = 'uid=' . intval($uid);
         #$where=$GLOBALS['TYPO3_DB']->fullQuoteStr($inputString,$table);
         $fields_values = $user;
-        $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
             $table,
             $where,
             $fields_values
