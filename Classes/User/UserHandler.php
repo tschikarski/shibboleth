@@ -313,9 +313,41 @@ class UserHandler
 
         // Remove that data from $user - otherwise we get an error updating the user record in DB
         unset($user['tx_shibboleth_config']);
+
         if ($this->writeDevLog) {
             GeneralUtility::devlog('synchronizeUserData: Updating $user with uid=' . intval($uid) . ' in DB',
                 'shibboleth_userhandler', 0, $user);
+        }
+
+        if ($this->hasQueryBuilder) {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $query
+                ->update($this->db_user['table'])
+                ->where($query->expr()->eq('uid', $uid));
+            foreach ($user AS $userKey => $userValue) {
+                $query->set($userKey, $userValue);
+            }
+            try
+            {
+                $numAffectedRows = $query->execute();
+
+            } catch (\Exception $e) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not update $user in DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+
+            }
+            if ($numAffectedRows != 1) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+            }
+
+            $user['uid'] = $uid;
+            return $user;
         }
         // Update
         $table = $this->db_user['table'];
