@@ -289,6 +289,39 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     /**
      * @test
      */
+    public function existingUserUpdateFailsOnUnknownField() {
+        /** @var UserHandler $userHandler */
+        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
+            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
+            'FE',
+            'fe_users',
+            'fe_groups',
+            'Shib_Session_ID',
+            false,
+            ''),
+            '',false);
+        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
+        $_SERVER['eppn'] = 'myself@testshib.org';
+        $_SERVER['affiliation'] = 'goes to company';
+        $loginType = 'FE';
+        $db_user = 'fe_users';
+        $db_group = 'fe_groups';
+        $shibbSessionIdKey = 'Shib_Session_ID';
+        /** @var UserHandler $userHandler */
+        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
+        $userBefore = $userHandler->lookUpShibbolethUserInDatabase();
+        $userBefore = $userHandler->transferShibbolethAttributesToUserArray($userBefore);
+        unset($userBefore['_allowUser']);
+        unset($userBefore['tx_shibboleth_shibbolethsessionid']);
+        $userBefore['nonExistingField'] = 'dummy';
+        $uidReported = $userHandler->synchronizeUserData($userBefore);
+        $this->assertSame(0, (int) $uidReported);
+
+    }
+
+    /**
+     * @test
+     */
     public function nonExistingUserIsInsertedCorrectly() {
         /** @var UserHandler $userHandler */
         $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
@@ -318,6 +351,39 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
         $userAfter = $userHandler->lookUpShibbolethUserInDatabase();
         $this->assertSame('goes to company', $userAfter['company']);
         $this->assertSame('first time set', $userAfter['fax']);
+
+    }
+
+    /**
+     * @test
+     */
+    public function nonExistingUserInsertFailsOnUnknownField() {
+        /** @var UserHandler $userHandler */
+        $userHandler = $this->getAccessibleMock(\TrustCnct\Shibboleth\User\UserHandler::class,['getEnvironmentVariable'],array(
+            // $loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = ''
+            'FE',
+            'fe_users',
+            'fe_groups',
+            'Shib_Session_ID',
+            false,
+            ''),
+            '',false);
+        $userHandler->expects($this->once())->method('getEnvironmentVariable')->will($this->returnValue($_SERVER['TYPO3_PATH_ROOT']));
+        $_SERVER['eppn'] = 'new@testshib.org';
+        $_SERVER['affiliation'] = 'goes to company';
+        $_SERVER['entitlement'] = 'first time set';
+        $loginType = 'FE';
+        $db_user = 'fe_users';
+        $db_group = 'fe_groups';
+        $shibbSessionIdKey = 'Shib_Session_ID';
+        /** @var UserHandler $userHandler */
+        $userHandler->_callRef('__construct', $loginType, $this->db_user, $this->db_group, $shibbSessionIdKey);
+        $userBefore = $userHandler->transferShibbolethAttributesToUserArray(NULL);
+        unset($userBefore['_allowUser']);
+        unset($userBefore['tx_shibboleth_shibbolethsessionid']);
+        $userBefore['nonExistingField'] = 'dummy';
+        $uidReported = $userHandler->synchronizeUserData($userBefore);
+        $this->assertSame(0, (int) $uidReported);
 
     }
 
