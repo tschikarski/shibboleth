@@ -366,6 +366,40 @@ class UserHandler
             $user['disable'] = 1;
         }
         // Insert
+        if ($this->hasQueryBuilder) {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $query->insert($this->db_user['table'])->values($user);
+            if ($this->writeDevLog) {
+                GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $table,
+                    'shibboleth_userhandler', 0, $user);
+            }
+            try
+            {
+                $numAffectedRows = $query->execute();
+
+            } catch (\Exception $e) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+
+            }
+
+            if ($numAffectedRows != 1) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+            }
+            $user = $this->lookUpShibbolethUserInDatabase();
+            if ($this->writeDevLog) {
+                GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $user['uid'], 'shibboleth_userhandler');
+            }
+            return $user;
+
+        }
+        // Use old style database access
         $table = $this->db_user['table'];
         $insertFields = $user;
         if ($this->writeDevLog) {
