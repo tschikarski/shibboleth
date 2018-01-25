@@ -130,9 +130,6 @@ class UserHandler
                 ->where(
                     $query->expr()->eq($idField, $query->createNamedParameter($idValue))
                 );
-//                ->andWhere(
-//                    $query->expr()->eq('deleted', 0)
-//                );
             $statement = $query->execute();
             $row = $statement->fetch();
         } else {
