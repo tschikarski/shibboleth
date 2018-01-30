@@ -120,8 +120,17 @@ class UserHandler
             return 'Shibboleth data evaluates username to empty string!';
         }
 
+        $storagePid = 999999;
+        if ($this->loginType == 'FE') {
+            $storagePid = $this->shibboleth_extConf['FE_autoImport_pid'];
+        };
+        if ($this->loginType == 'BE') {
+            $storagePid = 0;
+        }
+
         if ($this->hasQueryBuilder) {
             $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $query */
             $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
             $query->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
             $query
@@ -129,6 +138,9 @@ class UserHandler
                 ->from($this->db_user['table'])
                 ->where(
                     $query->expr()->eq($idField, $query->createNamedParameter($idValue))
+                )
+                ->andWhere(
+                    $query->expr()->eq('pid', $query->createNamedParameter($storagePid))
                 );
             $statement = $query->execute();
             $row = $statement->fetch();
@@ -137,6 +149,7 @@ class UserHandler
             // Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
             // will create new users on every login attempt until user is unhidden by admin.
             $where .= ' AND deleted = 0 ';
+            $where .= ' AND pid = '.(int) $storagePid;
             //$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
             $table = $this->db_user['table'];
             $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
