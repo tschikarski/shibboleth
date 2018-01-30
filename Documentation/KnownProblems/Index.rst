@@ -11,12 +11,6 @@
 Known problems
 ==============
 
-changed FE-Users PID - unexpected behaviour possible
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-When FE users were imported to a storage folder, later change of the storage PID in the extension config might result
-in unexpected behaviour, as the extension does probably not recreate users in the new storage folder.
-
 Server clusters and load balancers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

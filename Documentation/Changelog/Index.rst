@@ -14,6 +14,11 @@ ChangeLog
 =======  ==============================
 Version  Changes:
 =======  ==============================
+3.0.5-b    Use Doctrine query builder,
+         if available (Deprecation)
+           Confine search for already
+         imported users to correct PID
+-------  ------------------------------
 3.0.4      Add handling of prefixed
          server variables
            Allow installation in
@@ -25,7 +30,6 @@ Version  Changes:
          in case of a Shibboleth
          user is not yet enabled for
          BE access
-           Fix composer mode
            Reject logins, if user ID
          is empty string
 -------  ------------------------------
