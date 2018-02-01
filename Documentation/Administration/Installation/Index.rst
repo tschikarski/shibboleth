@@ -23,14 +23,7 @@ or to your ``.htaccess`` file.
 See :ref:`administration-specialfiles`.
 
 If you decide to modify files (e.g. template files with the ``res`` directory), be sure to change their name or location.
-See section :ref:`configuration-configuration-options` for the required changes to the configuration options.
+See section :ref:`configuration-configuration-options-tables` for the required changes to the configuration options.
 
 As additional guidance, you should go through the :ref:`configuration-checklists`.
 
-
-
-.. toctree::
-    :maxdepth: 2
-    :titlesonly:
-
-    InstallationOfTheExtension/Index

@@ -11,6 +11,8 @@
 Administration
 ==============
 
+.. _defining-requirements:
+
 Defining your requirements
 --------------------------
 
@@ -32,7 +34,7 @@ Or you let Shibboleth just deliver the user ID and do all other user administrat
 The first case fits situations, where access to all applications including TYPO3 is regulated centrally.
 In contrast, the latter case would fit to situations, where responsibility for the TYPO3 instance is held by an independent organisational unit.
 
-You even can decide to auto-import users at their first login attempt with the "disabled" flag set.
+You even can decide to auto-import backend users at their first login attempt with the "disabled" flag set.
 You will then have the chance to set access levels manually before activating those user accounts.
 
 Shibboleth Overview
@@ -55,6 +57,9 @@ beyond the scope of this manual.
 
 .. [#] This extension is tested with ``shibboleth 2.5.6``
 
+
+
+.. _about-lazymode:
 
 Shibboleth's "lazy mode" and this extension
 -------------------------------------------

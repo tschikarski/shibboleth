@@ -6,7 +6,7 @@
 .. include:: ../../Includes.txt
 
 
-.. _configuration-configuration-options:
+.. _configuration-configuration-options-tables:
 
 Configuration Options
 ^^^^^^^^^^^^^^^^^^^^^
@@ -64,46 +64,46 @@ FE_autoImport_pid          int         New users will be put into page with this
 BE Authentication
 -----------------
 
-=========================  ==========  ===========================================================================================================  ==========================================
-Property:                  Data type:  Description:                                                                                                 Default:
-=========================  ==========  ===========================================================================================================  ==========================================
-BE_enable                  boolean     Activate Shibboleth for backend authentication                                                               FALSE
+==========================  ==========  ===========================================================================================================  =========================================================
+Property:                   Data type:  Description:                                                                                                 Default:
+==========================  ==========  ===========================================================================================================  =========================================================
+BE_enable                   boolean     Activate Shibboleth for backend authentication                                                               FALSE
 
-                                       **ATTENTION**:
-                                       Switching this from TRUE to FALSE doesn't deactivate users that might have been imported/
-                                       activated for Shibboleth. In special circumstances, these user accounts might be misused to get
-                                       unauthorized access to the system. **The same** is true, if you uninstall the shibboleth extension.
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_autoImport              boolean     Check this to allow automatic import of new Shibboleth                                                       FALSE
-                                       users, based on Shibboleth attributes. If set, any Shibboleth user will get imported as TYPO3
-                                       backend user. **Take care to activate this only, if you know exactly that you want this.**
+                                        **ATTENTION**:
+                                        Switching this from TRUE to FALSE doesn't deactivate users that might have been imported/
+                                        activated for Shibboleth. In special circumstances, these user accounts might be misused to get
+                                        unauthorized access to the system. **The same** is true, if you uninstall the shibboleth extension.
+--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ---------------------------------------------------------
+BE_autoImport               boolean     Check this to allow automatic import of new Shibboleth                                                       FALSE
+                                        users, based on Shibboleth attributes. If set, any Shibboleth user will get imported as TYPO3
+                                        backend user. **Take care to activate this only, if you know exactly that you want this.**
 
-                                       In connection with the ``BE_autoImportDisableuser``, you can automatically create the user and fill in
-                                       metadata from Shibboleth, without actually allowing immediate access to the user.
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_autoImportDisableUser   boolean     If this is set and BE_autoImport is active, new BE                                                           TRUE
-                                       users will be created in disabled state, yet to be
-                                       activated manually by an admin.
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_loginTemplatePath       string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login7.html``
+                                        In connection with the ``BE_autoImportDisableuser``, you can automatically create the user and fill in
+                                        metadata from Shibboleth, without actually allowing immediate access to the user.
+--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ---------------------------------------------------------
+BE_autoImportDisableUser    boolean     If this is set and BE_autoImport is active, new BE                                                           TRUE
+                                        users will be created in disabled state, yet to be
+                                        activated manually by an admin.
+--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ---------------------------------------------------------
+BE_loginTemplatePath        string      Customized backend login page. Hide login form for local users and provide link to Shibboleth login.         ``typo3conf/ext/shibboleth/res/be_form/login7.html``
 
-                                       Backend login page is not modified, if this option is empty.
+                                        Backend login page is not modified, if this option is empty.
 
-                                       **Do not modify original template file. It will be overridden by extension updates.**
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_logoutRedirectUrl       string      Redirect to this URL after backend logout. (**Without redirect, backend logout is followed by                ``/typo3conf/ext/shibboleth/res/be_form/logout.html``
-                                       immediate re-login.**)
+                                        **Do not modify original template file. It will be overridden by extension updates.**
+--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ---------------------------------------------------------
+BE_logoutRedirectUrl        string      Redirect to this URL after backend logout. (**Without redirect, backend logout is followed by                ``/typo3conf/ext/shibboleth/res/be_form/logout.html``
+                                        immediate re-login.**)
 
-                                       **Change filename or path, if you want to modify these files. Original files will be overwritten
-                                       by extension updates!**
--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ------------------------------------------
-BE_disabledUserRedirectUrl  string     (Optional) Redirect to this URL if a successful Shibboleth authentication results to an user record in       ``/typo3conf/ext/shibboleth/res/be_form/nologinyet.html``
-                                       state "disabled". This would be typical, if Shibboleth users shall be mapped to TYPO3-BE, but are
-                                       required manual activation.
+                                        **Change filename or path, if you want to modify these files. Original files will be overwritten
+                                        by extension updates!**
+--------------------------  ----------  -----------------------------------------------------------------------------------------------------------  ---------------------------------------------------------
+BE_disabledUserRedirectUrl  string      (Optional) Redirect to this URL if a successful Shibboleth authentication results to an user record in       ``/typo3conf/ext/shibboleth/res/be_form/nologinyet.html``
+                                        state "disabled". This would be typical, if Shibboleth users shall be mapped to TYPO3-BE, but are
+                                        required manual activation.
 
-                                       **Change filename or path, if you want to modify these files. Original files will be overwritten
-                                       by extension updates!**
-=========================  ==========  ===========================================================================================================  ==========================================
+                                        **Change filename or path, if you want to modify these files. Original files will be overwritten
+                                        by extension updates!**
+==========================  ==========  ===========================================================================================================  =========================================================
 
 
 Advanced
@@ -146,10 +146,14 @@ BE_devLog                  boolean     Write internal information on backend log
 database_devLog            boolean     When writing devlog info, also include details on database operations.                                       FALSE
 =========================  ==========  ===========================================================================================================  ==========================================
 
+.. _screenshots_config:
 
+Screenshots
+-----------
 
-.. toctree::
-    :maxdepth: 2
-    :titlesonly:
+.. image:: ../../Imagedir/extconf_general.png
+.. image:: ../../Imagedir/extconf_feauth.png
+.. image:: ../../Imagedir/extconf_beauth.png
+.. image:: ../../Imagedir/extconf_advanced.png
+.. image:: ../../Imagedir/extconf_debugging.png
 
-    MappingConfigurationFile/Index
