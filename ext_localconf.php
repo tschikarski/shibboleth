@@ -39,7 +39,7 @@ if (is_array($subtypesArray)) {
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
 	$_EXTKEY,
 	'auth' /* sv type */,
-	'ShibbolethAuthentificationService' /* sv key */,
+	\TrustCnct\Shibboleth\ShibbolethAuthentificationService::class /* sv key */,
 	array(
 		'title' => 'Shibboleth Authentication',
 		'description' => '',
@@ -81,5 +81,51 @@ if ($EXT_CONFIG['database_devLog']) {
 	$TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] = TRUE;
 }
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPItoST43($_EXTKEY, 'pi1/class.tx_shibboleth_pi1.php', '_pi1', 'list_type', 0);
-?>
+
+
+call_user_func(
+    function($extkey)
+    {
+
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+            'TrustCnct.Shibboleth',
+            'LoginLink',
+            [
+                'LoginLink' => 'show'
+            ],
+            // non-cacheable actions
+            [
+                'LoginLink' => ''
+            ]
+        );
+
+        $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+        $iconRegistry->registerIcon(
+            'tx-shibboleth-loginlink',
+            \TYPO3\CMS\Core\Imaging\IconProvider\BitmapIconProvider::class,
+            ['source' => 'EXT:'.$extkey.'/Resources/Public/Icons/user_plugin_loginlink.png']
+        );
+
+        // wizards
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig(
+            'mod {
+             wizards.newContentElement.wizardItems.plugins {
+                elements {
+                    loginlink {
+                        iconIdentifier = tx-shibboleth-loginlink
+                        title = LLL:EXT:shibboleth/Resources/Private/Language/locallang_db.xlf:tx_shibboleth_domain_model_loginlink
+                        description = LLL:EXT:shibboleth/Resources/Private/Language/locallang_db.xlf:tx_shibboleth_domain_model_loginlink.description
+                        tt_content_defValues {
+                            CType = list
+                            list_type = shibboleth_loginlink
+                        }
+                    }
+                }
+                show = *
+            }
+       }'
+        );
+    },
+    $_EXTKEY
+);
+

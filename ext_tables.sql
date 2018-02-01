@@ -1,3 +1,5 @@
+# noinspection SqlNoDataSourceInspectionForFile
+
 #
 # Table structure for table 'fe_users'
 #

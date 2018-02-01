@@ -15,35 +15,68 @@ namespace TrustCnct\Shibboleth\User;
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 
 class UserHandler
 {
-	var $writeDevLog;
-	var $tsfeDetected = FALSE;
-	var $loginType=''; //FE or BE
-	var $user='';
-	var $db_user='';
-	var $db_group='';
-	var $shibboleth_extConf;
-	var $config; // typoscript like configuration for the current loginType
-	var $cObj; // local cObj, needed to parse the typoscript configuration
+    var $writeDevLog;
+    var $tsfeDetected = FALSE;
+    var $loginType=''; //FE or BE
+    var $user=array();
+    var $db_user=array();
+    var $db_group=array();
+    protected $shibboleth_extConf;
+    var $mappingConfigAbsolutePath;
+    var $config; // typoscript like configuration for the current loginType
+    var $cObj; // local cObj, needed to parse the typoscript configuration
     var $envShibPrefix = '';
-	var $shibSessionIdKey;
+    var $shibSessionIdKey;
 
+    /**
+     * @var
+     */
+
+    /**
+     * @var QueryBuilder
+     */
+    protected $queryBuilder;
+
+    /**
+     * @var boolean
+     */
+    protected $hasQueryBuilder = false;
+
+    /**
+     * UserHandler constructor.
+     * @param $loginType
+     * @param $db_user
+     * @param $db_group
+     * @param $shibSessionIdKey
+     * @param bool $writeDevLog
+     * @param string $envShibPrefix
+     */
 	function __construct($loginType, $db_user, $db_group, $shibSessionIdKey, $writeDevLog = FALSE, $envShibPrefix = '') {
 		global $TYPO3_CONF_VARS;
-		$this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
-		//if ($this->writeDevLog) GeneralUtility::devlog('constructor','shibboleth_userhandler',0,$TYPO3_CONF_VARS);
+        $this->writeDevLog = ($TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] AND $writeDevLog);
 
-		$this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+        $this->shibboleth_extConf = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
 
-		$this->loginType = $loginType;
-		$this->db_user = $db_user;
-		$this->db_group = $db_group;
-		$this->shibSessionIdKey = $shibSessionIdKey;
+        $this->loginType = $loginType;
+        $this->db_user = $db_user;
+        $this->db_group = $db_group;
+        $this->shibSessionIdKey = $shibSessionIdKey;
         $this->envShibPrefix = $envShibPrefix;
 		$this->config = $this->getTyposcriptConfiguration();
+
+        if (class_exists(ConnectionPool::class)) {
+            $this->hasQueryBuilder = true;
+        } else {
+		    $this->hasQueryBuilder = false;
+        }
 
         $serverEnvReplaced = $_SERVER;
         $pattern = '/^' . $this->envShibPrefix . '/';
@@ -58,16 +91,17 @@ class UserHandler
         if (is_object($GLOBALS['TSFE'])) {
             $this->tsfeDetected = TRUE;
         }
+        /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $localcObj */
         $localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
         $localcObj->start($serverEnvReplaced);
-		if (!$this->tsfeDetected) {
-			unset($GLOBALS['TSFE']);
-		}
+        if (!$this->tsfeDetected) {
+            unset($GLOBALS['TSFE']);
+        }
 
-		$this->cObj = $localcObj;
-	}
+        $this->cObj = $localcObj;
+    }
 
-	function getUserFromDB() {
+	function lookUpShibbolethUserInDatabase() {
 
 		$idField = $this->config['IDMapping.']['typo3Field'];
 		$idValue = $this->getSingle($this->config['IDMapping.']['shibID'],$this->config['IDMapping.']['shibID.']);
@@ -86,31 +120,55 @@ class UserHandler
             return 'Shibboleth data evaluates username to empty string!';
         }
 
-		$where = $idField . '=\'' . $idValue . '\' ';
-		// Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
-		// will create new users on every log in attempt until user is unhidden by admin.
-		$where .= ' AND deleted = 0 ';
-		if($this->db_user['checkPidList']) {
-			$where .= $this->db_user['check_pid_clause'];
-		}
-		#if ($this->writeDevLog) GeneralUtility::devlog('userFromDB: where-statement','shibboleth_userhandler',0,array($where));
-		//$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
-		$table = $this->db_user['table'];
-		$groupBy = '';
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
-		#$sql = $GLOBALS['TYPO3_DB']->SELECTquery (
-			'*',
-			$table,
-			$where
-		);
-		if ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))  {
+        $storagePid = 999999;
+        if ($this->loginType == 'FE') {
+            $storagePid = $this->shibboleth_extConf['FE_autoImport_pid'];
+        };
+        if ($this->loginType == 'BE') {
+            $storagePid = 0;
+        }
+
+        if ($this->hasQueryBuilder) {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $query */
+            $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $query->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            $query
+                ->select('*')
+                ->from($this->db_user['table'])
+                ->where(
+                    $query->expr()->eq($idField, $query->createNamedParameter($idValue))
+                )
+                ->andWhere(
+                    $query->expr()->eq('pid', $query->createNamedParameter($storagePid))
+                );
+            $statement = $query->execute();
+            $row = $statement->fetch();
+        } else {
+            $where = $idField . '=\'' . $idValue . '\' ';
+            // Next line: Don't use "enable_clause", as it will also exclude hidden users, i.e.
+            // will create new users on every login attempt until user is unhidden by admin.
+            $where .= ' AND deleted = 0 ';
+            $where .= ' AND pid = '.(int) $storagePid;
+            //$GLOBALS['TYPO3_DB']->debugOutput = TRUE;
+            $table = $this->db_user['table'];
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
+                '*',
+                $table,
+                $where
+            );
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+
+        }
+
+        if ($row)  {
 			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth_userhandler',0,$row);
 			return $row;
-		} else {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
-			return false;
 		}
-	}
+        if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
+        return false;
+
+    }
 
     function transferShibbolethAttributesToUserArray($user) {
             // We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
@@ -151,85 +209,18 @@ class UserHandler
 		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','shibboleth_userhandler',0,$user);
 
 		if($user['uid']) {
-			// User is in DB, so we have to update, therefore remove uid from DB record and save it for later
-			$uid = $user['uid'];
-			unset($user['uid']);
-			// We have to update the tstamp field, in any case.
-			$user['tstamp'] = time();
+            $user = $this->updateUser($user);
 
-            $user = $this->mapAdditionalFields($user);
+        } else {
+            $user = $this->insertUser($user);
 
-            // Remove that data from $user - otherwise we get an error updating the user record in DB
-			unset($user['tx_shibboleth_config']);
-			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Updating $user with uid='.intval($uid).' in DB','shibboleth_userhandler',0,$user);
-			// Update
-			$table = $this->db_user['table'];
-			$where = 'uid='.intval($uid);
-			#$where=$GLOBALS['TYPO3_DB']->fullQuoteStr($inputString,$table);
-			$fields_values = $user;
-			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-				$table,
-				$where,
-				$fields_values
-			);
-			$sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
-			if ($sql_errno) {
-				if ($this->writeDevLog) {
-					GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
-					if ($sql_errno > 0) {
-						GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(), 'shibboleth_userhandler');
-					}
-				}
-				unset($user);
-				$uid = 0;
-			}
-		} else {
-			// We will insert a new user
-			// We have to set crdate and tstamp correctly
-			$user['crdate'] = time();
-			$user['tstamp'] = time();
-			foreach($user['tx_shibboleth_config']['createUserFieldsMapping.'] as $field => $fieldConfig) {
-				$newFieldValue = $this->getSingle($user['tx_shibboleth_config']['createUserFieldsMapping.'][$field],$user['tx_shibboleth_config']['createUserFieldsMapping.'][$field . '.']);
-				if(substr(trim($field), -1) != '.') {
-					$user[$field] = $newFieldValue;
-				}
-			}
-			// Remove that data from $user - otherwise we get an error inserting the user record into DB
-			unset($user['tx_shibboleth_config']);
-			// Determine correct pid for new user
-			if ($this->loginType == 'FE') {
-				$user['pid'] = intval($this->shibboleth_extConf['FE_autoImport_pid']);
-			} else {
-				$user['pid'] = 0;
-			}
-			// In BE Autoimport might be done with disable=1, i.e. BE User has to be enabled manually after first login attempt.
-			if ($this->loginType == 'BE' && $this->shibboleth_extConf['BE_autoImportDisableUser']) {
-				$user['disable'] = 1;
-			}
-			// Insert
-			$table = $this->db_user['table'];
-			$insertFields = $user;
-			if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table '.$table,'shibboleth_userhandler',0,$user);
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery(
-				$table,
-				$insertFields
-			);
-			$sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
-			if ($sql_errno) {
-				if ($this->writeDevLog) {
-					GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
-					if ($sql_errno > 0) {
-						GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(), 'shibboleth_userhandler');
-					}
-				}
-				unset($user);
-				$uid = 0;
-			} else {
-				$uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-				if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: Got new uid '.$uid,'shibboleth_userhandler');
-			}
-		}
+        }
 
+        if ($user === NULL) {
+		    $uid = 0;
+        } else {
+		    $uid = $user['uid'];
+        }
 		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth_userhandler');
 		return $uid;
 	}
@@ -239,18 +230,19 @@ class UserHandler
 		#$incFile = $GLOBALS['TSFE']->tmpl->getFileName($fName);
 		#$GLOBALS['TSFE']->tmpl->fileContent($incFile);
 
-		$configString = GeneralUtility::getURL(GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath']);
+        $this->mappingConfigAbsolutePath = $this->getEnvironmentVariable('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath'];
+        $configString = GeneralUtility::getURL($this->mappingConfigAbsolutePath);
 		if($configString === FALSE) {
 			if ($this->writeDevLog) GeneralUtility::devlog('Could not find config file, please check extension setting for correct path!','shibboleth_userhandler',3);
 			return array();
 		}
 
 		$parser = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Configuration\TsConfigParser');
-		$parser->parse($configString);
+        $parser->parse($configString);
 
-		$completeSetup = $parser->setup;
+        $completeSetup = $parser->setup;
 
-		$localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
+        $localSetup = $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
 
 		return $localSetup;
 	}
@@ -293,14 +285,191 @@ class UserHandler
      * @param $user
      * @return mixed
      */
-    private function mapAdditionalFields($user)
+    private function mapAdditionalFields($user, $forInsert = False)
     {
-        foreach ($user['tx_shibboleth_config']['updateUserFieldsMapping.'] as $field => $fieldConfig) {
-            $newFieldValue = $this->getSingle($user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field],
-                $user['tx_shibboleth_config']['updateUserFieldsMapping.'][$field . '.']);
+        $configPartString = 'updateUserFieldsMapping.';
+        if ($forInsert) { $configPartString = 'createUserFieldsMapping.'; }
+        foreach ($user['tx_shibboleth_config'][$configPartString] as $field => $fieldConfig) {
+            $newFieldValue = $this->getSingle($user['tx_shibboleth_config'][$configPartString][$field],
+                $user['tx_shibboleth_config'][$configPartString][$field . '.']);
             if (substr(trim($field), -1) != '.') {
                 $user[$field] = $newFieldValue;
             }
+        }
+        return $user;
+    }
+
+    /**
+     * Wrapper function for GeneralUtility::getIndpEnv()
+     *
+     * @see GeneralUtility::getIndpEnv
+     * @param string $key Name of the "environment variable"/"server variable" you wish to get.
+     * @return string
+     */
+    protected function getEnvironmentVariable($key) {
+		return GeneralUtility::getIndpEnv($key);
+	}
+
+    /**
+     * @param $user
+     * @return array
+     */
+    private function updateUser($user)
+    {
+// User is in DB, so we have to update, therefore remove uid from DB record and save it for later
+        $uid = $user['uid'];
+        unset($user['uid']);
+        // We have to update the tstamp field, in any case.
+        $user['tstamp'] = time();
+
+        $user = $this->mapAdditionalFields($user);
+
+        // Remove that data from $user - otherwise we get an error updating the user record in DB
+        unset($user['tx_shibboleth_config']);
+
+        if ($this->writeDevLog) {
+            GeneralUtility::devlog('synchronizeUserData: Updating $user with uid=' . intval($uid) . ' in DB',
+                'shibboleth_userhandler', 0, $user);
+        }
+
+        if ($this->hasQueryBuilder) {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $query
+                ->update($this->db_user['table'])
+                ->where($query->expr()->eq('uid', $uid));
+            foreach ($user AS $userKey => $userValue) {
+                $query->set($userKey, $userValue);
+            }
+            try
+            {
+                $numAffectedRows = $query->execute();
+
+            } catch (\Exception $e) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not update $user in DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+
+            }
+            if ($numAffectedRows != 1) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+            }
+
+            $user['uid'] = $uid;
+            return $user;
+        }
+        // Update
+        $table = $this->db_user['table'];
+        $where = 'uid=' . intval($uid);
+        #$where=$GLOBALS['TYPO3_DB']->fullQuoteStr($inputString,$table);
+        $fields_values = $user;
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+            $table,
+            $where,
+            $fields_values
+        );
+        $sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
+        if ($sql_errno) {
+            if ($this->writeDevLog) {
+                GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
+                if ($sql_errno > 0) {
+                    GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                        'shibboleth_userhandler');
+                }
+            }
+            return NULL;
+        }
+        $user['uid'] = $uid;
+        return $user;
+    }
+
+    /**
+     * @param $user
+     * @return array
+     */
+    private function insertUser($user)
+    {
+        // We will insert a new user
+        // We have to set crdate and tstamp correctly
+        $user['crdate'] = time();
+        $user['tstamp'] = time();
+        $user = $this->mapAdditionalFields($user, True);
+        // Remove that data from $user - otherwise we get an error inserting the user record into DB
+        unset($user['tx_shibboleth_config']);
+        // Determine correct pid for new user
+        if ($this->loginType == 'FE') {
+            $user['pid'] = intval($this->shibboleth_extConf['FE_autoImport_pid']);
+        } else {
+            $user['pid'] = 0;
+        }
+        // In BE Autoimport might be done with disable=1, i.e. BE User has to be enabled manually after first login attempt.
+        if ($this->loginType == 'BE' && $this->shibboleth_extConf['BE_autoImportDisableUser']) {
+            $user['disable'] = 1;
+        }
+        // Insert
+        if ($this->hasQueryBuilder) {
+            $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+            $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
+            $query->insert($this->db_user['table'])->values($user);
+            if ($this->writeDevLog) {
+                GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $table,
+                    'shibboleth_userhandler', 0, $user);
+            }
+            try
+            {
+                $numAffectedRows = $query->execute();
+
+            } catch (\Exception $e) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+
+            }
+
+            if ($numAffectedRows != 1) {
+                if ($this->writeDevLog) {
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                }
+                return NULL;
+            }
+            $user = $this->lookUpShibbolethUserInDatabase();
+            if ($this->writeDevLog) {
+                GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $user['uid'], 'shibboleth_userhandler');
+            }
+            return $user;
+
+        }
+        // Use old style database access
+        $table = $this->db_user['table'];
+        $insertFields = $user;
+        if ($this->writeDevLog) {
+            GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $table,
+                'shibboleth_userhandler', 0, $user);
+        }
+        $GLOBALS['TYPO3_DB']->exec_INSERTquery(
+            $table,
+            $insertFields
+        );
+        $sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
+        if ($sql_errno) {
+            if ($this->writeDevLog) {
+                GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
+                if ($sql_errno > 0) {
+                    GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(),
+                        'shibboleth_userhandler');
+                }
+            }
+            return NULL;
+        }
+        $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        $user['uid'] = $uid;
+        if ($this->writeDevLog) {
+            GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $uid, 'shibboleth_userhandler');
         }
         return $user;
     }

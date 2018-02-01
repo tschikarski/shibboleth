@@ -16,8 +16,8 @@ your Apache web server. There are installers for various operating systems, incl
 Windows. Details on how to install a Shibboleth service provider on an Apache web server are found in
 the Shibboleth documentation (https://wiki.shibboleth.net/confluence/display/SHIB2/Installation).
 
-The service provider is devided into two interacting components. The Shibboleth daemon and the
-mod_shib Apache module.
+The service provider is devided into two interacting components. The **Shibboleth daemon** and the
+**mod_shib Apache module**. Typically, by installing the package onto your server, you will get both.
 
 The main configuration file is typically named ``shibboleth2.xml`` (Location depending on
 operating system, typically somewhere in an “etc” directory). This file defines, how the SP is interacting with
@@ -27,10 +27,9 @@ the Identity Providers you will use to authenticate users. It will define:
 * How the SP is talking to the IdP and which keys and certificates this communication will use.
 * How user information is filtered and mapped on your server. [#]_
 
-Please refer to the Shibboleth documentation on details how to
-configure this file.
+Please refer to the Shibboleth documentation on details how to configure this file.
 
-Additionally, you will have to activate Shibboleth authentication **in “lazy mode”**  for your
+Additionally, you will have to activate Shibboleth authentication **in “lazymode”** (see :ref:`about-lazymode` for your
 TYPO3 instance. For FE authentication you will need to protect at least the base path of your
 installation\ [#]_, for BE authentication you will have to protect at least the “typo3” sub-folder. To
 do so, you need to add the following two Apache directives into your site config or into an

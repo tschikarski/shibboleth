@@ -11,6 +11,8 @@
 Configuration
 =============
 
+.. _configuration-checking-the-installation:
+
 Checking the installation
 -------------------------
 

@@ -47,8 +47,6 @@ EXT: Shibboleth
     The content of this document is related to TYPO3,
     a GNU/GPL CMS/Framework available from `www.typo3.org <https://typo3.org/>`__.
 
-    **I know, you are short of time.** If you want to skip most of this, please read at least :ref:`configuration-checklists`. It will help you save time.
-
     **Table of Contents**
 
 .. toctree::
@@ -56,10 +54,10 @@ EXT: Shibboleth
     :titlesonly:
 
     Introduction/Index
-    UsersManual/Index
     Administration/Index
     Configuration/Index
     Debugging/Index
+    UsersManual/Index
     KnownProblems/Index
     TodoList/Index
     Changelog/Index

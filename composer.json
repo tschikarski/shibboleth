@@ -5,15 +5,22 @@
   "keywords": ["TYPO3 CMS", "Authentication"],
   "license": ["GPL-2.0+"],
   "homepage": "https://github.com/tschikarski/shibboleth",
-  "version": "3.0.4",
+  "version": "3.1.0-beta",
   "support": {
     "issues": "https://github.com/tschikarski/shibboleth/issues"
   },
+  "repositories": {
+    "nimut": {
+      "type": "vcs",
+      "url": "git@github.com:Nimut/testing-framework.git"
+    }
+  },
   "require": {
-    "typo3/cms": ">=7.6.10,<8.0"
+    "typo3/cms": ">=7.6.10"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.8.0"
+    "phpunit/phpunit": "~4.8.0",
+    "nimut/testing-framework": "^1.1"
   },
   "authors": [
     {

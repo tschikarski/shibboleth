@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+    <be_users>
+        <uid>1</uid>
+        <pid>0</pid>
+        <tstamp>1366642540</tstamp>
+        <username>myself@testshib.org</username>
+        <password>shibb:50dfb56f5ab71a8cb9086234cae665b3bdf2ebae</password> <!-- password -->
+        <usergroup>1</usergroup>
+        <disable>0</disable>
+        <starttime>0</starttime>
+        <endtime>0</endtime>
+        <crdate>1366642540</crdate>
+        <cruser_id>0</cruser_id>
+        <deleted>0</deleted>
+        <TSconfig>NULL</TSconfig>
+        <lastlogin>1371033743</lastlogin>
+    </be_users>
+    <be_users>
+        <uid>2</uid>
+        <pid>1</pid>
+        <tstamp>1366642541</tstamp>
+        <username>wrongpid@testshib.org</username>
+        <password>shibb:50dfb56f5ab71a8cb9086234cae665b3bdf2ebae</password>
+        <usergroup>1</usergroup>
+        <disable>0</disable>
+        <starttime>0</starttime>
+        <endtime>0</endtime>
+        <crdate>1366642541</crdate>
+        <cruser_id>0</cruser_id>
+        <deleted>0</deleted>
+        <TSconfig>NULL</TSconfig>
+        <lastlogin>1371033743</lastlogin>
+    </be_users>
+</dataset>
