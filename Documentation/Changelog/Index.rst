@@ -14,6 +14,10 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
+3.1.1-beta  Fix wrong version number
+            3.2.0 shown in extension
+            manager
+----------  ------------------------------
 3.1.0-beta  Use Doctrine query builder,
             if available (Deprecation)
 
