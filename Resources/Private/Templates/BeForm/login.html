@@ -4,13 +4,13 @@
  in the extension configuration accordingly!
 -->
 
-<f:layout name="Login7Layout" />
+<f:layout name="LoginLayout" />
 
 <f:section name="shibbMessage">
 	<!-- Shibboleth: Message block -->
 	<div id="shib_message">
 		<div class="t3-headline">
-			<h2>Shibboleth: DEPRECATED Extension Configuration!</h2>
+			<h2>Backend login via "Shibboleth"</h2>
 		</div>
 
 		<div class="t3-login-box-body">
@@ -21,14 +21,17 @@
 
 			<!-- Our message -->
 			<p>
-				Please inform the administrator of this TYPO3 installation about this!
+				This TYPO3 installation is Shibboleth-enabled. To access the backend, you need an account with appropriate access rights.
 			</p>
 			<p>
-				Your extension is configured to use the old template file "res/login7.html" in the extension directory. This file will be removed from the extension in later versions!
+				To activate your account and authorization to access this website, please contact the administrator of the site in your unit.
 			</p>
 			<p>
-				Please, create a new template file of your own and set the extension configuration option "BE_loginTemplatePath", accordingly! New installations will point to an example file for this.
+				Once your account is activated, follow this link:
 			</p>
+			<div class="btn btn-block btn-login t3js-login-submit">
+				<a href="/typo3/?redirecttoshibboleth=yes">Login with Shibboleth »</a>
+			</div>
 			<div style="clear:both"></div>
 		</div>
 	</div>
