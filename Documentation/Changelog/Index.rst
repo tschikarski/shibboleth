@@ -14,6 +14,11 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
+3.1.2-beta  Rename and move template files
+
+            Fix redirect on disabled BE
+            users, when debugging was off
+----------  ------------------------------
 3.1.1-beta  Fix wrong version number
             3.2.0 shown in extension
             manager
