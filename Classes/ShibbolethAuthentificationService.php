@@ -102,6 +102,10 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     }
     
     function getUser() {
+
+        if ($this->isLoggedInByNonShibboleth()) {
+            return FALSE;
+        }
         
         if (is_object($GLOBALS['TSFE'])) {
             $isAlreadyThere = TRUE;
@@ -290,6 +294,14 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     private function isLoggedInByShibboleth()
     {
         return is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid'];
+    }
+
+    /**
+     * @return bool
+     */
+    private function isLoggedInByNonShibboleth()
+    {
+        return is_array($this->authInfo['userSession']) && !$this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid'];
     }
 
     /**
