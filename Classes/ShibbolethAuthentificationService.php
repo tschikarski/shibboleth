@@ -57,49 +57,6 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     );
 
     /**
-     * @return bool
-     */
-    private function isLoggedInByShibboleth()
-    {
-        return is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid'];
-    }
-
-    /**
-     * @return bool
-     */
-    private function applicationHasMatchingShibbolethSession()
-    {
-        if (!$this->hasShibbolethSession) {
-            return false;
-        }
-        if (($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '') &&
-            ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->shibApplicationIdKey])) {
-            if($this->writeDevLog)
-                GeneralUtility::devlog(
-                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->shibApplicationIdKey] .
-                    ' does not match required '. $this->authInfo['loginType'].'_applicationID (' .
-                    $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'].
-                    ') - see extra data for environment variables',
-                    'shibboleth',
-                    2,
-                    $_SERVER);
-            return false;
-        }
-        return true;
-    }
-
-    private function logoffPresentUser() {
-        if($this->writeDevLog)
-            GeneralUtility::devlog(
-                $this->mode . ': have a non-matching Shibboleth user logged in - logout! - for session id see extra data',
-                'shibboleth',
-                0,
-                $this->authInfo['userSession']
-            );
-        $this->pObj->logoff();
-    }
-
-    /**
      * [Put your description here]
      *
      * @return    [type]        ...
@@ -162,7 +119,6 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 'shibboleth',
                 1
             );
-
         // Without a valid Shibboleth session, bail out here returning FALSE
         if (!$this->applicationHasMatchingShibbolethSession()) {
             if($this->writeDevLog)
@@ -328,6 +284,48 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
         return false; // To be safe: Default access is no access.
     }
 
+    /**
+     * @return bool
+     */
+    private function isLoggedInByShibboleth()
+    {
+        return is_array($this->authInfo['userSession']) && $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid'];
+    }
+
+    /**
+     * @return bool
+     */
+    private function applicationHasMatchingShibbolethSession()
+    {
+        if (!$this->hasShibbolethSession) {
+            return false;
+        }
+        if (($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != '') &&
+            ($this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'] != $_SERVER[$this->shibApplicationIdKey])) {
+            if($this->writeDevLog)
+                GeneralUtility::devlog(
+                    $this->mode . ': Shibboleth session appliation ID ' . $_SERVER[$this->shibApplicationIdKey] .
+                    ' does not match required '. $this->authInfo['loginType'].'_applicationID (' .
+                    $this->shibboleth_extConf[$this->authInfo['loginType'].'_applicationID'].
+                    ') - see extra data for environment variables',
+                    'shibboleth',
+                    2,
+                    $_SERVER);
+            return false;
+        }
+        return true;
+    }
+
+    private function logoffPresentUser() {
+        if($this->writeDevLog)
+            GeneralUtility::devlog(
+                $this->mode . ': have a non-matching Shibboleth user logged in - logout! - for session id see extra data',
+                'shibboleth',
+                0,
+                $this->authInfo['userSession']
+            );
+        $this->pObj->logoff();
+    }
 
 }
 
