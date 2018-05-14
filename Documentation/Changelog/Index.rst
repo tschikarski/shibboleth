@@ -14,6 +14,9 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
+...         Fix target URL when forcing
+            SSL.
+----------  ------------------------------
 3.1.4-beta  Fix creation of BE users at
             FE login in certain cases.
 
