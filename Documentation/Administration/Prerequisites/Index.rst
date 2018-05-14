@@ -45,8 +45,8 @@ do so, you need to add the following two Apache directives into your site config
 Explanation: The first line defines the authentication type to be shibboleth, e.g. in contrast to
 “basic”. The second line is needed to activate ´lazy mode´.
 
-This extension ships with an example file. It can be found in ``res/_.htaccess``. There, you will find additional
-hints, i.e. how to configure mod_rewrite.
+This extension ships with an example file. It can be found in the extension root and is named ``_.htaccess``.
+There, you will find additional hints, i.e. how to configure mod_rewrite.
 
 ::
 
