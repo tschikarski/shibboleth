@@ -53,7 +53,7 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
             if ($typo3SiteUrlParamString != '') {
                 $typo3SiteUrlParamString = '?' . $typo3SiteUrlParamString;
             }
-            $shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL')) .
+            $shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode($typo3_site_url) .
                     'typo3/' . $typo3SiteUrlParamString;
             \TYPO3\CMS\Core\Utility\HttpUtility::redirect($shiblinkUrl, \TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_302);
         }
