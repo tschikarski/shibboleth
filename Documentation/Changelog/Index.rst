@@ -20,6 +20,9 @@ Version     Changes:
             Fix unwanted logout, when
             Shibboleth session ID changes
             without changing the user.
+
+            Prepare "res/" directory for
+            later removal (deprecated)
 ----------  ------------------------------
 3.1.4-beta  Fix creation of BE users at
             FE login in certain cases.
