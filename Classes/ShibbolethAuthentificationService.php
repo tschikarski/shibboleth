@@ -257,13 +257,13 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 return 100;
             }
 
-                // The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, Session-ID might have changed on some miraculous way
-            if ($_SERVER[$this->shibSessionIdKey] == $this->authInfo['userSession']['tx_shibboleth_shibbolethsessionid']) {
-                    // Shibboleth session still the same, authenticate!
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shib-Session-ID: authenticated','shibboleth',-1,array($_SERVER[$this->shibSessionIdKey]));
+                // The logged in user is a Shibboleth user, and we have a Shib-Session-ID. However, we are paranoic and check, if we still have the same user.
+            if ($user['username'] == $this->authInfo['userSession']['username']) {
+                    // Shibboleth user name still the same.
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found our previous Shibboleth user: authenticated','shibboleth',-1);
                 return 200;
             } else {
-                if($this->writeDevLog) GeneralUtility::devlog('authUser: Found a changed Shibboleth Session-ID: reject','shibboleth',3,array($_SERVER[$this->shibSessionIdKey]));
+                if($this->writeDevLog) GeneralUtility::devlog('authUser: Shibboleth user changed from "'.$this->authInfo['userSession']['username'].'" to "'.$user['username'].'": reject','shibboleth',3,array($_SERVER[$this->shibSessionIdKey]));
                 $this->logoffPresentUser();
                 return false;
             }
