@@ -14,6 +14,12 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
+3.1.4-beta  Fix creation of BE users at
+            FE login in certain cases.
+
+            Avoid logout of existing local
+            BE session at FE login.
+----------  ------------------------------
 3.1.3-beta  Rename and move template files
 
             Fix redirect on disabled BE
