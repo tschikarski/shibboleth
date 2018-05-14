@@ -50,6 +50,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     var $hasShibbolethSession = FALSE;
     var $shibSessionIdKey = '';
     var $shibApplicationIdKey = '';
+    var $primaryMode = '';
     var $forbiddenUser = array(
         'uid' => 999999,
         'username' => 'nevernameauserlikethis',
@@ -63,7 +64,7 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
      */
     function init() {
         $available = parent::init();
-        
+
         // Here you can initialize your class.
         
         // The class have to do a strict check if the service is available.
@@ -103,10 +104,20 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
     
     function getUser() {
 
+        if (($this->primaryMode != '') and ($this->primaryMode != $this->mode)) {
+            if($this->writeDevLog) GeneralUtility::devlog('Secondary login of mode '.$this->mode.' detected after registering primary mode'.$this->primaryMode.'. Skipping.','shibboleth',0);
+            return false;
+        }
+
+        if ($this->primaryMode == '') {
+            $this->primaryMode = $this->mode;
+        }
+
         if ($this->isLoggedInByNonShibboleth()) {
+            if($this->writeDevLog) GeneralUtility::devlog('Existing non-Shibboleth session detected (mode '.$this->mode.'). Skipping.','shibboleth',0);
             return FALSE;
         }
-        
+
         if (is_object($GLOBALS['TSFE'])) {
             $isAlreadyThere = TRUE;
         }
