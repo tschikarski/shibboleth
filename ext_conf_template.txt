@@ -1,5 +1,5 @@
   # cat=General/enable/010; type=string; label=Path to field mapping config file: Path from TYPO3 root directory pointing to text file mit typoscript-like configuration containing field mappings. ATTENTION: This file is crucial for allowing / disallowing Shibboleth users into FE, BE, groups etc.
-mappingConfigPath = /typo3conf/ext/shibboleth/res/config.txt
+mappingConfigPath = /typo3conf/ext/shibboleth/Resources/Private/config.txt
   # cat=General/enable/020; type=string; label=URL of Shibboleth handler: See your shibboleth xml config file (shibboleth2.xml): attribute "handlerURL" of tag "Sessions"; no leading slash!
 sessions_handlerURL = Shibboleth.sso
   # cat=General/enable/030; type=string; label=Location of Shibboleth Session Initiator: See your shibboleth xml config file (shibboleth2.xml): attribute "Location" of tag "SessionInitiator"; with leading slash!

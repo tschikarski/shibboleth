@@ -34,3 +34,9 @@ away from the TYPO3 frontend / backend immediately after the logout. Otherwise, 
 will immediately re-login the user to the TYPO3 application.
 
 For a discussion on the difficulties of a global logout see: https://wiki.shibboleth.net/confluence/display/SHIB2/IdPEnableSLO
+
+Mixed login
+^^^^^^^^^^^
+
+If shibboleth is enabled for FE and BE and a Shibboleth session already exists, e.g. for the FE, there is no possibility
+to login to the BE with another account. Use two different browsers or open the BE using "in-private-browsing".

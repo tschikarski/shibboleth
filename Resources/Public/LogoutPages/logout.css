@@ -23,7 +23,7 @@ div.header a {
 	display: block;
 	width: auto;
 	height: 88px;
-	background-image: url('/typo3conf/ext/shibboleth/Resources/Public/Icons/Shibboleth-logo-smaller.jpg');
+	background-image: url('../Icons/Shibboleth-logo-smaller.jpg');
 	background-repeat: no-repeat;
 	background-position: left top;
 	line-height: 200px;

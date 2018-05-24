@@ -4,7 +4,7 @@
 		<header/>
 		<body>
 			<trans-unit id="login.link">
-				<source>Login with Shibboleth (!)</source>
+				<source>Login with Shibboleth (Reference in deprecated locallang.xlf!)</source>
 			</trans-unit>
 		</body>
 	</file>

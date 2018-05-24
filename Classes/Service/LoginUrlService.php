@@ -44,7 +44,7 @@ class LoginUrlService
             $sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
         }
 
-        $targetParam = 'target=' . rawurlencode(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'));
+        $targetParam = 'target=' . rawurlencode($typo3_site_url);
 
         if (($entityIDparam != '') and ($targetParam != '')) {
             $params = $entityIDparam . '&' . $targetParam;
