@@ -17,7 +17,7 @@ General
 =========================  ==========  ===========================================================================================================  ==========================================
 Property:                  Data type:  Description:                                                                                                 Default:
 =========================  ==========  ===========================================================================================================  ==========================================
-mappingConfigPath          path        Point this to your mapping configuration file (for                                                           ``/typo3conf/ext/shibboleth/res/config.txt``
+mappingConfigPath          path        Point this to your mapping configuration file (for                                                           ``/typo3conf/ext/shibboleth/Resources/Private/config.txt``
                                        usage of this file, see :ref:`configuration-configuration-options-mapping-configuration-file`).
                                        **In most cases you
                                        will have to change this.**  (Never apply your changes

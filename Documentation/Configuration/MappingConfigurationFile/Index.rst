@@ -11,7 +11,7 @@
 Mapping Configuration File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Under ``/typo3conf/ext/shibboleth/res/sample-config.txt`` you find a sample config file.
+Under ``Resources/Private/sample-config.txt`` you find a sample config file.
 It makes use of the Typoscript parser to achieve maximum flexibility.
 To better understand, what it does, let's examine it's structure.
 
