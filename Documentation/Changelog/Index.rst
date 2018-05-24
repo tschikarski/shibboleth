@@ -14,7 +14,7 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
-...         Fix target URL when forcing
+3.1.5-beta  Fix target URL when forcing
             SSL.
 
             Fix unwanted logout, when
