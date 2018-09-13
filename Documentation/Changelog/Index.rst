@@ -14,6 +14,9 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
+3.1.6       Stable after testing -
+            aequivalent to 3.1.5-beta
+----------  ------------------------------
 3.1.5-beta  Fix target URL when forcing
             SSL.
 
