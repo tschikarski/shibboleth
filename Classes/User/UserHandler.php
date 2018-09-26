@@ -416,7 +416,7 @@ class UserHandler
             $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
             $query->insert($this->db_user['table'])->values($user);
             if ($this->writeDevLog) {
-                GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $table,
+                GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $this->db_user['table'],
                     '\TrustCnct\Shibboleth\User\UserHandler', 0, $user);
             }
             try
