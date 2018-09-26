@@ -283,10 +283,10 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
             if (defined('TYPO3_MODE') AND (TYPO3_MODE == 'BE') AND ($user['disable'])) {
                 if ($this->writeDevLog) GeneralUtility::devLog('authUser: user created/exists, but is in state "disable"','\TrustCnct\Shibboleth\ShibbolethAuthentificationService',2,$user);
                 if ($this->shibboleth_extConf['BE_disabledUserRedirectUrl']) {
+                    $redirectUrl = $this->shibboleth_extConf['BE_disabledUserRedirectUrl'];
                     if ($this->writeDevLog) {
                         GeneralUtility::devLog('authUser: redirecting to '. $redirectUrl,'\TrustCnct\Shibboleth\ShibbolethAuthentificationService');
                     }
-                    $redirectUrl = $this->shibboleth_extConf['BE_disabledUserRedirectUrl'];
                     // initiate Redirect here
                     header("Location: $redirectUrl");
                     exit;
