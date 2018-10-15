@@ -32,9 +32,5 @@ forceSSL = 1
 FE_applicationID =
   # cat=Advanced/enable/170; type=string; label=BE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
 BE_applicationID =
-  # cat=Debugging/enable/190; type=boolean; label=FE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
-FE_devLog = 0
-  # cat=Debugging/enable/200; type=boolean; label=BE user auth devLog: Activate devLog'ging for FE. Please note that you have to have a devLog extension to really get logs
-BE_devLog = 0
-  # cat=Debugging/enable/210; type=boolean; label=Activate extra devLog'ging for FE/BE: Includes information on DB operations.
+  # cat=Debugging/enable/210; type=boolean; label=Activate extra devLog'ging for FE/BE: Include information on DB operations. Note that general activation of devlog requires to set [SYS][enable_DLOG] to true.
 database_devLog = 0

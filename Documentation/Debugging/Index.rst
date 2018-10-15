@@ -33,14 +33,29 @@ Activating devlog debugging
 ---------------------------
 
 This extension is able to write debug information via 'devlog'. Install the extension 'devlog'.
-If you have access to the server, you might want to use the file based variant 'rlmp_filedevlog' instead and run something like ``tail -f debug.log`` on the console.
+If you have access to the server, you might want to use the file based variant 'rlmp_filedevlog' instead and
+run something like ``tail -f debug.log`` on the console.
 
-With this installed, go to the extension configuration and select the "debugging" tab. Here, you can activate debug logs for frontend and/or backend.
+To enable writing devlog entries, you have to go to the install tool and under "All configuration" set the value
+for ``[SYS][enable_DLOG]`` to ``true``.
 
-Don't start with additional debugging info, as it fills up your debug log with even more information.
+You might want to filter the devlog entries by "Key". Select the class name ``\TrustCnct\Shibboleth\ShibbolethAuthentificationService``.
+
+After trying a Shibboleth log in (FE or BE), you should find an entry with message ``getUserFE ($_SERVER)`` or ``getUserBE ($_SERVER)`` as the
+first entry of the test run. This will tell you the content of the $_SERVER variable on that run, which is important to
+determine, if the web server successfully received parameters from the SP module. To view the variable, click on the small arrow
+symbol in the "Extra data" column.
+
+Further entries tell why the extension decided to do, what it did.
+
+In rare cases you might want to activate additional logging, which can tell some details of what's going on on the database level. For that,
+go to the extension configuration and select the "debugging" tab. Here, you can activate this additional logging.
 
 *Hint:* Debugging BE authentication is a bit tricky, when you have the TYPO3 backend open, as you might be confused by AJAX requests showing up in the log.
 That's a good reason to switch to file based logging. It will allow you to keep the BE closed while testing.
+
+**WARNING:** Deactivate devlog as soon as you finish debugging. Never keep it active on a production system. You might do so by uninstalling/deactivating
+the devlog extension or by disabling the system variable ``[SYS][enable_DLOG]``.
 
 Checking if the extension is active
 -----------------------------------
