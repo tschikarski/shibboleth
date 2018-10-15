@@ -279,7 +279,10 @@ class ShibbolethAuthentificationService extends \TYPO3\CMS\Sv\AbstractAuthentica
                 // We now can auto-import; we won't be in authUser, if getUser didn't detect auto-import configuration.
             $user['uid'] = $userhandler->synchronizeUserData($user);
             if($this->writeDevLog) GeneralUtility::devlog('authUser: after insert/update DB $uid=' . $user['uid'] . '; ($user attached).','\TrustCnct\Shibboleth\ShibbolethAuthentificationService',0,$user);
-            if ((! $user['disable']) AND ($user['uid']>0)) return 200;
+            if ((! $user['disable']) AND ($user['uid']>0)) {
+                if ($this->writeDevLog) GeneralUtility::devLog('authUser: user authenticated','\TrustCnct\Shibboleth\ShibbolethAuthentificationService',-1,$user);
+                return 200;
+            }
             if (defined('TYPO3_MODE') AND (TYPO3_MODE == 'BE') AND ($user['disable'])) {
                 if ($this->writeDevLog) GeneralUtility::devLog('authUser: user created/exists, but is in state "disable"','\TrustCnct\Shibboleth\ShibbolethAuthentificationService',2,$user);
                 if ($this->shibboleth_extConf['BE_disabledUserRedirectUrl']) {
