@@ -72,6 +72,11 @@ Set ``shibID`` to the desired value by referencing the
 appropriate Shibboleth attribute (``REMOTE_USER`` in our example). In standard TYPO3 installations
 ``typo3Field`` must be set to ``username``. Take care to select a unique Shibboleth field.
 
+*Hint:* Make sure your selection of the identifier field ist appropriate for your use case. As all components
+of Shibboleth are highly configurable and use cases my vary, we cannot give a final advise here. However, in most
+cases you will probably choose a field that is unique, persistent and global. A typical choice could be ``eppn``.
+For more information on properties of name identifiers, see https://wiki.shibboleth.net/confluence/display/CONCEPT/NameIdentifiers!
+
 Within ``userControls`` there are three parts.
 For simplicity, in our example we use just one-to-one mappings and hard-coded values.
 In real world, you might want to use the full toolset of Typoscript (e.g. ``CASE, COA, noTrimWrap`` etc.) to set values.
