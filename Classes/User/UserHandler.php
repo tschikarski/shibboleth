@@ -110,7 +110,7 @@ class UserHandler
             if ($this->writeDevLog)
                 GeneralUtility::devLog(
                     'getUserFromDB: Shibboleth data evaluates username to empty string! Extra data may help',
-                    'shibboleth',
+                    '\TrustCnct\Shibboleth\User\UserHandler',
                     3,
                     array(
                         'idField' => $idField,
@@ -162,10 +162,10 @@ class UserHandler
         }
 
         if ($row)  {
-			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','shibboleth_userhandler',0,$row);
+			if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning user record ($row)','\TrustCnct\Shibboleth\User\UserHandler',0,$row);
 			return $row;
 		}
-        if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','shibboleth_userhandler',0,$row);
+        if ($this->writeDevLog) GeneralUtility::devlog('getUserFromDB returning FALSE (no record found)','\TrustCnct\Shibboleth\User\UserHandler',0,$row);
         return false;
 
     }
@@ -189,7 +189,7 @@ class UserHandler
             if ($this->writeDevLog)
                 GeneralUtility::devLog(
                     'transferShibbolethAttributesToUserArray: Shibboleth data evaluates username to empty string! Extra data may help',
-                    'shibboleth',
+                    '\TrustCnct\Shibboleth\User\UserHandler',
                     3,
                     array(
                         'idField' => $idField,
@@ -201,12 +201,12 @@ class UserHandler
 
         $user[$idField] = $idValue;
 
-		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray: newUserArray','shibboleth_userhandler',0,$user);
+		if ($this->writeDevLog) GeneralUtility::devlog('transferShibbolethAttributesToUserArray: newUserArray','\TrustCnct\Shibboleth\User\UserHandler',0,$user);
 		return $user;
 	}
 
 	function synchronizeUserData(&$user) {
-		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','shibboleth_userhandler',0,$user);
+		if ($this->writeDevLog) GeneralUtility::devlog('synchronizeUserData','\TrustCnct\Shibboleth\User\UserHandler',0,$user);
 
 		if($user['uid']) {
             $user = $this->updateUser($user);
@@ -221,7 +221,7 @@ class UserHandler
         } else {
 		    $uid = $user['uid'];
         }
-		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'shibboleth_userhandler');
+		if ($this->writeDevLog) GeneralUtility::devLog('synchronizeUserData: After update/insert; $uid='.$uid,'\TrustCnct\Shibboleth\User\UserHandler');
 		return $uid;
 	}
 
@@ -233,7 +233,7 @@ class UserHandler
         $this->mappingConfigAbsolutePath = $this->getEnvironmentVariable('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath'];
         $configString = GeneralUtility::getURL($this->mappingConfigAbsolutePath);
 		if($configString === FALSE) {
-			if ($this->writeDevLog) GeneralUtility::devlog('Could not find config file, please check extension setting for correct path!','shibboleth_userhandler',3);
+			if ($this->writeDevLog) GeneralUtility::devlog('Could not find config file, please check extension setting for correct path!','\TrustCnct\Shibboleth\User\UserHandler',3);
 			return array();
 		}
 
@@ -329,7 +329,7 @@ class UserHandler
 
         if ($this->writeDevLog) {
             GeneralUtility::devlog('synchronizeUserData: Updating $user with uid=' . intval($uid) . ' in DB',
-                'shibboleth_userhandler', 0, $user);
+                '\TrustCnct\Shibboleth\User\UserHandler', 0, $user);
         }
 
         if ($this->hasQueryBuilder) {
@@ -347,14 +347,14 @@ class UserHandler
 
             } catch (\Exception $e) {
                 if ($this->writeDevLog) {
-                    GeneralUtility::devlog('synchronizeUserData: Could not update $user in DB.', 'shibboleth_userhandler', 3, $user);
+                    GeneralUtility::devlog('synchronizeUserData: Could not update $user in DB.', '\TrustCnct\Shibboleth\User\UserHandler', 3, $user);
                 }
                 return NULL;
 
             }
             if ($numAffectedRows != 1) {
                 if ($this->writeDevLog) {
-                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', '\TrustCnct\Shibboleth\User\UserHandler', 3, $user);
                 }
                 return NULL;
             }
@@ -375,10 +375,10 @@ class UserHandler
         $sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
         if ($sql_errno) {
             if ($this->writeDevLog) {
-                GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
+                GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, '\TrustCnct\Shibboleth\User\UserHandler');
                 if ($sql_errno > 0) {
                     GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-                        'shibboleth_userhandler');
+                        '\TrustCnct\Shibboleth\User\UserHandler');
                 }
             }
             return NULL;
@@ -416,8 +416,8 @@ class UserHandler
             $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
             $query->insert($this->db_user['table'])->values($user);
             if ($this->writeDevLog) {
-                GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $table,
-                    'shibboleth_userhandler', 0, $user);
+                GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $this->db_user['table'],
+                    '\TrustCnct\Shibboleth\User\UserHandler', 0, $user);
             }
             try
             {
@@ -425,7 +425,7 @@ class UserHandler
 
             } catch (\Exception $e) {
                 if ($this->writeDevLog) {
-                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', '\TrustCnct\Shibboleth\User\UserHandler', 3, $user);
                 }
                 return NULL;
 
@@ -433,13 +433,13 @@ class UserHandler
 
             if ($numAffectedRows != 1) {
                 if ($this->writeDevLog) {
-                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', 'shibboleth_userhandler', 3, $user);
+                    GeneralUtility::devlog('synchronizeUserData: Could not insert $user into DB.', '\TrustCnct\Shibboleth\User\UserHandler', 3, $user);
                 }
                 return NULL;
             }
             $user = $this->lookUpShibbolethUserInDatabase();
             if ($this->writeDevLog) {
-                GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $user['uid'], 'shibboleth_userhandler');
+                GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $user['uid'], '\TrustCnct\Shibboleth\User\UserHandler');
             }
             return $user;
 
@@ -449,7 +449,7 @@ class UserHandler
         $insertFields = $user;
         if ($this->writeDevLog) {
             GeneralUtility::devlog('synchronizeUserData: Inserting $user into DB table ' . $table,
-                'shibboleth_userhandler', 0, $user);
+                '\TrustCnct\Shibboleth\User\UserHandler', 0, $user);
         }
         $GLOBALS['TYPO3_DB']->exec_INSERTquery(
             $table,
@@ -458,10 +458,10 @@ class UserHandler
         $sql_errno = $GLOBALS['TYPO3_DB']->sql_errno();
         if ($sql_errno) {
             if ($this->writeDevLog) {
-                GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, 'shibboleth_userhandler');
+                GeneralUtility::devlog('synchronizeUserData: DB Error No. = ' . $sql_errno, '\TrustCnct\Shibboleth\User\UserHandler');
                 if ($sql_errno > 0) {
                     GeneralUtility::devLog('synchronizeUserData: DB Error Msg: ' . $GLOBALS['TYPO3_DB']->sql_error(),
-                        'shibboleth_userhandler');
+                        '\TrustCnct\Shibboleth\User\UserHandler');
                 }
             }
             return NULL;
@@ -469,7 +469,7 @@ class UserHandler
         $uid = $GLOBALS['TYPO3_DB']->sql_insert_id();
         $user['uid'] = $uid;
         if ($this->writeDevLog) {
-            GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $uid, 'shibboleth_userhandler');
+            GeneralUtility::devLog('synchronizeUserData: Got new uid ' . $uid, '\TrustCnct\Shibboleth\User\UserHandler');
         }
         return $user;
     }
