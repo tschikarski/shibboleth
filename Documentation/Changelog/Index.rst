@@ -14,6 +14,10 @@ ChangeLog
 ==========  ==============================
 Version     Changes:
 ==========  ==============================
+3.1.7       Small fixes: Code cleanups,
+            handling of debug switches
+            for devlog
+----------  ------------------------------
 3.1.6       Stable after testing -
             aequivalent to 3.1.5-beta
 ----------  ------------------------------
