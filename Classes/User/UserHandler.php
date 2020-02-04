@@ -236,9 +236,13 @@ class UserHandler
 			if ($this->writeDevLog) GeneralUtility::devlog('Could not find config file, please check extension setting for correct path!','\TrustCnct\Shibboleth\User\UserHandler',3);
 			return array();
 		}
+		
+        /** @var \TYPO3\CMS\Backend\Configuration\TypoScript\ConditionMatching\ConditionMatcher $matchObj */
+        $matchObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Configuration\TypoScript\ConditionMatching\ConditionMatcher::class);
 
-		$parser = GeneralUtility::makeInstance('TYPO3\CMS\Backend\Configuration\TsConfigParser');
-        $parser->parse($configString);
+        /** @var \TYPO3\CMS\Backend\Configuration\TsConfigParser $parser */
+        $parser = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Configuration\TsConfigParser::class);
+        $parser->parse($configString, $matchObj);
 
         $completeSetup = $parser->setup;
 
