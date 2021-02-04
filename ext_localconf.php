@@ -3,11 +3,12 @@ if (!defined ('TYPO3_MODE')) {
  	die ('Access denied.');
 }
 
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1';
-$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1';
+$GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_fetchUserIfNoSession'] = '1';
+$GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['BE_fetchUserIfNoSession'] = '1';
+
 
 // Configuration of authentication service.
-$EXT_CONFIG = unserialize($TYPO3_CONF_VARS['EXT']['extConf']['shibboleth']);
+$EXT_CONFIG = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'];
 
 if ($EXT_CONFIG['enableAlwaysFetchUser']) {
 	// Activate the following two lines, in case you want to give your Shibboleth-SP
@@ -17,8 +18,8 @@ if ($EXT_CONFIG['enableAlwaysFetchUser']) {
 	// Additionally, this will imply a strange behaviour of the Logout button as well as
 	// the BE timeout warning window.
 
-	$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
-	$TYPO3_CONF_VARS['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
+	$GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['FE_alwaysFetchUser'] = '1'; // default
+	$GLOBALS['TYPO3_CONF_VARS']['SVCONF']['auth']['setup']['BE_alwaysFetchUser'] = '1'; // default
 }
 
 if ($EXT_CONFIG['FE_enable']) {
@@ -64,22 +65,16 @@ if ($EXT_CONFIG['BE_enable']) {
 	$GLOBALS['TYPO3_CONF_VARS']['BE']['toolbarItems'][1435433111] = \TrustCnct\Shibboleth\Toolbar\UserToolbarItem::class;
 }
 
-$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLog'] = FALSE;
-$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogFE'] = FALSE;
-$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogBE'] = FALSE;
-$TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] = FALSE;
-
-if ($EXT_CONFIG['FE_devLog']) {
-	$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogFE'] = TRUE;
+if ($EXT_CONFIG['debugLog']) {
+    $GLOBALS['TYPO3_CONF_VARS']['LOG']['TrustCnct']['Shibboleth']['writerConfiguration'] = [
+        \TYPO3\CMS\Core\Log\LogLevel::DEBUG => [
+            'TYPO3\\CMS\\Core\\Log\\Writer\\FileWriter' => [
+            ]
+        ],
+    ];
 }
 
-if ($EXT_CONFIG['BE_devLog']) {
-	$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['writeDevLogBE'] = TRUE;
-}
 
-if ($EXT_CONFIG['database_devLog']) {
-	$TYPO3_CONF_VARS['SC_OPTIONS']['shibboleth/lib/class.tx_shibboleth_userhandler.php']['writeMoreDevLog'] = TRUE;
-}
 
 
 
