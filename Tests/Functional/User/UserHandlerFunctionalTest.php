@@ -9,7 +9,6 @@
 namespace TrustCnct\Shibboleth\User;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Nimut\TestingFramework\TestCase;
 
 class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\FunctionalTestCase
 {
@@ -20,8 +19,29 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
     protected function setUp() {
         parent::setUp();
         global $TYPO3_CONF_VARS;
-        $TYPO3_CONF_VARS['EXT']['extConf']['shibboleth'] = 'a:20:{s:17:"mappingConfigPath";s:62:"/typo3conf/ext/shibboleth/Tests/Functional/Fixtures/config.txt";s:19:"sessions_handlerURL";s:14:"Shibboleth.sso";s:25:"sessionInitiator_Location";s:6:"/Login";s:9:"FE_enable";s:1:"1";s:13:"FE_autoImport";s:1:"1";s:17:"FE_autoImport_pid";s:1:"2";s:9:"BE_enable";s:1:"0";s:13:"BE_autoImport";s:1:"1";s:24:"BE_autoImportDisableUser";s:1:"0";s:20:"BE_loginTemplatePath";s:48:"typo3conf/ext/shibboleth/res/be_form/login7.html";s:20:"BE_logoutRedirectUrl";s:49:"/typo3conf/ext/shibboleth/res/be_form/logout.html";s:26:"BE_disabledUserRedirectUrl";s:53:"/typo3conf/ext/shibboleth/res/be_form/nologinyet.html";s:21:"enableAlwaysFetchUser";s:1:"1";s:8:"entityID";s:0:"";s:8:"forceSSL";s:1:"1";s:16:"FE_applicationID";s:0:"";s:16:"BE_applicationID";s:0:"";s:9:"FE_devLog";s:1:"1";s:9:"BE_devLog";s:1:"0";s:15:"database_devLog";s:1:"0";}';
-        $this->db_user = array(
+        $TYPO3_CONF_VARS['EXTENSIONS']['shibboleth'] = [
+            "mappingConfigPath" => "\/typo3conf\/ext\/shibboleth\/Tests\/Functional\/Fixtures\/config.txt",
+            "sessions_handlerURL" => "Shibboleth.sso",
+            "sessionInitiator_Location" => "\/Login",
+            "FE_enable" => "1",
+            "FE_autoImport" => "1",
+            "FE_autoImport_pid" => "2",
+            "BE_enable" => "0",
+            "BE_autoImport" => "1",
+            "BE_autoImportDisableUser" => "0",
+            "BE_loginTemplatePath" => "typo3conf\/ext\/shibboleth\/res\/be_form\/login7.html",
+            "BE_logoutRedirectUrl" => "\/typo3conf\/ext\/shibboleth\/res\/be_form\/logout.html",
+            "BE_disabledUserRedirectUrl" => "\/typo3conf\/ext\/shibboleth\/res\/be_form\/nologinyet.html",
+            "enableAlwaysFetchUser" => "1",
+            "entityID" => "",
+            "forceSSL" => "1",
+            "FE_applicationID" => "",
+            "BE_applicationID" => "",
+            "FE_devLog" => "1",
+            "BE_devLog" => "0",
+            "database_devLog" => "0"
+        ];
+        $this->db_user = [
             'table' => 'fe_users',
             'userid_column' => 'uid',
             'username_column' => 'username',
@@ -30,10 +50,10 @@ class UserHandlerFunctionalTest extends \Nimut\TestingFramework\TestCase\Functio
             'enable_clause' => '',
             'checkPidList' => 0,
             'check_pid_clause' => '`pid` IN (2)'
-        );
-        $this->db_group = array(
+        ];
+        $this->db_group = [
             'table' => 'fe_groups'
-        );
+        ];
         $this->importDataSet('web/typo3conf/ext/shibboleth/Tests/Functional/Fixtures/fe_users.xml');
         $this->importDataSet('web/typo3conf/ext/shibboleth/Tests/Functional/Fixtures/be_users.xml');
     }

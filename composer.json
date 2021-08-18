@@ -9,18 +9,11 @@
   "support": {
     "issues": "https://github.com/tschikarski/shibboleth/issues"
   },
-  "repositories": {
-    "nimut": {
-      "type": "vcs",
-      "url": "git@github.com:Nimut/testing-framework.git"
-    }
-  },
   "require": {
     "typo3/cms-core": "^10.4"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.8.0",
-    "nimut/testing-framework": "^1.1"
+    "nimut/testing-framework": "^5.2.1"
   },
   "authors": [
     {
@@ -45,10 +38,12 @@
     "bin-dir": ".Build/bin"
   },
   "scripts": {
-    "post-autoload-dump": [
-      "mkdir -p .Build/Web/typo3conf/ext/",
-      "[ -L .Build/Web/typo3conf/ext/shibboleth ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/shiboleth"
-    ]
+      "post-autoload-dump": [
+          "@prepare-extension-test-structure"
+      ],
+      "prepare-extension-test-structure": [
+          "Nimut\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
+      ]
   },
   "extra": {
     "typo3/cms": {

@@ -8,16 +8,16 @@
 
 namespace TrustCnct\Shibboleth\Service;
 
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LoginUrlService
 {
-    protected $extConf;
+    protected $configuration;
 
     public function __construct()
     {
-        $this->extConf =  unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth']);
-
+        $this->configuration =  GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('shibboleth');
     }
 
     /**
@@ -25,20 +25,18 @@ class LoginUrlService
      */
     public function createUrl()
     {
-        $entityIDparam = $this->extConf['entityID'];
+        $entityIDparam = $this->configuration['entityID'];
         if ($entityIDparam != '') {
             $entityIDparam = 'entityID='. rawurldecode($entityIDparam);
         }
 
         $typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-        if ($this->extConf['forceSSL']) {
+
+        if ($this->configuration['forceSSL']) {
             $typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
         }
 
-        // TODO: hard-coded link text shall be replaced by locallang.xml based, piGetLL or something like that
-        $linkText = 'Shibboleth Login';
-
-        $sessionHandlerUrl = $this->extConf['sessions_handlerURL'];
+        $sessionHandlerUrl = $this->configuration['sessions_handlerURL'];
 
         if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
             $sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
@@ -56,9 +54,6 @@ class LoginUrlService
             $params = '?' . $params;
         }
 
-        $linkUrl = $sessionHandlerUrl . $this->extConf['sessionInitiator_Location'] . $params;
-
-        return $linkUrl;
-
+        return $sessionHandlerUrl . $this->configuration['sessionInitiator_Location'] . $params;
     }
 }

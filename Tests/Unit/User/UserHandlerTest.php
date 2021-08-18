@@ -16,35 +16,71 @@
 namespace TrustCnct\Shibboleth\User;
 
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class UserHandlerTest extends UnitTestCase
 {
-    protected $db_user;
-    protected $db_group;
+    /**
+     * @var array
+     */
+    protected $db_user = [
+        'table' => 'fe_users',
+        'userid_column' => 'uid',
+        'username_column' => 'username',
+        'userident_column' => 'password',
+        'usergroup_column' => 'usergroup',
+        'enable_clause' => '',
+        'checkPidList' => 0,
+        'check_pid_clause' => '`pid` IN (2)'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $db_group = [
+        'table' => 'fe_groups'
+    ];
+
+    /**
+     * @var UserHandler
+     */
+    protected $userHandler;
 
     /**
      * Test setup
      */
     protected function setUp() {
         parent::setUp();
-        $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'] = array(); // Avoid exception in web/typo3conf/ext/shibboleth/Classes/User/UserHandler.php:76
-        $enable_clause = '';
-        $this->db_user = array(
-            'table' => 'fe_users',
-            'userid_column' => 'uid',
-            'username_column' => 'username',
-            'userident_column' => 'password',
-            'usergroup_column' => 'usergroup',
-            'enable_clause' => $enable_clause,
-            'checkPidList' => 0,
-            'check_pid_clause' => '`pid` IN (2)'
-        );
-        $this->db_group = array(
-            'table' => 'fe_groups'
-        );
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
+            'BE_applicationID' => '',
+            'BE_autoImport' => '0',
+            'BE_autoImportDisableUser' => '1',
+            'BE_disabledUserRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/nologinyet.html',
+            'BE_enable' => '0',
+            'BE_loginTemplatePath' => 'typo3conf/ext/shibboleth/Resources/Private/Templates/BeForm/login.html',
+            'BE_logoutRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/logout.html',
+            'FE_applicationID' => '',
+            'FE_autoImport' => '0',
+            'FE_autoImport_pid' => '',
+            'FE_enable' => '0',
+            'debugLog' => '0',
+            'enableAlwaysFetchUser' => '1',
+            'entityID' => '',
+            'forceSSL' => '1',
+            'mappingConfigPath' => '/typo3conf/ext/shibboleth/Resources/Private/config.txt',
+            'pageUidForTSFE' => '1',
+            'sessionInitiator_Location' => '/Login',
+            'sessions_handlerURL' => 'Shibboleth.sso',
+        ];
+        $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'] = []; // Avoid exception in web/typo3conf/ext/shibboleth/Classes/User/UserHandler.php:76
 
+        $GLOBALS['TSFE'] = $this->createMock(TypoScriptFrontendController::class);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
     }
 
     /**
@@ -98,20 +134,5 @@ class UserHandlerTest extends UnitTestCase
         $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'redirect');
         $this->assertSame('ShibbSomeValue',$userHandler->cObj->data['ShibbSomeEnvironment']);
     }
-
-    /**
-     * Helper to debug variable contents
-     *
-     * @param null $mixed
-     * @return string
-     */
-    private function var_dump_ret($mixed = null) {
-        ob_start();
-        var_dump($mixed);
-        $content = ob_get_contents();
-        ob_end_clean();
-        return $content;
-    }
-
 
 }

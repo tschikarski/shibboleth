@@ -16,8 +16,9 @@ namespace TrustCnct\Shibboleth\LoginProvider;
  */
 
 use TYPO3\CMS\Backend\Controller\LoginController;
-use TYPO3\CMS\Backend\LoginProvider\LoginProviderInterface;
 use TYPO3\CMS\Backend\LoginProvider\UsernamePasswordLoginProvider;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -31,35 +32,35 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
 {
     public function render(StandaloneView $view, PageRenderer $pageRenderer, LoginController $loginController)
     {
-        $extConf =  unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth']);
+        $configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('shibboleth');
 
-        if (GeneralUtility::_GET('redirecttoshibboleth') == 'yes') {
+        if (GeneralUtility::_GET('redirecttoshibboleth') === 'yes') {
             // Redirect to Shibboleth login
             $typo3SiteUrlParams = array();
             $typo3SiteUrlParams[] = 'login_status=login';
-            $entityIDparam = $extConf['entityID'];
+            $entityIDparam = $configuration['entityID'];
             if ($entityIDparam != '') {
                 $typo3SiteUrlParams[] = 'entityID='. rawurldecode($entityIDparam);
             }
             $typo3_site_url = GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
-            if ($extConf['forceSSL']) {
+            if ($configuration['forceSSL']) {
                 $typo3_site_url = str_replace('http://', 'https://', $typo3_site_url);
             }
-            $sessionHandlerUrl = $extConf['sessions_handlerURL'];
-            if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
+            $sessionHandlerUrl = $configuration['sessions_handlerURL'];
+            if (0 !== strpos($sessionHandlerUrl, "http")) {
                 $sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
             }
             $typo3SiteUrlParamString = implode('&', $typo3SiteUrlParams);
             if ($typo3SiteUrlParamString != '') {
                 $typo3SiteUrlParamString = '?' . $typo3SiteUrlParamString;
             }
-            $shiblinkUrl = $sessionHandlerUrl . $extConf['sessionInitiator_Location'] . '?target=' . rawurlencode($typo3_site_url) .
+            $shiblinkUrl = $sessionHandlerUrl . $configuration['sessionInitiator_Location'] . '?target=' . rawurlencode($typo3_site_url) .
                     'typo3/' . $typo3SiteUrlParamString;
             \TYPO3\CMS\Core\Utility\HttpUtility::redirect($shiblinkUrl, \TYPO3\CMS\Core\Utility\HttpUtility::HTTP_STATUS_302);
         }
 
         parent::render($view,$pageRenderer,$loginController);
-        $templatePathAndFilename = GeneralUtility::getFileAbsFileName(PATH_site . $extConf['BE_loginTemplatePath']);
+        $templatePathAndFilename = GeneralUtility::getFileAbsFileName(Environment::getPublicPath() . '/' . $configuration['BE_loginTemplatePath']);
         if (is_file($templatePathAndFilename)) {
             $view->setTemplatePathAndFilename($templatePathAndFilename);
             $newLayoutRootPaths = $view->getLayoutRootPaths();
@@ -67,7 +68,7 @@ class ShibbolethLoginProvider extends UsernamePasswordLoginProvider
             $newLayoutRootPaths[] = $extPath . 'Resources/Private/Layouts';
             $view->setLayoutRootPaths($newLayoutRootPaths);
         } else {
-            throw new \TYPO3\CMS\Extbase\Configuration\Exception\NoSuchFileException('BE_loginTemplatePath: File not found', 1473848139);
+            throw new \TYPO3\CMS\Extbase\Configuration\Exception('BE_loginTemplatePath: File not found', 1473848139);
         }
     }
 

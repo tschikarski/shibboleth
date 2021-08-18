@@ -1,2 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
 Resources/Private/config.txt
+composer.lock
+.Build
