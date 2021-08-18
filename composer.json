@@ -5,7 +5,7 @@
   "keywords": ["TYPO3 CMS", "Authentication"],
   "license": ["GPL-2.0+"],
   "homepage": "https://github.com/tschikarski/shibboleth",
-  "version": "3.1.7",
+  "version": "3.1.8",
   "support": {
     "issues": "https://github.com/tschikarski/shibboleth/issues"
   },
