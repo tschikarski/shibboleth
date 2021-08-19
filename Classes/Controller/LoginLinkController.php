@@ -1,6 +1,8 @@
 <?php
 namespace TrustCnct\Shibboleth\Controller;
 
+use TrustCnct\Shibboleth\Service\LoginUrlService;
+
 /***
  *
  * This file is part of the "TrustCnct.Shibboleth" Extension for TYPO3 CMS.
@@ -19,9 +21,13 @@ class LoginLinkController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionContro
 {
     /**
      * @var \TrustCnct\Shibboleth\Service\LoginUrlService
-     * @inject
      */
     protected $loginUrlService;
+
+    public function injectLoginUrlService(LoginUrlService $loginUrlService)
+    {
+        $this->loginUrlService = $loginUrlService;
+    }
 
     /**
      * action show

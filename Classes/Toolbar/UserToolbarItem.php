@@ -11,36 +11,18 @@ namespace TrustCnct\Shibboleth\Toolbar;
  * @subpackage    tx_shibboleth
  */
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Backend\Domain\Repository\Module\BackendModuleRepository;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Imaging\Icon;
-use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolbarItem {
+class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolbarItem
+{
 
     /**
      * @var \TYPO3\CMS\Backend\Domain\Repository\Module\BackendModuleRepository $backendModuleRepository
      */
     protected $backendModuleRepository;
-
-    /**
-     * reference to the backend object
-     *
-     * @var TYPO3backend
-     */
-    protected $backendReference;
-
-    /**
-     * @var \TYPO3\CMS\Core\Imaging\IconFactory $iconFactory
-     * @inject
-     */
-    protected $iconFactory;
-
-    /**
-     * @var string
-     */
-    protected $EXTKEY = 'shibboleth';
 
     /**
      * Render drop down
@@ -56,75 +38,22 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
 
         if (!$this->backendModuleRepository) {
             $this->backendModuleRepository = GeneralUtility::makeInstance(BackendModuleRepository::class);
-
-        }
-        if(version_compare(TYPO3_version, '8.5.0') >= 0) {
-
-            $view = $this->getFluidTemplateObject('UserToolbarItemDropDown.html');
-            $view->assignMultiple([
-                'modules' => $this->backendModuleRepository->findByModuleName('user')->getChildren(),
-                'logoutUrl' => $redirect_url,
-                'switchUserMode' => $this->getBackendUser()->user['ses_backuserid'],
-            ]);
-            return $view->render();
-
         }
 
-        $backendUser = $this->getBackendUser();
-        //$languageService = $this->getLanguageService();
-        $languageService = $GLOBALS['LANG'];
-
-        $dropdown = array();
-        $dropdown[] = '<ul class="dropdown-list">';
-
-        $urlParameters = array(
-            'redirect' => htmlspecialchars($redirect_url)
-        );
-
-        /** @var \TYPO3\CMS\Backend\Domain\Model\Module\BackendModule $userModuleMenu */
-        $userModuleMenu = $this->backendModuleRepository->findByModuleName('user');
-        if ($userModuleMenu != false && $userModuleMenu->getChildren()->count() > 0) {
-            foreach ($userModuleMenu->getChildren() as $module) {
-                /** @var BackendModule $module */
-                $dropdown[] ='<li'
-                    . ' id="' . htmlspecialchars($module->getName()) . '"'
-                    . ' class="typo3-module-menu-item submodule mod-' . htmlspecialchars($module->getName()) . '" '
-                    . ' data-modulename="' . htmlspecialchars($module->getName()) . '"'
-                    . ' data-navigationcomponentid="' . htmlspecialchars($module->getNavigationComponentId()) . '"'
-                    . ' data-navigationframescript="' . htmlspecialchars($module->getNavigationFrameScript()) . '"'
-                    . ' data-navigationframescriptparameters="' . htmlspecialchars($module->getNavigationFrameScriptParameters()) . '"'
-                    . '>';
-                $dropdown[] = '<a title="' . htmlspecialchars($module->getDescription()) . '" href="' . htmlspecialchars($module->getLink()) . '" class="dropdown-list-link modlink">';
-                $dropdown[] = '<span class="submodule-icon typo3-app-icon"><span><span>' . $module->getIcon() . '</span></span></span>';
-                $dropdown[] = '<span class="submodule-label">' . htmlspecialchars($module->getTitle()) . '</span>';
-                $dropdown[] = '</a>';
-                $dropdown[] = '</li>';
-            }
-            $dropdown[] = '<li class="divider"></li>';
-        }
-
-        // Logout button
-        $buttonLabel = 'LLL:EXT:lang/locallang_core.xlf:' . ($backendUser->user['ses_backuserid'] ? 'buttons.exit' : 'buttons.logout');
-        $dropdown[] = '<li class="reset-dropdown">';
-        $dropdown[] = '<a href="' . htmlspecialchars(BackendUtility::getModuleUrl('logout', $urlParameters)) . '" class="btn btn-danger pull-right" target="_top">';
-        if(!$this->iconFactory) {
-            $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        }
-        $dropdown[] = $this->iconFactory->getIcon('actions-logout', Icon::SIZE_SMALL)->render('inline') . ' ';
-        $dropdown[] = $languageService->sL($buttonLabel, true);
-        $dropdown[] = '</a>';
-        $dropdown[] = '</li>';
-
-        $dropdown[] = '</ul>';
-
-        return implode(LF, $dropdown);
+        $view = $this->getFluidTemplateObject('UserToolbarItemDropDown.html');
+        $view->assignMultiple([
+            'modules' => $this->backendModuleRepository->findByModuleName('user')->getChildren(),
+            'logoutUrl' => $redirect_url,
+            'switchUserMode' => $this->getBackendUser()->user['ses_backuserid'],
+        ]);
+        return $view->render();
     }
 
     /**
      * Returns additional attributes for the list item in the toolbar
      * (Must be implemented.)
      *
-     * @return string List item HTML attibutes
+     * @return array List item HTML attibutes
      */
     public function getAdditionalAttributes() {
         $attributes = parent::getAdditionalAttributes();
@@ -140,10 +69,10 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
         if (!$this->isShibbolethUser()) {
             return '';
         }
-		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->EXTKEY]);
-		$redirect_url = trim($extConf['BE_logoutRedirectUrl']);
+		$configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('shibboleth');
+		$redirect_url = trim($configuration['BE_logoutRedirectUrl']);
 		if (strpos($redirect_url,'Logout?return=') === FALSE) {
-			$redirect_url = '/'.trim($extConf['sessions_handlerURL']).'/Logout?return='.$redirect_url;
+			$redirect_url = '/'.trim($configuration['sessions_handlerURL']).'/Logout?return='.$redirect_url;
 		}
 		return $redirect_url;
 	}
@@ -153,8 +82,10 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
      */
     protected function isShibbolethUser()
     {
-        return $GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid'];
+        if ($GLOBALS['BE_USER'] instanceof BackendUserAuthentication) {
+            return isset($GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid']) && !empty($GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid']);
+        }
+        return false;
     }
 
 }
-?>

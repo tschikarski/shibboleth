@@ -8,16 +8,52 @@
 
 namespace TrustCnct\Shibboleth\Toolbar;
 
-use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
+class UserToolbarItemTest extends UnitTestCase
 {
+
+    protected $resetSingletonInstances = true;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
+            "mappingConfigPath" => "/typo3conf/ext/shibboleth/Resources/Private/config.txt",
+            "sessions_handlerURL" => "Shibboleth.sso",
+            "sessionInitiator_Location" => "/Login",
+            "FE_enable" => "1",
+            "FE_autoImport" => "1",
+            "FE_autoImport_pid" => "2",
+            "BE_enable" => "0",
+            "BE_autoImport" => "1",
+            "BE_autoImportDisableUser" => "0",
+            "BE_loginTemplatePath" => "typo3conf/ext/shibboleth/res/be_form/login7.html",
+            "BE_logoutRedirectUrl" => "Logout?return=/typo3conf/ext/shibboleth/res/be_form/logout.html",
+            "BE_disabledUserRedirectUrl" => "/typo3conf/ext/shibboleth/res/be_form/nologinyet.html",
+            "enableAlwaysFetchUser" => "1",
+            "entityID" => "",
+            "forceSSL" => "1",
+            "FE_applicationID" => "",
+            "BE_applicationID" => "",
+            "FE_devLog" => "1",
+            "BE_devLog" => "0",
+            "database_devLog" => "1"
+        ];
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
+    }
+
     /**
      * @test
      */
-    public function getSecureLogoutRedirectUrlContainsLoginReturnStringOnce() {
+    public function getSecureLogoutRedirectUrlContainsLoginReturnStringOnce()
+    {
         /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
         $backendUser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
         $GLOBALS['BE_USER'] = $backendUser;
@@ -40,7 +76,28 @@ class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
         $GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid'] = 'something';
         $userToolbarItem = $this->getAccessibleMock(\TrustCnct\Shibboleth\Toolbar\UserToolbarItem::class,
             null);
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth'] = 'a:20:{s:17:"mappingConfigPath";s:40:"/typo3conf/ext/shibboleth/Resources/Private/config.txt";s:19:"sessions_handlerURL";s:14:"Shibboleth.sso";s:25:"sessionInitiator_Location";s:6:"/Login";s:9:"FE_enable";s:1:"1";s:13:"FE_autoImport";s:1:"1";s:17:"FE_autoImport_pid";s:1:"2";s:9:"BE_enable";s:1:"1";s:13:"BE_autoImport";s:1:"1";s:24:"BE_autoImportDisableUser";s:1:"0";s:20:"BE_loginTemplatePath";s:48:"typo3conf/ext/shibboleth/res/be_form/login7.html";s:20:"BE_logoutRedirectUrl";s:63:"Logout?return=/typo3conf/ext/shibboleth/res/be_form/logout.html";s:26:"BE_disabledUserRedirectUrl";s:53:"/typo3conf/ext/shibboleth/res/be_form/nologinyet.html";s:21:"enableAlwaysFetchUser";s:1:"1";s:8:"entityID";s:0:"";s:8:"forceSSL";s:1:"1";s:16:"FE_applicationID";s:0:"";s:16:"BE_applicationID";s:0:"";s:9:"FE_devLog";s:1:"1";s:9:"BE_devLog";s:1:"0";s:15:"database_devLog";s:1:"1";}';
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
+            "mappingConfigPath" => "/typo3conf/ext/shibboleth/Resources/Private/config.txt",
+            "sessions_handlerURL" => "Shibboleth.sso",
+            "sessionInitiator_Location" => "/Login",
+            "FE_enable" => "1",
+            "FE_autoImport" => "1",
+            "FE_autoImport_pid" => "2",
+            "BE_enable" => "0",
+            "BE_autoImport" => "1",
+            "BE_autoImportDisableUser" => "0",
+            "BE_loginTemplatePath" => "typo3conf/ext/shibboleth/res/be_form/login7.html",
+            "BE_logoutRedirectUrl" => "Logout?return=/typo3conf/ext/shibboleth/res/be_form/logout.html",
+            "BE_disabledUserRedirectUrl" => "/typo3conf/ext/shibboleth/res/be_form/nologinyet.html",
+            "enableAlwaysFetchUser" => "1",
+            "entityID" => "",
+            "forceSSL" => "1",
+            "FE_applicationID" => "",
+            "BE_applicationID" => "",
+            "FE_devLog" => "1",
+            "BE_devLog" => "0",
+            "database_devLog" => "1"
+        ];
         $returnValue = $userToolbarItem->_call('getSecureLogoutRedirectUrl');
         $this->assertSame(1, preg_match_all('/Logout\?return\=/',
             $returnValue),'Expected "Logout?return=" exactly once');
@@ -50,7 +107,11 @@ class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
-    public function getSecureLogoutRedirectUrlDoesNotContainLoginUrlIfNoShibbolethUser() {
+    public function getSecureLogoutRedirectUrlDoesNotContainLoginUrlIfNoShibbolethUser()
+    {
+        /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
+        $backendUser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
+        $GLOBALS['BE_USER'] = $backendUser;
         $userToolbarItem = $this->getAccessibleMock(\TrustCnct\Shibboleth\Toolbar\UserToolbarItem::class,
             null);
         $returnValue = $userToolbarItem->_call('getSecureLogoutRedirectUrl');

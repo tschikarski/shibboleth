@@ -2,35 +2,56 @@
 
 namespace TrustCnct\Shibboleth\Tests\Unit\Service;
 
-use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TrustCnct\Shibboleth\Service\LoginUrlService;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
+class LoginUrlServiceTest extends UnitTestCase
 {
-    protected $extConf;
 
-    protected $testExtConf = array(
-        'sessions_handlerURL' => 'ShibbolethTest.sso',
-        'sessionInitiator_Location' => 'LoginTest',
-        'forceSSL' => false,
-        'entityID' => ''
-    );
+    use \Prophecy\PhpUnit\ProphecyTrait;
 
-    protected function setUp()
+    protected $configuration;
+
+    /**
+     * @var LoginUrlService
+     */
+    protected $loginUrlService;
+
+    protected function setUp(): void
     {
         parent::setUp();
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth'] = serialize($this->testExtConf);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
+            'BE_applicationID' => '',
+            'BE_autoImport' => '0',
+            'BE_autoImportDisableUser' => '1',
+            'BE_disabledUserRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/nologinyet.html',
+            'BE_enable' => '0',
+            'BE_loginTemplatePath' => 'typo3conf/ext/shibboleth/Resources/Private/Templates/BeForm/login.html',
+            'BE_logoutRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/logout.html',
+            'FE_applicationID' => '',
+            'FE_autoImport' => '0',
+            'FE_autoImport_pid' => '',
+            'FE_enable' => '0',
+            'debugLog' => '0',
+            'enableAlwaysFetchUser' => '1',
+            'entityID' => '',
+            'forceSSL' => '0',
+            'mappingConfigPath' => '/typo3conf/ext/shibboleth/Resources/Private/config.txt',
+            'pageUidForTSFE' => '1',
+            'sessionInitiator_Location' => '/Login',
+            'sessions_handlerURL' => 'Shibboleth.sso',
+        ];
+        $this->loginUrlService = new LoginUrlService();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        unset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['shibboleth']);
+        unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
         parent::tearDown();
     }
 
-    protected function getParameterArrayFromUrl($url) {
+    protected function getParameterArrayFromUrl($url)
+    {
         if (strpos($url,'?') === FALSE) return array();
         preg_match('|\?(.*)$|', $url, $matches);
         $parameterAssignments = explode('&', $matches[1]);
@@ -45,79 +66,125 @@ class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
-    public function loginLinkProtocolIsHttp() {
-        $mockedUrlService = $this->getMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        preg_match('|^(.+)\:.*|',$mockedUrlService->createUrl(),$matches);
-        $this->assertRegExp('|http|', $matches[1]);
+    public function loginLinkProtocolIsHttp()
+    {
+        preg_match('|^(.+)\:.*|',$this->loginUrlService->createUrl(),$matches);
+        $this->assertMatchesRegularExpression('|http|', $matches[1]);
     }
 
     /**
      * @test
      */
-    public function loginLinkProtocolIsForcedHttps() {
-        $mockedUrlService = $this->getAccessibleMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $specialExtConf = $mockedUrlService->_get('extConf');
-        $specialExtConf['forceSSL'] = true;
-        $mockedUrlService->_set('extConf',$specialExtConf);
-        preg_match('|^(.+)\:.*|',$mockedUrlService->createUrl(),$matches);
-        $this->assertRegExp('|https|', $matches[1]);
+    public function loginLinkProtocolIsForcedHttps()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
+            'BE_applicationID' => '',
+            'BE_autoImport' => '0',
+            'BE_autoImportDisableUser' => '1',
+            'BE_disabledUserRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/nologinyet.html',
+            'BE_enable' => '0',
+            'BE_loginTemplatePath' => 'typo3conf/ext/shibboleth/Resources/Private/Templates/BeForm/login.html',
+            'BE_logoutRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/logout.html',
+            'FE_applicationID' => '',
+            'FE_autoImport' => '0',
+            'FE_autoImport_pid' => '',
+            'FE_enable' => '0',
+            'debugLog' => '0',
+            'enableAlwaysFetchUser' => '1',
+            'entityID' => '',
+            'forceSSL' => '1',
+            'mappingConfigPath' => '/typo3conf/ext/shibboleth/Resources/Private/config.txt',
+            'pageUidForTSFE' => '1',
+            'sessionInitiator_Location' => '/Login',
+            'sessions_handlerURL' => 'Shibboleth.sso',
+        ];
+        $this->loginUrlService = new LoginUrlService();
+        preg_match('|^(.+)\:.*|',$this->loginUrlService->createUrl(),$matches);
+        $this->assertMatchesRegularExpression('|https|', $matches[1]);
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsShibbolethHandlerUrl() {
-        $mockedUrlService = $this->getMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $this->assertRegExp('|/'.$this->extConf['sessions_handlerURL'].'/|', $mockedUrlService->createUrl());
-    }
-
-    /**
-     * @test
-     */
-    public function loginLinkContainsSessionInitiatorLocation() {
-        $mockedUrlService = $this->getMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $link = $mockedUrlService->createUrl();
+    public function loginLinkContainsShibbolethHandlerUrl()
+    {
+        $link = $this->loginUrlService->createUrl();
         $this->assertNotEmpty($link);
-        $this->assertRegExp('|/'.$this->extConf['sessionsInitiator_location'].'|', $link);
+        $this->assertMatchesRegularExpression('|/Shibboleth.sso/|', $link);
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsTargetParameter() {
-        $mockedUrlService = $this->getMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $parameters = $this->getParameterArrayFromUrl($mockedUrlService->createUrl());
+    public function loginLinkContainsSessionInitiatorLocation()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $this->assertMatchesRegularExpression('|\/Login|', $link);
+    }
+
+    /**
+     * @test
+     */
+    public function loginLinkContainsTargetParameter()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $parameters = $this->getParameterArrayFromUrl($link);
         $this->assertArrayHasKey('target',$parameters);
     }
 
     /**
      * @test
      */
-    public function loginLinkTargetParameterIsUrl() {
-        $mockedUrlService = $this->getMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $parameters = $this->getParameterArrayFromUrl($mockedUrlService->createUrl());
+    public function loginLinkTargetParameterIsUrl()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $parameters = $this->getParameterArrayFromUrl($link);
         $targetUrl = urldecode($parameters['target']);
-        $this->assertRegExp('|^https?://.*$|', $targetUrl,'Link target must have URL format.');
+        $this->assertMatchesRegularExpression('|^https?://.*$|', $targetUrl,'Link target must have URL format.');
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsNoEntityIdParameter() {
-        $mockedUrlService = $this->getMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $parameters = $this->getParameterArrayFromUrl($mockedUrlService->createUrl());
+    public function loginLinkContainsNoEntityIdParameter()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $parameters = $this->getParameterArrayFromUrl($link);
         $this->assertArrayNotHasKey('entityID',$parameters);
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsOptionalEntityIdParameter() {
-        $mockedUrlService = $this->getAccessibleMock('TrustCnct\Shibboleth\Service\LoginUrlService',['dummy']);
-        $specialExtConf = $mockedUrlService->_get('extConf');
-        $specialExtConf['entityID'] = 'EntityIdTest';
-        $mockedUrlService->_set('extConf',$specialExtConf);
-        $parameters = $this->getParameterArrayFromUrl($mockedUrlService->createUrl());
+    public function loginLinkContainsOptionalEntityIdParameter()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
+            'BE_applicationID' => '',
+            'BE_autoImport' => '0',
+            'BE_autoImportDisableUser' => '1',
+            'BE_disabledUserRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/nologinyet.html',
+            'BE_enable' => '0',
+            'BE_loginTemplatePath' => 'typo3conf/ext/shibboleth/Resources/Private/Templates/BeForm/login.html',
+            'BE_logoutRedirectUrl' => '/typo3conf/ext/shibboleth/Resources/Public/LogoutPages/logout.html',
+            'FE_applicationID' => '',
+            'FE_autoImport' => '0',
+            'FE_autoImport_pid' => '',
+            'FE_enable' => '0',
+            'debugLog' => '0',
+            'enableAlwaysFetchUser' => '1',
+            'entityID' => 'EntityIdTest',
+            'forceSSL' => '1',
+            'mappingConfigPath' => '/typo3conf/ext/shibboleth/Resources/Private/config.txt',
+            'pageUidForTSFE' => '1',
+            'sessionInitiator_Location' => '/Login',
+            'sessions_handlerURL' => 'Shibboleth.sso',
+        ];
+        $this->loginUrlService = new LoginUrlService();
+        $parameters = $this->getParameterArrayFromUrl($this->loginUrlService->createUrl());
         $this->assertArrayHasKey('entityID',$parameters,'We expect here the additional parameter "entityID".');
         $this->assertSame('EntityIdTest',$parameters['entityID']);
     }

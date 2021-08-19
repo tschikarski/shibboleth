@@ -32,5 +32,9 @@ forceSSL = 1
 FE_applicationID =
   # cat=Advanced/enable/170; type=string; label=BE Application-ID (optional): Compare Shibboleth Application-ID with this string, if not empty
 BE_applicationID =
-  # cat=Debugging/enable/210; type=boolean; label=Activate extra devLog'ging for FE/BE: Include information on DB operations. Note that general activation of devlog requires to set [SYS][enable_DLOG] to true.
-database_devLog = 0
+  # cat=Advanced/enable/190; type=int; label=Page Uid to init TSFE TypoScriptFrontendController
+pageUidForTSFE = 1
+  # cat=Debugging/enable/210; type=boolean; label=Activate extra debug log for FE/BE: Include information on DB operations.
+debugLog = 0
+
+

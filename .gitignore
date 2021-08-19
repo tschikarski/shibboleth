@@ -1,2 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 Resources/Private/config.txt
+
+.Build/
+.idea/
+Build/.phpunit.result.cache
+Build/testing-docker/.env
+composer.lock
+Tests/Acceptance/Support/_generated/
