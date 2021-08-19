@@ -20,6 +20,7 @@ use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Configuration\SiteConfiguration;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -31,6 +32,7 @@ use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class UserHandler implements LoggerAwareInterface
@@ -78,7 +80,7 @@ class UserHandler implements LoggerAwareInterface
     protected $config; // typoscript like configuration for the current loginType
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+     * @var ContentObjectRenderer
      */
     protected $cObj; // local cObj, needed to parse the typoscript configuration
 
@@ -130,10 +132,10 @@ class UserHandler implements LoggerAwareInterface
             $this->tsfeDetected = true;
         }
 
-        $this->initializeTypoScriptFrontend((int)$this->shibboleth_extConf['pageUidForTSFE']);
+//        $this->initializeTypoScriptFrontend((int)$this->shibboleth_extConf['pageUidForTSFE']);
 
-        /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $localcObj */
-        $localcObj = GeneralUtility::makeInstance(\TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer::class);
+        /** @var ContentObjectRenderer $localcObj */
+        $localcObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
         $localcObj->start($serverEnvReplaced);
         if (!$this->tsfeDetected) {
             unset($GLOBALS['TSFE']);
@@ -179,7 +181,11 @@ class UserHandler implements LoggerAwareInterface
         Locales::setSystemLocaleFromSiteLanguage($siteLanguage);
     }
 
-    function lookUpShibbolethUserInDatabase()
+    /**
+     * @return false|array|string
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    public function lookUpShibbolethUserInDatabase()
     {
         $idField = $this->config['IDMapping.']['typo3Field'];
         $idValue = $this->getSingle($this->config['IDMapping.']['shibID'], $this->config['IDMapping.']['shibID.']);
@@ -225,10 +231,13 @@ class UserHandler implements LoggerAwareInterface
         }
         $this->logger->debug('getUserFromDB returning FALSE (no record found)', [$row]);
         return false;
-
     }
 
-    function transferShibbolethAttributesToUserArray($user)
+    /**
+     * @param array $user
+     * @return array|string
+     */
+    public function transferShibbolethAttributesToUserArray($user)
     {
         // We will need part of the config array when writing user to DB in "synchronizeUserData"; let's put it into $user
         $user['tx_shibboleth_config'] = $this->config['userControls.'];
@@ -262,13 +271,16 @@ class UserHandler implements LoggerAwareInterface
         return $user;
     }
 
-    function synchronizeUserData(&$user)
+    /**
+     * @param array $user
+     * @return int|mixed|string
+     */
+    public function synchronizeUserData(&$user)
     {
         $this->logger->debug('synchronizeUserData', [$user]);
 
         if ($user['uid']) {
             $user = $this->updateUser($user);
-
         } else {
             $user = $this->insertUser($user);
         }
@@ -282,22 +294,31 @@ class UserHandler implements LoggerAwareInterface
         return $uid;
     }
 
-    function getTyposcriptConfiguration()
+    public function getTyposcriptConfiguration()
     {
-        $this->mappingConfigAbsolutePath = $this->getEnvironmentVariable('TYPO3_DOCUMENT_ROOT') . $this->shibboleth_extConf['mappingConfigPath'];
-        $configString = GeneralUtility::getURL($this->mappingConfigAbsolutePath);
+        $this->mappingConfigAbsolutePath = Environment::getPublicPath() . $this->shibboleth_extConf['mappingConfigPath'];
+        $configString = false;
+        if (\is_file($this->mappingConfigAbsolutePath)) {
+            $configString = file_get_contents($this->mappingConfigAbsolutePath);
+        }
         if ($configString === false) {
             $this->logger->debug('Could not find config file, please check extension setting for correct path!');
             return [];
         }
 
+        /** @var TypoScriptParser $parser */
         $parser = GeneralUtility::makeInstance(TypoScriptParser::class);
         $parser->parse($configString);
         $completeSetup = $parser->setup;
         return $completeSetup['tx_shibboleth.'][$this->loginType . '.'];
     }
 
-    function getSingle($conf, $subConf)
+    /**
+     * @param string $conf
+     * @param array|null $subConf
+     * @return string
+     */
+    private function getSingle($conf, $subConf)
     {
         if (is_array($subConf)) {
             if ($GLOBALS['TSFE']->cObjectDepthCounter == 0) {
@@ -318,8 +339,9 @@ class UserHandler implements LoggerAwareInterface
     }
 
     /**
-     * @param $user
-     * @return mixed
+     * @param array $user
+     * @param bool $forInsert
+     * @return array
      */
     private function mapAdditionalFields($user, $forInsert = false)
     {
@@ -338,24 +360,12 @@ class UserHandler implements LoggerAwareInterface
     }
 
     /**
-     * Wrapper function for GeneralUtility::getIndpEnv()
-     *
-     * @param string $key Name of the "environment variable"/"server variable" you wish to get.
-     * @return string
-     * @see GeneralUtility::getIndpEnv
-     */
-    protected function getEnvironmentVariable($key)
-    {
-        return GeneralUtility::getIndpEnv($key);
-    }
-
-    /**
-     * @param $user
-     * @return array
+     * @param array $user
+     * @return array|null
      */
     private function updateUser($user)
     {
-// User is in DB, so we have to update, therefore remove uid from DB record and save it for later
+        // User is in DB, so we have to update, therefore remove uid from DB record and save it for later
         $uid = $user['uid'];
         unset($user['uid']);
         // We have to update the tstamp field, in any case.
@@ -366,7 +376,7 @@ class UserHandler implements LoggerAwareInterface
         // Remove that data from $user - otherwise we get an error updating the user record in DB
         unset($user['tx_shibboleth_config']);
 
-        $this->logger->debug('synchronizeUserData: Updating $user with uid=' . intval($uid) . ' in DB', [$user]);
+        $this->logger->debug('synchronizeUserData: Updating $user with uid=' . (int)$uid . ' in DB', [$user]);
 
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $query = $connectionPool->getQueryBuilderForTable($this->db_user['table']);
@@ -384,7 +394,7 @@ class UserHandler implements LoggerAwareInterface
                 [$e->getMessage()]);
             return null;
         }
-        if ($numAffectedRows != 1) {
+        if ($numAffectedRows !== 1) {
             $this->logger->debug('synchronizeUserData: Could not insert $user into DB.', [$user]);
             return null;
         }
@@ -393,8 +403,8 @@ class UserHandler implements LoggerAwareInterface
     }
 
     /**
-     * @param $user
-     * @return array
+     * @param array $user
+     * @return array|null
      */
     private function insertUser($user)
     {
@@ -406,13 +416,13 @@ class UserHandler implements LoggerAwareInterface
         // Remove that data from $user - otherwise we get an error inserting the user record into DB
         unset($user['tx_shibboleth_config']);
         // Determine correct pid for new user
-        if ($this->loginType == 'FE') {
-            $user['pid'] = intval($this->shibboleth_extConf['FE_autoImport_pid']);
+        if ($this->loginType === 'FE') {
+            $user['pid'] = (int)$this->shibboleth_extConf['FE_autoImport_pid'];
         } else {
             $user['pid'] = 0;
         }
         // In BE Autoimport might be done with disable=1, i.e. BE User has to be enabled manually after first login attempt.
-        if ($this->loginType == 'BE' && $this->shibboleth_extConf['BE_autoImportDisableUser']) {
+        if ($this->loginType === 'BE' && $this->shibboleth_extConf['BE_autoImportDisableUser']) {
             $user['disable'] = 1;
         }
         // Insert
@@ -431,7 +441,12 @@ class UserHandler implements LoggerAwareInterface
             $this->logger->debug('synchronizeUserData: Could not insert $user into DB.', [$user]);
             return null;
         }
-        $user = $this->lookUpShibbolethUserInDatabase();
+        $lookUp = $this->lookUpShibbolethUserInDatabase();
+        if (\is_array($lookUp)) {
+            $user = $lookUp;
+        } else {
+            // TODO what do we do with the returned string?
+        }
         $this->logger->debug('synchronizeUserData: Got new uid ' . $user['uid']);
         return $user;
     }

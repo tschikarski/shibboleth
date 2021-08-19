@@ -38,19 +38,19 @@ class LoginUrlService
 
         $sessionHandlerUrl = $this->configuration['sessions_handlerURL'];
 
-        if (preg_match('/^http/',$sessionHandlerUrl) == 0) {
+        if (0 !== strpos($sessionHandlerUrl, "http")) {
             $sessionHandlerUrl = $typo3_site_url . $sessionHandlerUrl;
         }
 
         $targetParam = 'target=' . rawurlencode($typo3_site_url);
 
-        if (($entityIDparam != '') and ($targetParam != '')) {
+        if (($entityIDparam !== '') && ($targetParam !== '')) {
             $params = $entityIDparam . '&' . $targetParam;
         } else {
             $params = $entityIDparam . $targetParam;
         }
 
-        if ($params != '') {
+        if ($params !== '') {
             $params = '?' . $params;
         }
 

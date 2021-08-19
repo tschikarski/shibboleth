@@ -12,6 +12,7 @@ namespace TrustCnct\Shibboleth\Toolbar;
  */
 
 use TYPO3\CMS\Backend\Domain\Repository\Module\BackendModuleRepository;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -81,7 +82,10 @@ class UserToolbarItem extends \TYPO3\CMS\Backend\Backend\ToolbarItems\UserToolba
      */
     protected function isShibbolethUser()
     {
-        return $GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid'];
+        if ($GLOBALS['BE_USER'] instanceof BackendUserAuthentication) {
+            return isset($GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid']) && !empty($GLOBALS['BE_USER']->user['tx_shibboleth_shibbolethsessionid']);
+        }
+        return false;
     }
 
 }
