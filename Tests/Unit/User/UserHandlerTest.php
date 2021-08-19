@@ -15,11 +15,15 @@
 
 namespace TrustCnct\Shibboleth\User;
 
-use Nimut\TestingFramework\TestCase\UnitTestCase;
-use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use PHPUnit\Framework\MockObject\MockObject;
+use TYPO3\TestingFramework\Core\AccessibleObjectInterface;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 class UserHandlerTest extends UnitTestCase
 {
+
+    protected $resetSingletonInstances = true;
+
     /**
      * @var array
      */
@@ -42,14 +46,15 @@ class UserHandlerTest extends UnitTestCase
     ];
 
     /**
-     * @var UserHandler
+     * @var UserHandler|MockObject|AccessibleObjectInterface
      */
     protected $userHandler;
 
     /**
      * Test setup
      */
-    protected function setUp() {
+    protected function setUp(): void
+    {
         parent::setUp();
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
             'BE_applicationID' => '',
@@ -73,11 +78,9 @@ class UserHandlerTest extends UnitTestCase
             'sessions_handlerURL' => 'Shibboleth.sso',
         ];
         $GLOBALS['TYPO3_CONF_VARS']['DB']['Connections']['Default'] = []; // Avoid exception in web/typo3conf/ext/shibboleth/Classes/User/UserHandler.php:76
-
-        $GLOBALS['TSFE'] = $this->createMock(TypoScriptFrontendController::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
@@ -88,10 +91,10 @@ class UserHandlerTest extends UnitTestCase
      */
     public function tempTsfeIsFinallyUnsetTest()
     {
-        /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
-        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
-        $this->assertFalse($userHandler->tsfeDetected);
-        $this->assertEmpty($GLOBALS['TSFE']);
+        $GLOBALS['TSFE'] = null;
+        $this->userHandler = $this->getAccessibleMock(UserHandler::class, null, ['FE', $this->db_user, $this->db_group,'Shib_Session_ID',false]);
+        $this->assertFalse($this->userHandler->_get('tsfeDetected'));
+        $this->assertFalse(isset($GLOBALS['TSFE']));
     }
 
     /**
@@ -101,38 +104,42 @@ class UserHandlerTest extends UnitTestCase
     {
         $GLOBALS['TSFE'] = new \stdClass();
         $GLOBALS['TSFE']->cObjectDepthCounter = 100;
-        /** @var \TrustCnct\Shibboleth\User\UserHandler $userHandler */
-        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
-        $this->assertTrue($userHandler->tsfeDetected);
+        $this->userHandler = $this->getAccessibleMock(UserHandler::class, null, ['FE', $this->db_user, $this->db_group,'Shib_Session_ID',false]);
+        $this->assertTrue($this->userHandler->_get('tsfeDetected'));
         $this->assertObjectHasAttribute('cObjectDepthCounter',$GLOBALS['TSFE']);
     }
 
     /**
      * @test
      */
-    public function validCObjCreatedTest() {
-        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
-        $this->assertNotEmpty($userHandler->cObj->data);
-        $this->assertNotEmpty($userHandler->cObj->data['USER']);
+    public function validCObjCreatedTest()
+    {
+        $GLOBALS['TSFE'] = null;
+        $this->userHandler = $this->getAccessibleMock(UserHandler::class, null, ['FE', $this->db_user, $this->db_group,'Shib_Session_ID',false]);
+        $this->assertNotEmpty($this->userHandler->_get('cObj')->data);
     }
 
     /**
      * @test
      */
-    public function environmentGoesIntoCObjData() {
+    public function environmentGoesIntoCObjData()
+    {
+        $GLOBALS['TSFE'] = null;
         $_SERVER['UserHandlerTestEnvironment'] = 'UserHandlerTestValue';
-        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'');
-        $this->assertNotEmpty($userHandler->cObj->data['UserHandlerTestEnvironment']);
-        $this->assertSame('UserHandlerTestValue',$userHandler->cObj->data['UserHandlerTestEnvironment']);
+        $this->userHandler = $this->getAccessibleMock(UserHandler::class, null, ['FE', $this->db_user, $this->db_group,'Shib_Session_ID',false]);
+        $this->assertNotEmpty($this->userHandler->_get('cObj')->data['UserHandlerTestEnvironment']);
+        $this->assertSame('UserHandlerTestValue',$this->userHandler->_get('cObj')->data['UserHandlerTestEnvironment']);
     }
 
     /**
      * @test
      */
-    public function environmentPrefixIsRecognized() {
+    public function environmentPrefixIsRecognized()
+    {
+        $GLOBALS['TSFE'] = null;
         $_SERVER['redirectShibbSomeEnvironment'] = 'ShibbSomeValue';
-        $userHandler = new UserHandler('FE', $this->db_user, $this->db_group,'Shib_Session_ID',false,'redirect');
-        $this->assertSame('ShibbSomeValue',$userHandler->cObj->data['ShibbSomeEnvironment']);
+        $this->userHandler = $this->getAccessibleMock(UserHandler::class, null, ['FE', $this->db_user, $this->db_group,'Shib_Session_ID',false]);
+        $this->assertSame('ShibbSomeValue',$this->userHandler->_get('cObj')->data['redirectShibbSomeEnvironment']);
     }
 
 }

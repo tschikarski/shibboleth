@@ -13,7 +13,13 @@
     "typo3/cms-core": "^10.4"
   },
   "require-dev": {
-    "nimut/testing-framework": "^5.2.1"
+    "typo3/testing-framework": "^6.9.0",
+    "phpspec/prophecy": "^1.12.2",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "codeception/codeception": "^4.1",
+    "codeception/module-webdriver": "^1.1",
+    "codeception/module-asserts": "^1.2",
+    "codeception/module-cli": "^1.1"
   },
   "authors": [
     {
@@ -35,20 +41,24 @@
   },
   "config": {
     "vendor-dir": ".Build/vendor",
-    "bin-dir": ".Build/bin"
+    "bin-dir": ".Build/bin",
+    "preferred-install": {
+      "typo3/cms-core": "source"
+    }
   },
   "scripts": {
       "post-autoload-dump": [
           "@prepare-extension-test-structure"
       ],
       "prepare-extension-test-structure": [
-          "Nimut\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
+          "TYPO3\\TestingFramework\\Composer\\ExtensionTestEnvironment::prepare"
       ]
   },
   "extra": {
     "typo3/cms": {
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
-      "web-dir": ".Build/Web"
+      "web-dir": ".Build/Web",
+      "extension-key": "shibboleth"
     }
   }
 }

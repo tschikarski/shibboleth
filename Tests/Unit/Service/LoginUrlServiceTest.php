@@ -3,17 +3,21 @@
 namespace TrustCnct\Shibboleth\Tests\Unit\Service;
 
 use TrustCnct\Shibboleth\Service\LoginUrlService;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
+class LoginUrlServiceTest extends UnitTestCase
 {
+
+    use \Prophecy\PhpUnit\ProphecyTrait;
+
     protected $configuration;
 
     /**
      * @var LoginUrlService
      */
-    protected $loginUrlService = null;
+    protected $loginUrlService;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
@@ -40,13 +44,14 @@ class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
         $this->loginUrlService = new LoginUrlService();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
         parent::tearDown();
     }
 
-    protected function getParameterArrayFromUrl($url) {
+    protected function getParameterArrayFromUrl($url)
+    {
         if (strpos($url,'?') === FALSE) return array();
         preg_match('|\?(.*)$|', $url, $matches);
         $parameterAssignments = explode('&', $matches[1]);
@@ -61,15 +66,17 @@ class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
-    public function loginLinkProtocolIsHttp() {
+    public function loginLinkProtocolIsHttp()
+    {
         preg_match('|^(.+)\:.*|',$this->loginUrlService->createUrl(),$matches);
-        $this->assertRegExp('|http|', $matches[1]);
+        $this->assertMatchesRegularExpression('|http|', $matches[1]);
     }
 
     /**
      * @test
      */
-    public function loginLinkProtocolIsForcedHttps() {
+    public function loginLinkProtocolIsForcedHttps()
+    {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
             'BE_applicationID' => '',
             'BE_autoImport' => '0',
@@ -93,54 +100,68 @@ class LoginUrlServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
         ];
         $this->loginUrlService = new LoginUrlService();
         preg_match('|^(.+)\:.*|',$this->loginUrlService->createUrl(),$matches);
-        $this->assertRegExp('|https|', $matches[1]);
+        $this->assertMatchesRegularExpression('|https|', $matches[1]);
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsShibbolethHandlerUrl() {
-        $this->assertRegExp('|/'.$this->configuration['sessions_handlerURL'].'/|', $this->loginUrlService->createUrl());
-    }
-
-    /**
-     * @test
-     */
-    public function loginLinkContainsSessionInitiatorLocation() {
+    public function loginLinkContainsShibbolethHandlerUrl()
+    {
         $link = $this->loginUrlService->createUrl();
         $this->assertNotEmpty($link);
-        $this->assertRegExp('|/'.$this->configuration['sessionsInitiator_location'].'|', $link);
+        $this->assertMatchesRegularExpression('|/Shibboleth.sso/|', $link);
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsTargetParameter() {
-        $parameters = $this->getParameterArrayFromUrl($this->loginUrlService->createUrl());
+    public function loginLinkContainsSessionInitiatorLocation()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $this->assertMatchesRegularExpression('|\/Login|', $link);
+    }
+
+    /**
+     * @test
+     */
+    public function loginLinkContainsTargetParameter()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $parameters = $this->getParameterArrayFromUrl($link);
         $this->assertArrayHasKey('target',$parameters);
     }
 
     /**
      * @test
      */
-    public function loginLinkTargetParameterIsUrl() {
-        $parameters = $this->getParameterArrayFromUrl($this->loginUrlService->createUrl());
+    public function loginLinkTargetParameterIsUrl()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $parameters = $this->getParameterArrayFromUrl($link);
         $targetUrl = urldecode($parameters['target']);
-        $this->assertRegExp('|^https?://.*$|', $targetUrl,'Link target must have URL format.');
+        $this->assertMatchesRegularExpression('|^https?://.*$|', $targetUrl,'Link target must have URL format.');
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsNoEntityIdParameter() {
-        $parameters = $this->getParameterArrayFromUrl($this->loginUrlService->createUrl());
+    public function loginLinkContainsNoEntityIdParameter()
+    {
+        $link = $this->loginUrlService->createUrl();
+        $this->assertNotEmpty($link);
+        $parameters = $this->getParameterArrayFromUrl($link);
         $this->assertArrayNotHasKey('entityID',$parameters);
     }
 
     /**
      * @test
      */
-    public function loginLinkContainsOptionalEntityIdParameter() {
+    public function loginLinkContainsOptionalEntityIdParameter()
+    {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
             'BE_applicationID' => '',
             'BE_autoImport' => '0',

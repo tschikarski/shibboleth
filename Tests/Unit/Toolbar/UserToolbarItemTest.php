@@ -9,11 +9,14 @@
 namespace TrustCnct\Shibboleth\Toolbar;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
+class UserToolbarItemTest extends UnitTestCase
 {
 
-    protected function setUp()
+    protected $resetSingletonInstances = true;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
@@ -40,7 +43,7 @@ class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
         ];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
@@ -49,7 +52,8 @@ class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
-    public function getSecureLogoutRedirectUrlContainsLoginReturnStringOnce() {
+    public function getSecureLogoutRedirectUrlContainsLoginReturnStringOnce()
+    {
         /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
         $backendUser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
         $GLOBALS['BE_USER'] = $backendUser;
@@ -103,7 +107,11 @@ class UserToolbarItemTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
     /**
      * @test
      */
-    public function getSecureLogoutRedirectUrlDoesNotContainLoginUrlIfNoShibbolethUser() {
+    public function getSecureLogoutRedirectUrlDoesNotContainLoginUrlIfNoShibbolethUser()
+    {
+        /** @var $backendUser \TYPO3\CMS\Core\Authentication\BackendUserAuthentication */
+        $backendUser = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
+        $GLOBALS['BE_USER'] = $backendUser;
         $userToolbarItem = $this->getAccessibleMock(\TrustCnct\Shibboleth\Toolbar\UserToolbarItem::class,
             null);
         $returnValue = $userToolbarItem->_call('getSecureLogoutRedirectUrl');

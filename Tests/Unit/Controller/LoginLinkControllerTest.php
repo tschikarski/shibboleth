@@ -1,33 +1,38 @@
 <?php
 namespace TrustCnct\Shibboleth\Tests\Unit\Controller;
 
+use Prophecy\Prophecy\ObjectProphecy;
 use TrustCnct\Shibboleth\Controller\LoginLinkController;
 use TrustCnct\Shibboleth\Service\LoginUrlService;
+use TYPO3\CMS\Fluid\View\TemplateView;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
  * Test case.
  */
-class LoginLinkControllerTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
+class LoginLinkControllerTest extends UnitTestCase
 {
-    /**
-     * @var \TrustCnct\Shibboleth\Controller\LoginLinkController
-     */
-    protected $loginLinkController = null;
+
+    use \Prophecy\PhpUnit\ProphecyTrait;
 
     /**
-     * @var \TrustCnct\Shibboleth\Service\LoginUrlService
+     * @var LoginLinkController
      */
-    protected $loginUrlService;
+    private $subject;
 
-    public function injectLoginUrlService(LoginUrlService $loginUrlService)
-    {
-        $this->loginUrlService = $loginUrlService;
-    }
+    /**
+     * @var TemplateView|ObjectProphecy
+     */
+    private $viewProphecy;
 
-    protected function setUp()
+    /**
+     * @var LoginUrlService|ObjectProphecy
+     */
+    private $loginUrlServiceProphecy;
+
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->loginLinkController = $this->getMockBuilder(LoginLinkController::class)->getMock();
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth'] = [
             'BE_applicationID' => '',
             'BE_autoImport' => '0',
@@ -49,9 +54,22 @@ class LoginLinkControllerTest extends \Nimut\TestingFramework\TestCase\UnitTestC
             'sessionInitiator_Location' => '/Login',
             'sessions_handlerURL' => 'Shibboleth.sso',
         ];
+
+        $this->subject = new LoginLinkController();
+
+        $this->viewProphecy = $this->prophesize(TemplateView::class);
+        $view = $this->viewProphecy->reveal();
+
+        $reflectionClass = new \ReflectionClass(LoginLinkController::class);
+        $prop = $reflectionClass->getProperty('view');
+        $prop->setAccessible(true);
+        $prop->setValue($this->subject, $view);
+
+        $this->loginUrlServiceProphecy = $this->prophesize(LoginUrlService::class);
+        $this->subject->injectLoginUrlService($this->loginUrlServiceProphecy->reveal());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         unset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['shibboleth']);
@@ -62,14 +80,11 @@ class LoginLinkControllerTest extends \Nimut\TestingFramework\TestCase\UnitTestC
      */
     public function showActionAssignsTheGivenLoginUrlToView()
     {
-        $loginUrl = 'https://localhost/Shibboleth.sso/LoginTest';
-        $view = $this->getMockBuilder(\TYPO3\CMS\Extbase\Mvc\View\ViewInterface::class)->getMock();
-        $this->inject($this->loginLinkController, 'view', $view);
-        $loginUrlService = $this->getMockBuilder(\TrustCnct\Shibboleth\Service\LoginUrlService::class)
-            ->setMethods(['createUrl'])->getMock();
-        $loginUrlService->expects($this->once())->method('createUrl')->willReturn($loginUrl);
-        $this->inject($this->loginLinkController, 'loginUrlService', $loginUrlService);
-        $view->expects($this->once())->method('assign')->with('loginLinkUrl', $loginUrl);
-        $this->loginLinkController->showAction();
+        $loginUrl = 'https://localhost/Shibboleth.sso/Login';
+
+        $this->viewProphecy->assign('loginLinkUrl', $loginUrl)->shouldBeCalled();
+        $this->loginUrlServiceProphecy->createUrl()->willReturn($loginUrl)->shouldBeCalled();
+
+        $this->subject->showAction();
     }
 }

@@ -1,0 +1,24 @@
+parameters:
+  level: 6
+
+  paths:
+    - %currentWorkingDirectory%/Classes
+    - %currentWorkingDirectory%/Tests
+
+  excludes_analyse:
+    - %currentWorkingDirectory%/Tests/Acceptance/Support/BackendTester.php
+    - %currentWorkingDirectory%/Tests/Acceptance/Backend/ModuleCest.php
+    - %currentWorkingDirectory%/Tests/Acceptance/Backend/GenerateCommandCest.php
+
+  checkMissingIterableValueType: false
+
+  ignoreErrors:
+    # @todo: These should probably be fixed in core?!
+    -
+      message: "#^Cannot call method fetchAllAssociative\\(\\) on Doctrine\\\\DBAL\\\\Driver\\\\ResultStatement\\|int\\.$#"
+      count: 4
+      path: %currentWorkingDirectory%/Classes/TcaDataGenerator/RecordFinder.php
+    -
+      message: "#^Parameter \\#1 \\.\\.\\.\\$where of method TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\QueryBuilder\\:\\:orWhere\\(\\) expects string, TYPO3\\\\CMS\\\\Core\\\\Database\\\\Query\\\\Expression\\\\CompositeExpression given\\.$#"
+      count: 1
+      path: %currentWorkingDirectory%/Classes/TcaDataGenerator/RecordFinder.php
